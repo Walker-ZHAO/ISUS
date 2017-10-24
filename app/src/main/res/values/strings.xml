@@ -1,0 +1,45 @@
+<resources>
+    <string name="app_name">ISUS</string>
+
+    <string name="get_permission_fail">禁止读写手机存储，可能会导致某些功能无法使用！！请在设置中赋予该权限！</string>
+    <string name="device_error">设别类型错误，请重新配置</string>
+    <string name="warning">警告</string>
+    <string name="warning_reset">重置后将会清除数据，您需要重新设置软件。</string>
+
+    <string name="config_title">配置</string>
+    <string name="config_device_id">设备ID</string>
+    <string name="config_cmdb">CMDB ID: %s</string>
+    <string name="config_sid">学校ID: %s</string>
+    <string name="config_server">服务器地址：%s</string>
+    <string name="config_comet">推送地址：%s</string>
+    <string name="config_device_type">设备类型：%s</string>
+
+    <string name="device_type_router">路由器</string>
+    <string name="device_type_server">服务器</string>
+    <string name="device_type_camera">摄像头</string>
+    <string name="device_type_attendance">宿舍考勤机</string>
+    <string name="device_type_sip_gateway">语音网关</string>
+    <string name="device_type_vision_phone">可视电话</string>
+    <string name="device_type_selfie">自拍机</string>
+    <string name="device_type_security">保安室警报</string>
+
+    <string name="external_face_server_int">人脸识别服务器内网IP</string>
+    <string name="external_face_server_ext">人脸识别服务器外网IP</string>
+    <string name="external_voip_gateway">语音网关</string>
+    <string name="external_voip_stun">语音网关转发设备</string>
+    <string name="external_self_lan_ip">设备内网IP</string>
+    <string name="external_self_wan_ip">设备外网IP</string>
+    <string name="external_m_key">密码</string>
+    <string name="external_s_key">密匙</string>
+
+    <string name="btn_reset">重置</string>
+
+    <string name="description_qr_image">设备ID二维码</string>
+
+    <string name="device_init_title">设别初始化</string>
+    <string name="device_init_school_id">请输入学校ID</string>
+    <string name="device_init_cmdb_id">请输入CMDB ID</string>
+
+    <string name="button_ok">确定</string>
+
+</resources>

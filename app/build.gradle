@@ -1,0 +1,74 @@
+apply plugin: 'com.android.library'
+
+apply plugin: 'kotlin-android'
+
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    compileSdkVersion COMPILE_SDK_VERSION
+    buildToolsVersion BUILD_TOOLS_VERSION
+    defaultConfig {
+//        applicationId "net.ischool.isus"
+        minSdkVersion MIN_SDK_VERSION
+        targetSdkVersion TARGET_SDK_VERSION
+        versionCode ISUS_VERSION_CODE
+        versionName ISUS_VERSION
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "com.android.support:appcompat-v7:$SUPPORT_LIB_VERSION"
+    implementation "com.android.support:design:$SUPPORT_LIB_VERSION"
+    implementation "com.android.support:support-v13:$SUPPORT_LIB_VERSION"
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    // Kotlin
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    implementation("org.jetbrains.anko:anko:$anko_version") {
+        exclude group: 'com.google.android', module: 'android'
+    }
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$reflect_version"
+    // RxKotlin
+    implementation 'io.reactivex.rxjava2:rxkotlin:2.1.0'
+    // RxAndroid
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    // RxLifecycle
+    implementation 'com.trello.rxlifecycle2:rxlifecycle-kotlin:2.1.0'
+    implementation 'com.trello.rxlifecycle2:rxlifecycle-components:2.1.0'
+    // RxBinding
+    implementation 'com.jakewharton.rxbinding2:rxbinding-kotlin:2.0.0'
+    // RxPreference
+    implementation 'com.f2prateek.rx.preferences2:rx-preferences:2.0.0-RC3'
+    // OKHttp3
+    implementation 'com.squareup.okhttp3:okhttp:3.9.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:3.9.0'
+    // Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+    implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
+    // Gson
+    implementation 'com.google.code.gson:gson:2.8.2'
+    // RxPermission
+    implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.4@aar'
+    // LibSuperUser
+    implementation 'eu.chainfire:libsuperuser:1.0.0.201704021214'
+    // Logger
+    implementation 'com.orhanobut:logger:2.1.1'
+    // Useful Extension
+    implementation 'com.github.Walker-ZHAO:Anke:0.0.5.3'
+}
+
+androidExtensions {
+    experimental = true
+}
