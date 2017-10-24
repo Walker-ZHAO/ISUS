@@ -1,3 +1,4 @@
+@file:JvmName("Constants")
 package net.ischool.isus
 
 /**
