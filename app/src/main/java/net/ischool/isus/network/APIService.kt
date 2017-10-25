@@ -1,6 +1,5 @@
 package net.ischool.isus.network
 
-import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import io.reactivex.Observable
@@ -60,14 +59,14 @@ interface APIService {
      */
     @FormUrlEncoded
     @POST("eqptapi/getConfig")
-    fun _getConfig(@Field("token") toke: String): Observable<Response<Result<Config>>>
+    fun _getConfig(@Field("token") token: String): Observable<Response<Result<Config>>>
 
     /**
      * 响应ping指令
      */
     @FormUrlEncoded
     @POST("eqptapi/pong")
-    fun _pong(@Field("token") toke: String): Observable<ResponseBody>
+    fun _pong(@Field("token") token: String): Observable<ResponseBody>
 
     /**
      * 获取服务端推送指令
@@ -132,25 +131,25 @@ interface APIService {
         }
 
         fun getConfig(): Observable<Response<Result<Config>>> {
-          return instance._getConfig(PreferenceManager.instance.getToken())
-                  .flatMap {
-                      val result = checkNotNull(it.body())
-                      if (result.errno == RESULT_OK) {
-                          with(PreferenceManager.instance) {
-                              if (getDeviceType() == result.data.type) {
-                                  setComet(result.data.comet)
-                                  setQR(result.data.QR)
-                                  setParameter(result.data.parameter)
-                              } else {
-                                  /** 设备类型不匹配，可能是CMDB ID配置错误，重置应用 **/
-                                  ISUS.instance.context.runOnUiThread { toast(getString(R.string.device_error)) }
-                                  Thread.sleep(2 * 1000)
-                                  CommandParser.instance.processCommand(CommandParser.instance.genCommand(ICommand.COMMAND_RESET, null))
-                              }
-                          }
-                      }
-                      Observable.just(it)
-                  }
+            return instance._getConfig(PreferenceManager.instance.getToken())
+                    .flatMap {
+                        val result = checkNotNull(it.body())
+                        if (result.errno == RESULT_OK) {
+                            with(PreferenceManager.instance) {
+                                if (getDeviceType() == result.data.type) {
+                                    setComet(result.data.comet)
+                                    setQR(result.data.QR)
+                                    setParameter(result.data.parameter)
+                                } else {
+                                    /** 设备类型不匹配，可能是CMDB ID配置错误，重置应用 **/
+                                    ISUS.instance.context.runOnUiThread { toast(getString(R.string.device_error)) }
+                                    Thread.sleep(2 * 1000)
+                                    CommandParser.instance.processCommand(CommandParser.instance.genCommand(ICommand.COMMAND_RESET, null))
+                                }
+                            }
+                        }
+                        Observable.just(it)
+                    }
         }
 
         fun pong() = instance._pong(PreferenceManager.instance.getToken())

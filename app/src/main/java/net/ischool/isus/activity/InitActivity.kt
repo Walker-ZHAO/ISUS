@@ -9,10 +9,10 @@ import com.trello.rxlifecycle2.components.support.RxAppCompatActivity
 import com.trello.rxlifecycle2.kotlin.bindUntilEvent
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_init.*
 import net.ischool.isus.R
 import net.ischool.isus.network.APIService
-import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.toast
 import java.util.concurrent.TimeUnit
 
@@ -38,28 +38,28 @@ class InitActivity : RxAppCompatActivity() {
 
     private fun init() {
         if (set_school_id.text.isEmpty()) {
-            toast("学校ID不能为空")
+            runOnUiThread { toast("学校ID不能为空") }
         } else if (set_cmdb_id.text.isEmpty()) {
-            toast("CMDB ID不能为空")
+            runOnUiThread { toast("CMDB ID不能为空") }
         } else {
-            doAsync {
-                APIService.initDevice("14", "1110599")
-                        .flatMap { APIService.getConfig() }
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribeBy(
-                                onNext = {
-                                    toast("设备初始化成功")
-                                    setResult(Activity.RESULT_OK)
-                                    finish()
-                                },
-                                onComplete = { Log.i("Walker", "onComplete")},
-                                onError = {
-                                    toast("设备初始化失败，请稍后重试")
-                                    setResult(Activity.RESULT_CANCELED)
-                                    finish()
-                                }
-                        )
-            }
+            APIService.initDevice(set_cmdb_id.text.toString(), set_school_id.text.toString())
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(Schedulers.io())
+                    .flatMap { APIService.getConfig() }
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeBy(
+                            onNext = {
+                                toast("设备初始化成功")
+                                setResult(Activity.RESULT_OK)
+                                finish()
+                            },
+                            onComplete = { Log.i("Walker", "onComplete") },
+                            onError = {
+                                toast("设备初始化失败，请稍后重试")
+                                setResult(Activity.RESULT_CANCELED)
+                                finish()
+                            }
+                    )
         }
     }
 }
