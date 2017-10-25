@@ -38,7 +38,9 @@ class CommandImpl constructor(private val context: Context) : ICommand {
      * 进入配置页
      */
     override fun config() {
-        context.startActivity<ConfigActivity>()
+        val intent = Intent(context, ConfigActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(intent)
     }
 
     /**
