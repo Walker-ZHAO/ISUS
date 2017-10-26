@@ -1,6 +1,9 @@
 package net.ischool.isus
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -35,13 +38,13 @@ class MainActivity : RxAppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        ISUS.init(this, DeviceType.CAMERA)
+        ISUS.init(this, DeviceType.SECURITY)
 
         RxView.clicks(init)
                 .debounce(500, TimeUnit.MILLISECONDS)
                 .bindUntilEvent(this, ActivityEvent.DESTROY)
                 .observeOn(Schedulers.io())
-                .flatMap { APIService.initDevice("14", "1110599").bindUntilEvent(this, ActivityEvent.DESTROY) }
+                .flatMap { APIService.initDevice("37", "1113730").bindUntilEvent(this, ActivityEvent.DESTROY) }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                         onNext = { Log.i("Walker", "${it.body()}") },
@@ -123,6 +126,7 @@ class MainActivity : RxAppCompatActivity() {
 //            }
         }
 
+        registerReceiver(register, IntentFilter(ACTION_COMMAND))
 //        Syslog.logI("Hello syslog")
     }
 
@@ -217,5 +221,25 @@ class MainActivity : RxAppCompatActivity() {
             e.printStackTrace()
         }
         return p;
+    }
+
+    val register = object : BroadcastReceiver() {
+        override fun onReceive(p0: Context?, p1: Intent?) {
+            val intent = checkNotNull(p1)
+            if (intent.action == ACTION_COMMAND) {
+                val cmd = intent.getStringExtra(EXTRA_CMD)
+                val version = intent.getLongExtra(EXTRA_VERSION, 0L)
+                val cmdbid = intent.getStringExtra(EXTRA_CMDB_ID)
+                val args = intent.getBundleExtra(EXTRA_ARGS)
+                val type = args.getString("type")
+                val content = args.getString("content")
+
+                Log.i("Walker", cmd)
+                Log.i("Walker", "$version")
+                Log.i("Walker", cmdbid)
+                Log.i("Walker", type)
+                Log.i("Walker", content)
+            }
+        }
     }
 }

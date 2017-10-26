@@ -11,6 +11,10 @@ import net.ischool.isus.network.callback.StringCallback
 import okhttp3.Request
 import org.jetbrains.anko.startActivity
 import java.io.IOException
+import android.support.v4.content.ContextCompat.startActivity
+import android.provider.Settings;
+
+
 
 /**
  * Description
@@ -88,5 +92,14 @@ class CommandImpl constructor(private val context: Context) : ICommand {
                 }
             })
         }
+    }
+
+    /**
+     * 进入系统设置页
+     */
+    override fun setting() {
+        val intent = Intent(Settings.ACTION_SETTINGS)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(intent)
     }
 }

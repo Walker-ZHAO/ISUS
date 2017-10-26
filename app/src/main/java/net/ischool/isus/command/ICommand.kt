@@ -18,6 +18,7 @@ interface ICommand {
         val COMMAND_REBOOT  =   "reboot"
         val COMMAND_QUIT    =   "quit"
         val COMMAND_UPDATE  =   "update"
+        val COMMAND_SETTING =   "setting"
     }
 
     /**
@@ -49,6 +50,11 @@ interface ICommand {
      * 更新
      */
     fun update(url: String?)
+
+    /**
+     * 进入设置页
+     */
+    fun setting()
 
     /**
      * 执行cmd命令

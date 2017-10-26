@@ -27,6 +27,7 @@ class CommandParser private constructor(context: Context){
         commandMap.put(ICommand.COMMAND_REBOOT, 201708)
         commandMap.put(ICommand.COMMAND_QUIT, 201708)
         commandMap.put(ICommand.COMMAND_UPDATE, 201708)
+        commandMap.put(ICommand.COMMAND_SETTING, 201708)
     }
 
     companion object {
@@ -45,6 +46,7 @@ class CommandParser private constructor(context: Context){
                 ICommand.COMMAND_REBOOT -> processor.reboot()
                 ICommand.COMMAND_QUIT -> processor.quit()
                 ICommand.COMMAND_UPDATE -> processor.update(command.args["url"])
+                ICommand.COMMAND_SETTING -> processor.setting()
             }
         } else {
             // 广播无法处理的command
