@@ -110,4 +110,6 @@ class PreferenceManager private constructor(context: Context, deviceType: Int){
     fun getEXSelfSKey() = getParameter()["selfSKey"]
     /** 远程日志服务器地址（域名或IP） **/
     fun getSyslog() = getParameter()["syslog"]
+    /** 学校名称（校门门卫警报器） **/
+    fun getSchoolName() = getParameter()["schoolName"]
 }
