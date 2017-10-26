@@ -23,3 +23,6 @@ val EXTRA_ARGS = "args"
 
 // 广播的command的action
 val ACTION_COMMAND = "net.ischool.isus.command"
+
+// Syslog 的 UDP 端口
+val UDP_PORT = 514

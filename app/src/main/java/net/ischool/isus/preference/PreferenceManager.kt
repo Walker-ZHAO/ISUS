@@ -108,4 +108,6 @@ class PreferenceManager private constructor(context: Context, deviceType: Int){
     fun getEXSelfMKey() = getParameter()["selfMKey"]
     /** 用于API签名的密钥**/
     fun getEXSelfSKey() = getParameter()["selfSKey"]
+    /** 远程日志服务器地址（域名或IP） **/
+    fun getSyslog() = getParameter()["syslog"]
 }

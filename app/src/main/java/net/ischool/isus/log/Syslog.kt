@@ -5,6 +5,7 @@ import android.os.Process
 import android.util.TimeUtils
 import com.walker.anke.framework.processName
 import net.ischool.isus.ISUS
+import net.ischool.isus.UDP_PORT
 import net.ischool.isus.preference.PreferenceManager
 import org.jetbrains.anko.activityManager
 import org.jetbrains.anko.doAsync
@@ -25,8 +26,13 @@ import java.util.*
 class Syslog {
     companion object {
 
-        private val socket =  DatagramSocket()
-        private val server = InetAddress.getByName("192.168.0.10")
+        private val socket: DatagramSocket by lazy { DatagramSocket() }
+        private val server: InetAddress by lazy {
+            val host = with(PreferenceManager.instance) {
+                getSyslog() ?: getServer()
+            }
+            InetAddress.getByName(host)
+        }
 
         private val PRI_ERROR = 155
         private val PRI_NOTICE = 157
@@ -46,21 +52,21 @@ class Syslog {
         @JvmStatic fun logE(message: String) {
             doAsync {
                 val log = createLog(PRI_ERROR, message).toByteArray()
-                socket.send(DatagramPacket(log, log.size, server, 514))
+                socket.send(DatagramPacket(log, log.size, server, UDP_PORT))
             }
         }
 
         @JvmStatic fun logN(message: String) {
             doAsync {
                 val log = createLog(PRI_NOTICE, message).toByteArray()
-                socket.send(DatagramPacket(log, log.size, server, 514))
+                socket.send(DatagramPacket(log, log.size, server, UDP_PORT))
             }
         }
 
         @JvmStatic fun logI(message: String) {
             doAsync {
                 val log = createLog(PRI_INFO, message).toByteArray()
-                socket.send(DatagramPacket(log, log.size, server, 514))
+                socket.send(DatagramPacket(log, log.size, server, UDP_PORT))
             }
         }
     }
