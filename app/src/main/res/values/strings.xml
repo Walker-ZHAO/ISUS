@@ -11,7 +11,7 @@
     <string name="config_cmdb">CMDB ID: %s</string>
     <string name="config_sid">学校ID: %s</string>
     <string name="config_server">服务器地址：%s</string>
-    <string name="config_comet">推送地址：%s</string>
+    <string name="config_comet">推送地址：</string>
     <string name="config_device_type">设备类型：%s</string>
 
     <string name="device_type_router">路由器</string>
@@ -23,6 +23,8 @@
     <string name="device_type_selfie">自拍机</string>
     <string name="device_type_security">保安室警报</string>
 
+    <string name="external_syslog">Log发送地址</string>
+    <string name="external_school_name">学校名</string>
     <string name="external_face_server_int">人脸识别服务器内网IP</string>
     <string name="external_face_server_ext">人脸识别服务器外网IP</string>
     <string name="external_voip_gateway">语音网关</string>

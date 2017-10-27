@@ -32,13 +32,15 @@ class ConfigActivity : AppCompatActivity() {
         text_cmdbid.text = getString(R.string.config_cmdb, PreferenceManager.instance.getCMDB())
         text_school_id.text = getString(R.string.config_sid, PreferenceManager.instance.getSchoolId())
         text_server.text = getString(R.string.config_server, "${PreferenceManager.instance.getProtocal()}://${PreferenceManager.instance.getServer()}")
-        text_comet.text = getString(R.string.config_comet, PreferenceManager.instance.getComet())
+        text_comet_title.text = getString(R.string.config_comet)
+        text_comet.text = PreferenceManager.instance.getComet()
         text_device.text = getString(R.string.config_device_type, DeviceType.getDeviceName(PreferenceManager.instance.getDeviceType()))
 
         val builder = StringBuilder()
         val map = PreferenceManager.instance.getParameter()
         for ( (key, value) in map ) {
-            builder.append("${ExternalParameter.getEXPName(key)}：$value \n")
+            val title = ExternalParameter.getEXPName(key)?:key
+            builder.append("$title：$value \n")
         }
         text_external.text = builder.toString()
 

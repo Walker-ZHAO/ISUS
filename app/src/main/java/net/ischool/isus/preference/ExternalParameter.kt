@@ -12,6 +12,8 @@ import net.ischool.isus.R
  */
 class ExternalParameter {
     companion object {
+        val EXP_SYSLOG              = "syslog"          /** syslog上传地址 **/
+        val EXP_SCHOOL_NAME         = "schoolName"      /** 学校名 **/
         val EXP_FACE_SERVICE_INT    = "faceServerInt"   /** 人脸识别服务器内网IP **/
         val EXP_FACE_SERVICE_EXT    = "faceServerExt"   /** 人脸识别服务器公网IP **/
         val EXP_VOIP_GATEWAY        = "VoIPGW"          /** 语音网关 **/
@@ -26,8 +28,10 @@ class ExternalParameter {
          *
          * @param key   额外参数key字段
          */
-        fun getEXPName(key: String): String = with(ISUS.instance.context) {
+        fun getEXPName(key: String): String? = with(ISUS.instance.context) {
             when (key) {
+                EXP_SYSLOG              -> ISUS.instance.context.getString(R.string.external_syslog)
+                EXP_SCHOOL_NAME         -> ISUS.instance.context.getString(R.string.external_school_name)
                 EXP_FACE_SERVICE_INT    -> ISUS.instance.context.getString(R.string.external_face_server_int)
                 EXP_FACE_SERVICE_EXT    -> getString(R.string.external_face_server_ext)
                 EXP_VOIP_GATEWAY        -> getString(R.string.external_voip_gateway)
@@ -36,7 +40,7 @@ class ExternalParameter {
                 EXP_SELF_WAN_IP         -> getString(R.string.external_self_wan_ip)
                 EXP_SELF_M_KEY          -> getString(R.string.external_m_key)
                 EXP_SELF_S_KEY          -> getString(R.string.external_s_key)
-                else -> ""
+                else -> null
             }
         }
     }
