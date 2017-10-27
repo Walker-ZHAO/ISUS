@@ -17,6 +17,7 @@ import com.trello.rxlifecycle2.kotlin.bindUntilEvent
 import com.walker.anke.framework.disableBar
 import com.walker.anke.framework.disableNatigation
 import com.walker.anke.framework.disableNotificationBar
+import com.walker.anke.framework.reboot
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -27,6 +28,7 @@ import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import org.jetbrains.anko.powerManager
 import java.io.*
 import java.util.concurrent.TimeUnit
 
@@ -93,24 +95,27 @@ class MainActivity : RxAppCompatActivity() {
 
         RxView.clicks(reset)
                 .subscribeBy {
-                    APIService.downloadAsync("http://download.i-school.net/apk/ischool_teacher_8.8.0.apk", "/sdcard", object : StringCallback {
-                        override fun onResponse(string: String) {
-                            Log.i("Walker", string)
-                        }
-
-                        override fun onFailure(request: Request, e: IOException) {
-                            Log.i("Walker", e.toString())
-                        }
-                    })
+//                    APIService.downloadAsync("http://download.i-school.net/apk/ischool_teacher_8.8.0.apk", "/sdcard", object : StringCallback {
+//                        override fun onResponse(string: String) {
+//                            Log.i("Walker", string)
+//                        }
+//
+//                        override fun onFailure(request: Request, e: IOException) {
+//                            Log.i("Walker", e.toString())
+//                        }
+//                    })
 //                    val strs = Shell.SU.run("0 echo -BOC- id")
 //                    Log.i("Walker", "$strs")
 //                    if (Shell.SU.available())
 //                        Shell.SU.run("pm install -r /sdcard/app-debug.apk")
-//                    val p = execRuntimeProcess("su 0 echo -BOC- id")
+//                    val p = execRuntimeProcess("su 0 reboot")
 //                    val cn = ComponentName("com.studio.baoxu.gaofa", "com.studio.baoxu.gaofa.activity.LoginActivity");
 //                    val intent = Intent()
 //                    intent.component = cn
 //                    startActivity(intent)
+
+//                    reboot(null)
+
                 }
 
         btn_start.setOnClickListener {
@@ -132,7 +137,7 @@ class MainActivity : RxAppCompatActivity() {
         registerReceiver(register, IntentFilter(ACTION_COMMAND))
 //        Syslog.logI("Hello syslog")
 
-        disableBar()
+//        disableBar()
 
     }
 

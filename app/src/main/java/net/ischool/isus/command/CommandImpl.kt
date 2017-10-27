@@ -13,7 +13,7 @@ import org.jetbrains.anko.startActivity
 import java.io.IOException
 import android.support.v4.content.ContextCompat.startActivity
 import android.provider.Settings;
-
+import com.walker.anke.framework.reboot
 
 
 /**
@@ -57,11 +57,10 @@ class CommandImpl constructor(private val context: Context) : ICommand {
     /**
      * 设备重启
      *
-     * Note：需要设备已root，并且授予应用root权限
+     * Note：需要系统签名
      */
     override fun reboot() {
-        if (Shell.SU.available())
-            Shell.SU.run("reboot")
+        context.reboot(null)
     }
 
     /**
