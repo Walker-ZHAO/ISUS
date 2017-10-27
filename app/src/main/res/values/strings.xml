@@ -38,7 +38,7 @@
 
     <string name="description_qr_image">设备ID二维码</string>
 
-    <string name="device_init_title">设别初始化</string>
+    <string name="device_init_title">设备初始化</string>
     <string name="device_init_school_id">请输入学校ID</string>
     <string name="device_init_cmdb_id">请输入CMDB ID</string>
 
