@@ -14,6 +14,7 @@ import com.jakewharton.rxbinding2.view.RxView
 import com.trello.rxlifecycle2.android.ActivityEvent
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity
 import com.trello.rxlifecycle2.kotlin.bindUntilEvent
+import com.walker.anke.framework.disableBar
 import com.walker.anke.framework.disableNatigation
 import com.walker.anke.framework.disableNotificationBar
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -131,8 +132,7 @@ class MainActivity : RxAppCompatActivity() {
         registerReceiver(register, IntentFilter(ACTION_COMMAND))
 //        Syslog.logI("Hello syslog")
 
-        disableNotificationBar()
-        disableNatigation()
+        disableBar()
 
     }
 
