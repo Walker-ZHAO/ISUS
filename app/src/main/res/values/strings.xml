@@ -5,6 +5,7 @@
     <string name="device_error">设别类型错误，请重新配置</string>
     <string name="warning">警告</string>
     <string name="warning_reset">重置后将会清除数据，您需要重新设置软件。</string>
+    <string name="init_dialog_title">正在初始化...</string>
 
     <string name="config_title">配置</string>
     <string name="config_device_id">设备ID</string>

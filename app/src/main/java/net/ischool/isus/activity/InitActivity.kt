@@ -1,6 +1,7 @@
 package net.ischool.isus.activity
 
 import android.app.Activity
+import android.app.ProgressDialog
 import android.os.Bundle
 import android.util.Log
 import com.jakewharton.rxbinding2.view.RxView
@@ -13,6 +14,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_init.*
 import net.ischool.isus.R
 import net.ischool.isus.network.APIService
+import org.jetbrains.anko.indeterminateProgressDialog
 import org.jetbrains.anko.toast
 import java.util.concurrent.TimeUnit
 
@@ -37,6 +39,10 @@ class InitActivity : RxAppCompatActivity() {
     }
 
     private fun init() {
+
+        var dialog: ProgressDialog? = null
+        runOnUiThread { dialog = indeterminateProgressDialog(getString(R.string.init_dialog_title)) { setCancelable(false) } }
+
         if (set_school_id.text.isEmpty()) {
             runOnUiThread { toast("学校ID不能为空") }
         } else if (set_cmdb_id.text.isEmpty()) {
@@ -49,12 +55,14 @@ class InitActivity : RxAppCompatActivity() {
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeBy(
                             onNext = {
+                                dialog?.dismiss()
                                 toast("设备初始化成功")
                                 setResult(Activity.RESULT_OK)
                                 finish()
                             },
                             onComplete = { Log.i("Walker", "onComplete") },
                             onError = {
+                                dialog?.dismiss()
                                 toast("设备初始化失败，请稍后重试")
                                 setResult(Activity.RESULT_CANCELED)
                                 finish()

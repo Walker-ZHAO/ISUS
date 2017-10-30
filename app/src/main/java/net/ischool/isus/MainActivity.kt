@@ -1,5 +1,6 @@
 package net.ischool.isus
 
+import android.app.ProgressDialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -14,21 +15,15 @@ import com.jakewharton.rxbinding2.view.RxView
 import com.trello.rxlifecycle2.android.ActivityEvent
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity
 import com.trello.rxlifecycle2.kotlin.bindUntilEvent
-import com.walker.anke.framework.disableBar
-import com.walker.anke.framework.disableNatigation
-import com.walker.anke.framework.disableNotificationBar
-import com.walker.anke.framework.reboot
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import net.ischool.isus.network.APIService
-import net.ischool.isus.network.callback.StringCallback
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import org.jetbrains.anko.powerManager
 import java.io.*
 import java.util.concurrent.TimeUnit
 
