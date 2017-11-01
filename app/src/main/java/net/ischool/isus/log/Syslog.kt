@@ -1,15 +1,11 @@
 package net.ischool.isus.log
 
-import android.app.ActivityManager
 import android.os.Process
-import android.util.TimeUtils
-import com.walker.anke.framework.processName
 import net.ischool.isus.ISUS
 import net.ischool.isus.UDP_PORT
 import net.ischool.isus.preference.PreferenceManager
 import org.jetbrains.anko.activityManager
 import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
 import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
@@ -38,14 +34,14 @@ class Syslog {
         private val PRI_NOTICE = 157
         private val PRI_INFO = 158
 
-        private fun createLog(rpi: Int = PRI_INFO, message: String): String {
+        private fun createLog(pri: Int = PRI_INFO, message: String): String {
             val ts = SimpleDateFormat("MMM dd HH:mm:ss", Locale.ENGLISH).format(Date())
             return with(ISUS.instance.context) {
                 val processName = activityManager.runningAppProcesses
                         .filter { it.pid ==  Process.myPid() }
                         .map { it.processName }
                         .firstOrNull()?:"null"
-                "<$rpi>$ts $processName[${Process.myPid()}]: CMDBID=${PreferenceManager.instance.getCMDB()}: $message"
+                "<$pri>$ts $processName[${Process.myPid()}]: CMDBID=${PreferenceManager.instance.getCMDB()}: $message"
             }
         }
 
