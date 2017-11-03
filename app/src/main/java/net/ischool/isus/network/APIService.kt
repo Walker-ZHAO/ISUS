@@ -125,8 +125,10 @@ interface APIService {
                                 setServer(result.data.APIServer)
                                 setProtocal(result.data.protocal)
                             }
+                            Observable.just(it)
+                        } else {
+                            Observable.error(Throwable(result.error))
                         }
-                        Observable.just(it)
                     }
         }
 
@@ -147,8 +149,10 @@ interface APIService {
                                     CommandParser.instance.processCommand(CommandParser.instance.genCommand(ICommand.COMMAND_RESET, null))
                                 }
                             }
+                            Observable.just(it)
+                        } else {
+                            Observable.error(Throwable(result.error))
                         }
-                        Observable.just(it)
                     }
         }
 
