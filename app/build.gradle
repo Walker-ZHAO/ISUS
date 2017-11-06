@@ -48,8 +48,8 @@ dependencies {
     // RxAndroid
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
     // RxLifecycle
-    implementation 'com.trello.rxlifecycle2:rxlifecycle-kotlin:2.1.0'
-    implementation 'com.trello.rxlifecycle2:rxlifecycle-components:2.1.0'
+    implementation 'com.trello.rxlifecycle2:rxlifecycle-kotlin:2.2.0'
+    implementation 'com.trello.rxlifecycle2:rxlifecycle-components:2.2.0'
     // RxBinding
     implementation 'com.jakewharton.rxbinding2:rxbinding-kotlin:2.0.0'
     // RxPreference

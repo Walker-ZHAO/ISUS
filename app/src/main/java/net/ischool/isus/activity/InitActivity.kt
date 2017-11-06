@@ -41,13 +41,13 @@ class InitActivity : RxAppCompatActivity() {
     private fun init() {
 
         var dialog: ProgressDialog? = null
-        runOnUiThread { dialog = indeterminateProgressDialog(getString(R.string.init_dialog_title)) { setCancelable(false) } }
 
         if (set_school_id.text.isEmpty()) {
             runOnUiThread { toast("学校ID不能为空") }
         } else if (set_cmdb_id.text.isEmpty()) {
             runOnUiThread { toast("CMDB ID不能为空") }
         } else {
+            runOnUiThread { dialog = indeterminateProgressDialog(getString(R.string.init_dialog_title)) { setCancelable(false) } }
             APIService.initDevice(set_cmdb_id.text.toString(), set_school_id.text.toString())
                     .subscribeOn(Schedulers.io())
                     .observeOn(Schedulers.io())
