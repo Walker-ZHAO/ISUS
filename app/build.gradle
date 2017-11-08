@@ -65,8 +65,6 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.2'
     // RxPermission
     implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.4@aar'
-    // LibSuperUser
-    implementation 'eu.chainfire:libsuperuser:1.0.0.201704021214'
     // Logger
     implementation 'com.orhanobut:logger:2.1.1'
     // Useful Extension

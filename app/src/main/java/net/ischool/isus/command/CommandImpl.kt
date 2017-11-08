@@ -3,7 +3,6 @@ package net.ischool.isus.command
 import android.content.Context
 import android.content.Intent
 import com.orhanobut.logger.Logger
-import eu.chainfire.libsuperuser.Shell
 import io.reactivex.schedulers.Schedulers
 import net.ischool.isus.activity.ConfigActivity
 import net.ischool.isus.network.APIService
@@ -14,6 +13,7 @@ import java.io.IOException
 import android.support.v4.content.ContextCompat.startActivity
 import android.provider.Settings;
 import com.walker.anke.framework.reboot
+import net.ischool.isus.log.Syslog
 
 
 /**
@@ -76,18 +76,18 @@ class CommandImpl constructor(private val context: Context) : ICommand {
     /**
      * 静默安装
      *
-     * Note：需要设备已root，并且授予应用root权限
+     * Note：需要系统签名
      */
     override fun update(url: String?) {
         url?.let {
             APIService.downloadAsync(it, "/sdcard", object : StringCallback {
                 override fun onResponse(string: String) {
-                    if (Shell.SU.available())
-                        Shell.SU.run("pm install -r $string")
+                    execRuntimeProcess("pm install -r $string");
                 }
 
                 override fun onFailure(request: Request, e: IOException) {
                     Logger.w(e.message)
+                    Syslog.logE("Update file download failure")
                 }
             })
         }
