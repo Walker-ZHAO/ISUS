@@ -1,19 +1,22 @@
 package net.ischool.isus.command
 
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Process
 import com.orhanobut.logger.Logger
 import io.reactivex.schedulers.Schedulers
 import net.ischool.isus.activity.ConfigActivity
 import net.ischool.isus.network.APIService
 import net.ischool.isus.network.callback.StringCallback
 import okhttp3.Request
-import org.jetbrains.anko.startActivity
 import java.io.IOException
-import android.support.v4.content.ContextCompat.startActivity
 import android.provider.Settings;
 import com.walker.anke.framework.reboot
 import net.ischool.isus.log.Syslog
+import org.jetbrains.anko.alarmManager
+import java.io.File
 
 
 /**
@@ -51,7 +54,16 @@ class CommandImpl constructor(private val context: Context) : ICommand {
      * 重置
      */
     override fun reset() {
-        execRuntimeProcess("pm clear ${context.packageName}");
+        val appDir = File(context.cacheDir.parent)
+        if (appDir.exists()) {
+            appDir.list()
+                    .filter { it != "lib" }
+                    .forEach {
+                        deleteDir(File(appDir, it))
+                    }
+            launchHome(5 * 1000)
+            Process.killProcess(Process.myPid())
+        }
     }
 
     /**
@@ -82,6 +94,7 @@ class CommandImpl constructor(private val context: Context) : ICommand {
         url?.let {
             APIService.downloadAsync(it, "/sdcard", object : StringCallback {
                 override fun onResponse(string: String) {
+                    launchHome(120 * 1000)
                     execRuntimeProcess("pm install -r $string");
                 }
 
@@ -100,5 +113,33 @@ class CommandImpl constructor(private val context: Context) : ICommand {
         val intent = Intent(Settings.ACTION_SETTINGS)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         context.startActivity(intent)
+    }
+
+    /**
+     * 延时进入主目录
+     * @param triggerAtMillis: 延迟时间，单位毫秒
+     *
+     */
+    fun launchHome(triggerAtMillis: Long) {
+        val startActivity = Intent(Intent.ACTION_MAIN)
+        startActivity.addCategory(Intent.CATEGORY_HOME)
+        startActivity.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED)
+        val pendingIntent = PendingIntent.getActivity(context, 123456, startActivity, PendingIntent.FLAG_CANCEL_CURRENT)
+        context.alarmManager.set(AlarmManager.RTC, System.currentTimeMillis() + triggerAtMillis, pendingIntent)
+    }
+
+    /**
+     * 删除指定目录下的所有文件
+     * @param dir: 指定的目录文件
+     */
+    private fun deleteDir(dir: File): Boolean {
+        if (dir.isDirectory) {
+            dir.list().forEach {
+                val success = deleteDir(File(dir, it))
+                if (!success)
+                    return false
+            }
+        }
+        return dir.delete()
     }
 }

@@ -1,7 +1,5 @@
 package net.ischool.isus.command
 
-import java.io.IOException
-
 /**
  * 命令接口
  *
@@ -63,7 +61,8 @@ interface ICommand {
         var p: Process? = null
         try {
             p = Runtime.getRuntime().exec(cmd);
-        } catch (e: IOException) {
+            p?.waitFor()
+        } catch (e: Exception) {
             e.printStackTrace()
         }
         return p;
