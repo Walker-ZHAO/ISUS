@@ -20,7 +20,7 @@ import java.io.File
 
 
 /**
- * Description
+ * 具体命令实现
  *
  * Author: Walker
  * Email: zhaocework@gmail.com
@@ -61,7 +61,6 @@ class CommandImpl constructor(private val context: Context) : ICommand {
                     .forEach {
                         deleteDir(File(appDir, it))
                     }
-            launchHome(5 * 1000)
             Process.killProcess(Process.myPid())
         }
     }
@@ -94,7 +93,6 @@ class CommandImpl constructor(private val context: Context) : ICommand {
         url?.let {
             APIService.downloadAsync(it, "/sdcard", object : StringCallback {
                 override fun onResponse(string: String) {
-                    launchHome(120 * 1000)
                     execRuntimeProcess("pm install -r $string");
                 }
 
