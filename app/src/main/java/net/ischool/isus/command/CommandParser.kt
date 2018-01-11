@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import net.ischool.isus.*
+import net.ischool.isus.log.Syslog
 import net.ischool.isus.model.Command
 import net.ischool.isus.preference.PreferenceManager
 
@@ -38,6 +39,7 @@ class CommandParser private constructor(context: Context){
      * 命令处理器
      */
     fun processCommand(command: Command) {
+        Syslog.logI("ISUS process command: $command")
         if (canProcess(command)) {
             when (command.cmd.toLowerCase()) {
                 ICommand.COMMAND_PING -> processor.ping()
