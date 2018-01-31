@@ -38,13 +38,13 @@ class MainActivity : RxAppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        ISUS.init(this, DeviceType.VISION_PHONE)
+        ISUS.init(this, DeviceType.SECURITY)
 
         RxView.clicks(init)
                 .debounce(500, TimeUnit.MILLISECONDS)
                 .bindUntilEvent(this, ActivityEvent.DESTROY)
                 .observeOn(Schedulers.io())
-                .flatMap { APIService.initDevice("15", "1110599").bindUntilEvent(this, ActivityEvent.DESTROY) }
+                .flatMap { APIService.initDevice("58", "1110599").bindUntilEvent(this, ActivityEvent.DESTROY) }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                         onNext = { Log.i("Walker", "${it.body()}") },
@@ -59,7 +59,10 @@ class MainActivity : RxAppCompatActivity() {
                 .flatMap { APIService.getConfig().bindUntilEvent(this, ActivityEvent.DESTROY) }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
-                        onNext = { Log.i("Walker", "${it.body()}") },
+                        onNext = {
+                            Log.i("Walker", "${it.body()}")
+                            ISUS.instance.startService()
+                        },
                         onComplete = {Log.i("Walker", "onComplete")},
                         onError = { Log.e("Walker", "$it") }
                 )

@@ -70,7 +70,7 @@ class CommandParser private constructor(context: Context){
      */
     private fun canProcess(command: Command): Boolean {
         val cmdbid = PreferenceManager.instance.getCMDB()
-        val version = commandMap[command.cmd.toLowerCase()] ?: 0
+        val version = commandMap[command.cmd.toLowerCase()] ?: -1
         if (version >= command.cmd_version && cmdbid == command.cmdbid) {
             return true
         }
