@@ -10,6 +10,7 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import net.ischool.isus.command.CommandParser
 import net.ischool.isus.network.APIService
+import net.ischool.isus.network.interceptor.CacheInterceptor
 import java.net.ProtocolException
 import java.util.concurrent.TimeUnit
 
@@ -73,11 +74,14 @@ class ISUSService : Service() {
                                 if (isRunning) {
                                     // 408 超过最大尝试次数，OkHttp会抛出ProtocolException，此情况应立即重试
                                     // 返回无数据的情况，也应该立即重试
-                                    // 其他情况等待5s后，再进行连接
+                                    // 其他情况等待5s后，再进行连接（并且需要清空HTTP的缓存头）
                                     if (it is ProtocolException || it is NullPointerException)
                                         Observable.timer(0, TimeUnit.MILLISECONDS)
-                                    else
+                                    else {
+                                        CacheInterceptor.etag = ""
+                                        CacheInterceptor.last_modified = ""
                                         Observable.timer(5, TimeUnit.SECONDS)
+                                    }
                                 } else
                                     Observable.error<Throwable>(Throwable("Finish"))
                             }

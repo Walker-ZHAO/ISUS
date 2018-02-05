@@ -76,10 +76,10 @@ class PreferenceManager private constructor(context: Context, deviceType: Int){
     fun getToken() = _token.get()
     fun getServer() = _serverAddress.get()
     fun getProtocal() = _protocal.get()
-    fun getDeviceType() = _type.get().toInt()
+    fun getDeviceType() = _type.get()
     fun getComet() = _comet.get()
     fun getQR() = _base64QR.get()
-    fun getParameter() = Gson().fromJson<Map<String, String>>(_parameter.get())
+    fun getParameter() = Gson().fromJson<Map<String, String>>(_parameter.get())?:HashMap()
     fun getURL() = "${_protocal.get()}://${_serverAddress.get()}/"
 
     fun setCMDB(cmdb: String) = _cmdbId.set(cmdb)
@@ -87,7 +87,7 @@ class PreferenceManager private constructor(context: Context, deviceType: Int){
     fun setToken(t: String) = _token.set(t)
     fun setServer(server: String) = _serverAddress.set(server)
     fun setProtocal(pro: String) = _protocal.set(pro)
-    fun setDeviceType(deviceType: Int) = _type.set(deviceType)
+    private fun setDeviceType(deviceType: Int) = _type.set(deviceType)
     fun setComet(address: String) = _comet.set(address)
     fun setQR(qr: String) = _base64QR.set(qr)
     fun setParameter(param: Map<String, String>) = _parameter.set(Gson().toJson(param))
@@ -112,4 +112,10 @@ class PreferenceManager private constructor(context: Context, deviceType: Int){
     fun getSyslog() = getParameter()["syslog"]
     /** 学校名称 **/
     fun getSchoolName() = getParameter()["schoolName"]
+    /** 学校Logo **/
+    fun getSchoolLogo() = getParameter()["schoolLogo"]
+    /** 班级名称 **/
+    fun getClassName() = getParameter()["className"]
+    /** 班级ID **/
+    fun getClassId() = getParameter()["classId"]
 }

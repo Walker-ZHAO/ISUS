@@ -22,6 +22,8 @@
     <string name="device_type_sip_gateway">语音网关</string>
     <string name="device_type_vision_phone">可视电话</string>
     <string name="device_type_selfie">自拍机</string>
+    <string name="device_type_gate">闸机</string>
+    <string name="device_type_badge">班牌</string>
     <string name="device_type_security">保安室警报</string>
 
     <string name="external_syslog">Log发送地址</string>

@@ -16,6 +16,8 @@ class DeviceType {
         @JvmField val SIP_GATEWAY  = 7     /** 语音网关 **/
         @JvmField val VISION_PHONE = 8     /** 可视电话 **/
         @JvmField val SELFIE       = 9     /** 自拍机 **/
+        @JvmField val GATE         = 10    /** 闸机 **/
+        @JvmField val BADGE        = 11    /** 班牌 **/
         @JvmField val SECURITY     = 12    /** 保安室警报 **/
 
         /**
@@ -32,6 +34,8 @@ class DeviceType {
                 SIP_GATEWAY -> getString(R.string.device_type_sip_gateway)
                 VISION_PHONE -> getString(R.string.device_type_vision_phone)
                 SELFIE -> getString(R.string.device_type_selfie)
+                GATE -> getString(R.string.device_type_gate)
+                BADGE -> getString(R.string.device_type_badge)
                 SECURITY -> getString(R.string.device_type_security)
                 else -> ""
             }
