@@ -17,8 +17,8 @@ import okhttp3.Response
 class CacheInterceptor : Interceptor {
 
     companion object {
-        var etag: String = ""
-        var last_modified = ""
+        private var etag: String = ""
+        private var last_modified = ""
     }
 
     override fun intercept(chain: Interceptor.Chain?): Response {
@@ -39,8 +39,25 @@ class CacheInterceptor : Interceptor {
         }
 
         val response = safeChain.proceed(builder.build())
-        etag = response.header("Etag") ?: ""
-        last_modified = response.header("Last-Modified") ?: ""
+
+        /**
+         * 当次返回200->缓存返回的etag与modified头，作为下次访问的请求头
+         * 当次返回408->不缓存的etag与modified头，下次访问继续使用之前缓存的
+         * 当次返回其他->清空之前缓存的etag与modified头
+         */
+        if (originalRequest.url().toString().contains("comet")) {
+            when (response.code()) {
+                200 -> {
+                    etag = response.header("Etag") ?: ""
+                    last_modified = response.header("Last-Modified") ?: ""
+                }
+                408 -> { }
+                else -> {
+                    etag = ""
+                    last_modified = ""
+                }
+            }
+        }
         return response
 
     }

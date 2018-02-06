@@ -74,12 +74,9 @@ class ISUSService : Service() {
                                 if (isRunning) {
                                     // 408 超过最大尝试次数，OkHttp会抛出ProtocolException，此情况应立即重试
                                     // 返回无数据的情况，也应该立即重试
-                                    // 其他情况等待5s后，再进行连接（并且需要清空HTTP的缓存头）
                                     if (it is ProtocolException || it is NullPointerException)
                                         Observable.timer(0, TimeUnit.MILLISECONDS)
                                     else {
-                                        CacheInterceptor.etag = ""
-                                        CacheInterceptor.last_modified = ""
                                         Observable.timer(5, TimeUnit.SECONDS)
                                     }
                                 } else
