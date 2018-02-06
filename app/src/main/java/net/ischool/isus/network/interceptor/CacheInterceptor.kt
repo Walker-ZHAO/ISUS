@@ -20,12 +20,11 @@ class CacheInterceptor : Interceptor {
         private var etag: String = ""
         private var last_modified = ""
     }
-
     override fun intercept(chain: Interceptor.Chain?): Response {
         val safeChain = checkNotNull(chain)
         val originalRequest = safeChain.request()
         val builder: Request.Builder = originalRequest.newBuilder()
-        if (originalRequest.url().toString().contains("comet")) {
+        if (isMsgUrl(originalRequest.url().toString())) {
             if (etag.isNotEmpty()) {
                 builder.header("If-None-Match", etag)
             } else {
@@ -45,7 +44,7 @@ class CacheInterceptor : Interceptor {
          * 当次返回408->不缓存的etag与modified头，下次访问继续使用之前缓存的
          * 当次返回其他->清空之前缓存的etag与modified头
          */
-        if (originalRequest.url().toString().contains("comet")) {
+        if (isMsgUrl(originalRequest.url().toString())) {
             when (response.code()) {
                 200 -> {
                     etag = response.header("Etag") ?: ""
@@ -59,6 +58,10 @@ class CacheInterceptor : Interceptor {
             }
         }
         return response
-
     }
+
+    /**
+     * 判断是否是轮训消息接口（通过端口号判断）
+     */
+    private fun isMsgUrl(url: String) = url.contains("1931") || url.contains("1932")
 }
