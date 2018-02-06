@@ -118,4 +118,6 @@ class PreferenceManager private constructor(context: Context, deviceType: Int){
     fun getClassName() = getParameter()["className"]
     /** 班级ID **/
     fun getClassId() = getParameter()["classId"]
+    /** 设备名称（CMDB代号） **/
+    fun getDeviceName() = getParameter()["deviceName"]
 }
