@@ -28,9 +28,13 @@ class CacheInterceptor : Interceptor {
         if (originalRequest.url().toString().contains("comet")) {
             if (etag.isNotEmpty()) {
                 builder.header("If-None-Match", etag)
+            } else {
+                builder.removeHeader("If-None-Match")
             }
             if (last_modified.isNotEmpty()) {
                 builder.header("If-Modified-Since", last_modified)
+            } else {
+                builder.removeHeader("If-Modified-Since")
             }
         }
 

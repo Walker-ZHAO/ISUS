@@ -38,13 +38,13 @@ class MainActivity : RxAppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        ISUS.init(this, DeviceType.SECURITY)
+        ISUS.init(this, DeviceType.VISION_PHONE)
 
         RxView.clicks(init)
                 .debounce(500, TimeUnit.MILLISECONDS)
                 .bindUntilEvent(this, ActivityEvent.DESTROY)
                 .observeOn(Schedulers.io())
-                .flatMap { APIService.initDevice("58", "1110599").bindUntilEvent(this, ActivityEvent.DESTROY) }
+                .flatMap { APIService.initDevice("62", "1110599").bindUntilEvent(this, ActivityEvent.DESTROY) }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                         onNext = { Log.i("Walker", "${it.body()}") },

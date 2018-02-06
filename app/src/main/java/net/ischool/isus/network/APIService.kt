@@ -2,6 +2,7 @@ package net.ischool.isus.network
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import io.reactivex.Observable
 import net.ischool.isus.*
 import net.ischool.isus.command.CommandParser
@@ -118,6 +119,7 @@ interface APIService {
                     .flatMap {
                         val result = checkNotNull(it.body())
                         if (result.errno == RESULT_OK) {
+                            Log.i("ISUS", "init: ${result.data}")
                             with(PreferenceManager.instance) {
                                 setCMDB(cmdbid)
                                 setSchoolId(sid)
@@ -137,6 +139,7 @@ interface APIService {
                     .flatMap {
                         val result = checkNotNull(it.body())
                         if (result.errno == RESULT_OK) {
+                            Log.i("ISUS", "config: ${result.data}")
                             with(PreferenceManager.instance) {
                                 if (getDeviceType() == result.data.type) {
                                     setComet(result.data.comet)
