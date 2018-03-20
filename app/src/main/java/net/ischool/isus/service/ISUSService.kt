@@ -9,6 +9,7 @@ import io.reactivex.Observable
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import net.ischool.isus.command.CommandParser
+import net.ischool.isus.log.Syslog
 import net.ischool.isus.network.APIService
 import net.ischool.isus.network.interceptor.CacheInterceptor
 import java.net.ProtocolException
@@ -87,11 +88,13 @@ class ISUSService : Service() {
                             val command = it.body()
                             if (command != null) {
                                 Log.i("Walker", "onNext: $command")
+                                Syslog.logI("getCommand Info: $command")
                                 CommandParser.instance.processCommand(command)
                             }
                         }, onError = {
                             Log.i("Walker", "onError: $it")
                             it.printStackTrace()
+                            Syslog.logE("getCommand Error: $it")
                         }, onComplete = {
                             Log.i("Walker", "onComplete")
                         })
