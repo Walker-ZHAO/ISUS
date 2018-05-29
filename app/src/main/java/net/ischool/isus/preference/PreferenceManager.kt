@@ -44,6 +44,10 @@ class PreferenceManager private constructor(context: Context, deviceType: Int){
         setDeviceType(deviceType)
     }
 
+    override fun toString(): String {
+        return "{CMDB ID : ${getCMDB()}, School ID : ${getSchoolId()}, Token : ${getToken()}, Server Address : ${getServer()}, Protocal : ${getProtocal()}, Type : ${getDeviceType()}, Comet : ${getComet()}, Parameter : ${_parameter.get()}}"
+    }
+
     companion object {
 
         @Volatile

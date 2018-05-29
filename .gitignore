@@ -3,15 +3,7 @@
 .DS_Store
 *.iml
 /.gradle
-/.idea/inspectionProfiles
-/.idea/libraries
-/.idea/modules
-/.idea/gradle.xml
-/.idea/modules.xml
-/.idea/tasks.xml
-/.idea/workspace.xml
-/.idea/misc.xml
-/.idea/dbnavigator.xml
+/.idea/
 /local.properties
 /captures
 .externalNativeBuild
