@@ -12,6 +12,7 @@ import android.speech.tts.TextToSpeech
 import android.support.v4.content.FileProvider
 import android.util.Log
 import com.jakewharton.rxbinding2.view.RxView
+import com.rabbitmq.client.*
 import com.trello.rxlifecycle2.android.ActivityEvent
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity
 import com.trello.rxlifecycle2.kotlin.bindUntilEvent
@@ -19,11 +20,14 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
+import net.ischool.isus.activity.InitActivity
 import net.ischool.isus.network.APIService
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
+import org.jetbrains.anko.doAsync
+import org.jetbrains.anko.startActivity
 import java.io.*
 import java.util.concurrent.TimeUnit
 
@@ -34,11 +38,17 @@ class MainActivity : RxAppCompatActivity() {
 
     var mSpeech: TextToSpeech? = null
 
+    val factory by lazy { ConnectionFactory() }
+
+    var connection: Connection? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         ISUS.init(this, DeviceType.VISION_PHONE)
+
+        init_view.setOnClickListener { startActivity<InitActivity>() }
 
         RxView.clicks(init)
                 .debounce(500, TimeUnit.MILLISECONDS)
@@ -130,6 +140,10 @@ class MainActivity : RxAppCompatActivity() {
 //            btn_stop.snack("Hello Android") {
 //                action("OK") { toast("Kotlin power!") }
 //            }
+        }
+
+        mq_test.setOnClickListener {
+            testMQ()
         }
 
         registerReceiver(register, IntentFilter(ACTION_COMMAND))
@@ -250,5 +264,62 @@ class MainActivity : RxAppCompatActivity() {
                 Log.i("Walker", content)
             }
         }
+    }
+
+    private fun testMQ() {
+        setUpConnectionFactory()
+        doAsync {
+            // 需要再次初始化数据的时候就关闭上一个连接
+            connection?.close()
+            val config = factory.saslConfig
+            val mechanism = config.getSaslMechanism(arrayOf("PLAIN"))
+            Log.i("Walker", "name: ${mechanism.name}")
+            // 创建新的连接
+            connection = factory.newConnection()
+            // 创建通道
+            val channel = connection?.createChannel()
+            // 处理完一个消息，再接收下一个消息
+            channel?.basicQos(1)
+
+            // 随机命名一个队列名称
+            val queueName = "tester";
+            // 声明交换机类型
+            channel?.exchangeDeclare("equipment", "topic", true)
+            // 声明队列（持久的、非独占的、连接断开后队列会自动删除）
+            val queue = channel?.queueDeclare(queueName, true, false, false, null)
+            // 根据路由键将队列绑定到交换机上（需要知道交换机名称和路由键名称）
+            channel?.queueBind(queue?.queue, "equipment", "equipment.#")
+            // 创建消费者获取rabbitMQ上的消息。每当获取到一条消息后，就会回调handleDelivery（）方法，该方法可以获取到消息数据并进行相应处理
+            val consumer = object : DefaultConsumer(channel) {
+                override fun handleDelivery(consumerTag: String?, envelope: Envelope?, properties: AMQP.BasicProperties?, body: ByteArray?) {
+                    super.handleDelivery(consumerTag, envelope, properties, body)
+                    val msg = body?.toString(charset("UTF-8"))
+                    Log.e("Walker", "RabbitMQ message: $msg")
+                }
+            }
+            channel?.basicConsume(queue?.queue, true, consumer)
+        }
+    }
+
+    /**
+     * 服务器连接设置
+     */
+    private fun setUpConnectionFactory() {
+        /**
+         * host: cdn.schools.i-school.net
+         * port: 5672
+         * user: equipment
+         * pass: 1835ac0a6b749651efa42dd4e09e625a
+         * vhost: /
+         * exchange: equipment
+
+         */
+        factory.host = "cdn.schools.i-school.net"
+        factory.port = 5672
+        factory.username = "equipment"
+        factory.password = "1835ac0a6b749651efa42dd4e09e625a"
+        factory.virtualHost = "/"
+        // 设置连接恢复
+        factory.isAutomaticRecoveryEnabled = true
     }
 }

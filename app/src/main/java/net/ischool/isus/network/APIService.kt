@@ -7,10 +7,7 @@ import io.reactivex.Observable
 import net.ischool.isus.*
 import net.ischool.isus.command.CommandParser
 import net.ischool.isus.command.ICommand
-import net.ischool.isus.model.Command
-import net.ischool.isus.model.Config
-import net.ischool.isus.model.Metadata
-import net.ischool.isus.model.Result
+import net.ischool.isus.model.*
 import net.ischool.isus.network.callback.StringCallback
 import net.ischool.isus.network.interceptor.CacheInterceptor
 import net.ischool.isus.network.interceptor.URLInterceptor
@@ -38,6 +35,14 @@ import java.util.concurrent.TimeUnit
  * Date: 2017/10/23
  */
 interface APIService {
+
+    /**
+     * 获取学校信息
+     *
+     * @return  服务器返回该学校ID及名称等相关信息
+     */
+    @GET("platform/campusng/equipment/getSchool")
+    fun _getSchoolId(): Observable<Response<Result<SchoolInfo>>>
 
     /**
      * 登录
@@ -113,6 +118,8 @@ interface APIService {
         }
 
         private val delivery: Handler by lazy { Handler(Looper.getMainLooper()) }
+
+        fun getSchoolId() = instance._getSchoolId()
 
         fun initDevice(cmdbid: String, sid: String): Observable<Response<Result<Metadata>>> {
             return instance._initDevice(cmdbid, sid)

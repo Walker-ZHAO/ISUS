@@ -17,13 +17,6 @@
     </android.support.design.widget.AppBarLayout>
 
     <EditText
-        android:id="@+id/set_school_id"
-        android:inputType="number"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/device_init_school_id"/>
-
-    <EditText
         android:id="@+id/set_cmdb_id"
         android:inputType="number"
         android:layout_width="match_parent"

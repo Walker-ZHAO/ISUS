@@ -8,6 +8,7 @@ import com.jakewharton.rxbinding2.view.RxView
 import com.trello.rxlifecycle2.android.ActivityEvent
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity
 import com.trello.rxlifecycle2.kotlin.bindUntilEvent
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
@@ -42,16 +43,22 @@ class InitActivity : RxAppCompatActivity() {
 
         var dialog: ProgressDialog? = null
 
-        if (set_school_id.text.isEmpty()) {
-            runOnUiThread { toast("学校ID不能为空") }
-        } else if (set_cmdb_id.text.isEmpty()) {
+        if (set_cmdb_id.text.isEmpty()) {
             runOnUiThread { toast("CMDB ID不能为空") }
         } else {
             runOnUiThread { dialog = indeterminateProgressDialog(getString(R.string.init_dialog_title)) { setCancelable(false) } }
-            APIService.initDevice(set_cmdb_id.text.toString(), set_school_id.text.toString())
+            APIService.getSchoolId()
                     .subscribeOn(Schedulers.io())
                     .observeOn(Schedulers.io())
-                    .flatMap { APIService.getConfig() }
+                    .flatMap {
+                        val result = checkNotNull(it.body())
+                        if (result.errno == net.ischool.isus.RESULT_OK) {
+                            APIService.initDevice(set_cmdb_id.text.toString(), result.data.school_id.toString())
+                        } else {
+                            Observable.error(Throwable(result.error))
+                        }
+
+                    }.flatMap { APIService.getConfig() }
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeBy(
                             onNext = {

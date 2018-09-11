@@ -10,7 +10,7 @@ package net.ischool.isus
  */
 
 // 默认的服务器地址
-val END_POINT = "https://www.i-school.net/"
+val END_POINT = "http://cdn.schools.i-school.net/"
 
 // 网络访问结果
 val RESULT_OK = 0
