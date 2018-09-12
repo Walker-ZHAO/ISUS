@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!-- Ignore everything in the test source set -->
+    <issue id="all">
+        <ignore path="*/test/*" />
+    </issue>
+
+    <!-- Ignore the HardcodedText issue in the given files -->
+    <issue id="HardcodedText">
+        <ignore path="src/main/res/layout/activity_main.xml"/>
+    </issue>
+
+    <!-- Ignore the StaticFieldLeaks issue in the given files -->
+    <issue id="StaticFieldLeak">
+        <ignore path="src/main/java/net/ischool/isus/ISUS.kt"/>
+    </issue>
+
+    <!-- Ignore the UnusedAttribute issue in the given files -->
+    <issue id="UnusedAttribute">
+        <ignore path="src/main/AndroidManifest.xml"/>
+    </issue>
+
+    <!-- Disable this given check in this project -->
+    <issue id="GradleDependency" severity="ignore"/>
+</lint>

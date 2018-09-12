@@ -5,7 +5,7 @@
     <string name="device_error">设别类型错误，请重新配置</string>
     <string name="warning">警告</string>
     <string name="warning_reset">重置后将会清除数据，您需要重新设置软件。</string>
-    <string name="init_dialog_title">正在初始化...</string>
+    <string name="init_dialog_title">正在初始化&#8230;</string>
 
     <string name="config_title">配置</string>
     <string name="config_device_id">设备ID</string>
@@ -42,7 +42,6 @@
     <string name="description_qr_image">设备ID二维码</string>
 
     <string name="device_init_title">设备初始化</string>
-    <string name="device_init_school_id">请输入学校ID</string>
     <string name="device_init_cmdb_id">请输入CMDB ID</string>
 
     <string name="button_ok">确定</string>

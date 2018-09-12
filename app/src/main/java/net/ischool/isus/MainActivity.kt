@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.speech.tts.TextToSpeech
 import android.support.v4.content.FileProvider
 import android.util.Log
@@ -190,7 +191,7 @@ class MainActivity : RxAppCompatActivity() {
     }
 
     fun installAPP() {
-        val file = File("/sdcard/app-debug.apk")
+        val file = File("${Environment.getExternalStorageDirectory().path}/app-debug.apk")
         if (!file.exists())
             return
         val intent = Intent(Intent.ACTION_VIEW)

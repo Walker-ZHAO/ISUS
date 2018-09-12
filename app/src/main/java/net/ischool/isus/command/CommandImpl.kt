@@ -4,6 +4,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Environment
 import android.os.Process
 import com.orhanobut.logger.Logger
 import io.reactivex.schedulers.Schedulers
@@ -91,7 +92,7 @@ class CommandImpl constructor(private val context: Context) : ICommand {
      */
     override fun update(url: String?) {
         url?.let {
-            APIService.downloadAsync(it, "/sdcard", object : StringCallback {
+            APIService.downloadAsync(it, Environment.getExternalStorageDirectory().path, object : StringCallback {
                 override fun onResponse(string: String) {
                     execRuntimeProcess("pm install -r $string");
                 }
