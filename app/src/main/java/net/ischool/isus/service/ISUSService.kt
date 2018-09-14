@@ -36,7 +36,6 @@ class ISUSService : Service() {
         Log.e("ISIS", errorMsg)
         Syslog.logE(errorMsg)
     }
-    /**
     private val recoveryListener = object : RecoveryListener {
         override fun handleRecovery(recoverable: Recoverable?) {
             val msg = "RabbitMQ connect recovery completed"
@@ -118,7 +117,6 @@ class ISUSService : Service() {
             Syslog.logE(msg)
         }
     }
-     **/
     /** RabbitMQ End **/
 
     companion object {
@@ -180,7 +178,7 @@ class ISUSService : Service() {
         // 设置重试间隔，默认5s
         factory.networkRecoveryInterval = 5000
         // 设置异常处理
-        // factory.exceptionHandler = exceptionHandler
+        factory.exceptionHandler = exceptionHandler
     }
 
     /**
@@ -210,8 +208,8 @@ class ISUSService : Service() {
                 channel?.addShutdownListener(shutdownListener)
 
                 // 设置恢复监听
-                // (connection as Recoverable).addRecoveryListener(recoveryListener)
-                // (channel as Recoverable).addRecoveryListener(recoveryListener)
+                (connection as Recoverable).addRecoveryListener(recoveryListener)
+                (channel as Recoverable).addRecoveryListener(recoveryListener)
 
 
                 // 队列名称规则：学校ID.设备类型.CMDBID
