@@ -50,7 +50,7 @@ class ISUSService : Service() {
             Syslog.logI(msg)
         }
     }
-    **/
+
     private val exceptionHandler = object : DefaultExceptionHandler() {
         override fun handleFlowListenerException(channel: Channel?, exception: Throwable?) {
             super.handleFlowListenerException(channel, exception)
@@ -118,6 +118,7 @@ class ISUSService : Service() {
             Syslog.logE(msg)
         }
     }
+     **/
     /** RabbitMQ End **/
 
     companion object {
@@ -179,7 +180,7 @@ class ISUSService : Service() {
         // 设置重试间隔，默认5s
         factory.networkRecoveryInterval = 5000
         // 设置异常处理
-        factory.exceptionHandler = exceptionHandler
+        // factory.exceptionHandler = exceptionHandler
     }
 
     /**
