@@ -1,5 +1,7 @@
 package net.ischool.isus.model
 
+import com.google.gson.annotations.SerializedName
+
 /**
  * 学校信息
  *
@@ -9,4 +11,6 @@ package net.ischool.isus.model
  * Email: zhaocework@gmail.com
  * Date: 2018/9/6
  */
-data class SchoolInfo(val school_id: Int, val school_name: String)
+data class SchoolInfo(@SerializedName(value = "school_id", alternate = ["schoolid"])val school_id: Int,
+                      @SerializedName(value = "school_name", alternate = ["schoolname"]) val school_name: String,
+                      @SerializedName(value = "client_ip", alternate = ["clientip"]) val client_ip: String)

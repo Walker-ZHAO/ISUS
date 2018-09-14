@@ -42,6 +42,7 @@ class MainActivity : RxAppCompatActivity() {
     val factory by lazy { ConnectionFactory() }
 
     var connection: Connection? = null
+    var channel: Channel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -271,6 +272,7 @@ class MainActivity : RxAppCompatActivity() {
         setUpConnectionFactory()
         doAsync {
             // 需要再次初始化数据的时候就关闭上一个连接
+            channel?.close()
             connection?.close()
             val config = factory.saslConfig
             val mechanism = config.getSaslMechanism(arrayOf("PLAIN"))
@@ -278,7 +280,7 @@ class MainActivity : RxAppCompatActivity() {
             // 创建新的连接
             connection = factory.newConnection()
             // 创建通道
-            val channel = connection?.createChannel()
+            channel = connection?.createChannel()
             // 处理完一个消息，再接收下一个消息
             channel?.basicQos(1)
 

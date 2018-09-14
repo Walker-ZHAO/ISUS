@@ -41,7 +41,7 @@ interface APIService {
      *
      * @return  服务器返回该学校ID及名称等相关信息
      */
-    @GET("platform/campusng/equipment/getSchool")
+    @GET("sgrid/cmdb/getSchool")
     fun _getSchoolId(): Observable<Response<Result<SchoolInfo>>>
 
     /**
