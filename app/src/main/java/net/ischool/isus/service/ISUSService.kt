@@ -157,8 +157,10 @@ class ISUSService : Service() {
                 setUpConnectionFactory()
                 subscribe()
             } else {
-                channel?.close()
-                connection?.close()
+                doAsync {
+                    channel?.close()
+                    connection?.close()
+                }
             }
         }
         return START_STICKY
