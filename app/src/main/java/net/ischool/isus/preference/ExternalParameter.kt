@@ -12,16 +12,14 @@ import net.ischool.isus.R
  */
 class ExternalParameter {
     companion object {
-        val EXP_SYSLOG              = "syslog"          /** syslog上传地址 **/
-        val EXP_SCHOOL_NAME         = "schoolName"      /** 学校名 **/
-        val EXP_FACE_SERVICE_INT    = "faceServerInt"   /** 人脸识别服务器内网IP **/
-        val EXP_FACE_SERVICE_EXT    = "faceServerExt"   /** 人脸识别服务器公网IP **/
-        val EXP_VOIP_GATEWAY        = "VoIPGW"          /** 语音网关 **/
-        val EXP_VOIP_STUN           = "VoIPSTUN"        /** 语音网关转发设备 **/
-        val EXP_SELF_LAN_IP         = "selfLanIP"       /** 设备内网IP **/
-        val EXP_SELF_WAN_IP         = "selfWanIP"       /** 设备公网IP **/
-        val EXP_SELF_M_KEY          = "selfMKey"        /** 用于管理员登录设备的密码 **/
-        val EXP_SELF_S_KEY          = "selfSKey"        /** 用于API签名的密钥**/
+        const val EXP_SYSLOG              = "syslog"          /** syslog上传地址 **/
+        const val EXP_SCHOOL_NAME         = "schoolName"      /** 学校名 **/
+        const val EXP_VOIP_GATEWAY        = "VoIPGW"          /** 语音网关 **/
+        const val EXP_VOIP_STUN           = "VoIPSTUN"        /** 语音网关转发设备 **/
+        const val EXP_SELF_LAN_IP         = "selfLanIP"       /** 设备内网IP **/
+        const val EXP_SELF_WAN_IP         = "selfWanIP"       /** 设备公网IP **/
+        const val EXP_SELF_M_KEY          = "selfMKey"        /** 用于管理员登录设备的密码 **/
+        const val EXP_SELF_S_KEY          = "selfSKey"        /** 用于API签名的密钥**/
 
         /**
          * 获取额外参数的名称
@@ -32,8 +30,6 @@ class ExternalParameter {
             when (key) {
                 EXP_SYSLOG              -> ISUS.instance.context.getString(R.string.external_syslog)
                 EXP_SCHOOL_NAME         -> ISUS.instance.context.getString(R.string.external_school_name)
-                EXP_FACE_SERVICE_INT    -> ISUS.instance.context.getString(R.string.external_face_server_int)
-                EXP_FACE_SERVICE_EXT    -> getString(R.string.external_face_server_ext)
                 EXP_VOIP_GATEWAY        -> getString(R.string.external_voip_gateway)
                 EXP_VOIP_STUN           -> getString(R.string.external_voip_stun)
                 EXP_SELF_LAN_IP         -> getString(R.string.external_self_lan_ip)

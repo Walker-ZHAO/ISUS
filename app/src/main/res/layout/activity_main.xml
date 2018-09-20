@@ -8,14 +8,6 @@
     tools:context="net.ischool.isus.MainActivity">
 
     <Button
-        android:id="@+id/init_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="InitView"
-        android:layout_marginTop="20dp"
-        android:layout_gravity="center_horizontal" />
-
-    <Button
         android:id="@+id/init"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -30,15 +22,6 @@
         android:layout_marginBottom="8dp"
         android:layout_marginTop="8dp"
         android:text="Config"
-        android:layout_gravity="center_horizontal" />
-
-    <Button
-        android:id="@+id/command"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp"
-        android:text="Command"
         android:layout_gravity="center_horizontal" />
 
     <Button

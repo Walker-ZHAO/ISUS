@@ -21,6 +21,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
+import net.ischool.isus.activity.ConfigActivity
 import net.ischool.isus.activity.InitActivity
 import net.ischool.isus.network.APIService
 import okhttp3.FormBody
@@ -48,36 +49,11 @@ class MainActivity : RxAppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        ISUS.init(this, DeviceType.VISION_PHONE)
+        ISUS.init(this, DeviceType.SECURITY)
 
-        init_view.setOnClickListener { startActivity<InitActivity>() }
+        init.setOnClickListener { startActivity<InitActivity>() }
 
-        RxView.clicks(init)
-                .debounce(500, TimeUnit.MILLISECONDS)
-                .bindUntilEvent(this, ActivityEvent.DESTROY)
-                .observeOn(Schedulers.io())
-                .flatMap { APIService.initDevice("62", "1110599").bindUntilEvent(this, ActivityEvent.DESTROY) }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                        onNext = { Log.i("Walker", "${it.body()}") },
-                        onComplete = {Log.i("Walker", "onComplete")},
-                        onError = { Log.e("Walker", "$it") }
-                )
-
-        RxView.clicks(config)
-                .debounce(500, TimeUnit.MILLISECONDS)
-                .bindUntilEvent(this, ActivityEvent.DESTROY)
-                .observeOn(Schedulers.io())
-                .flatMap { APIService.getConfig().bindUntilEvent(this, ActivityEvent.DESTROY) }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                        onNext = {
-                            Log.i("Walker", "${it.body()}")
-                            ISUS.instance.startService()
-                        },
-                        onComplete = {Log.i("Walker", "onComplete")},
-                        onError = { Log.e("Walker", "$it") }
-                )
+        config.setOnClickListener { startActivity<ConfigActivity>() }
 
         RxView.clicks(ping)
                 .debounce(500, TimeUnit.MICROSECONDS)
@@ -87,18 +63,6 @@ class MainActivity : RxAppCompatActivity() {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                         onNext = { Log.i("Walker", "it") },
-                        onComplete = {Log.i("Walker", "onComplete")},
-                        onError = { Log.e("Walker", "$it") }
-                )
-
-        RxView.clicks(command)
-                .debounce(500, TimeUnit.MILLISECONDS)
-                .bindUntilEvent(this, ActivityEvent.DESTROY)
-                .observeOn(Schedulers.io())
-                .flatMap { APIService.getCommand().bindUntilEvent(this, ActivityEvent.DESTROY) }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeBy(
-                        onNext = { Log.i("Walker", "$it") },
                         onComplete = {Log.i("Walker", "onComplete")},
                         onError = { Log.e("Walker", "$it") }
                 )

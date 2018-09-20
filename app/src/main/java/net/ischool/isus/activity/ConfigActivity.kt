@@ -32,8 +32,6 @@ class ConfigActivity : AppCompatActivity() {
         text_cmdbid.text = getString(R.string.config_cmdb, PreferenceManager.instance.getCMDB())
         text_school_id.text = getString(R.string.config_sid, PreferenceManager.instance.getSchoolId())
         text_server.text = getString(R.string.config_server, "${PreferenceManager.instance.getProtocal()}://${PreferenceManager.instance.getServer()}")
-        text_comet_title.text = getString(R.string.config_comet)
-        text_comet.text = PreferenceManager.instance.getComet()
         text_device.text = getString(R.string.config_device_type, DeviceType.getDeviceName(PreferenceManager.instance.getDeviceType()))
 
         val builder = StringBuilder()

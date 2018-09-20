@@ -25,7 +25,6 @@ class PreferenceManager private constructor(context: Context, deviceType: Int){
     private val _serverAddress: Preference<String>   /** 学校相关的服务器地址 **/
     private val _protocal: Preference<String>        /** 服务器支持的协议 **/
     private val _type: Preference<Int>               /** 设备类型 **/
-    private val _comet: Preference<String>           /** Comet地址 **/
     private val _base64QR: Preference<String>        /** Base64 编码的二维码 **/
     private val _parameter: Preference<String>       /** 额外的参数配置 **/
 
@@ -38,14 +37,13 @@ class PreferenceManager private constructor(context: Context, deviceType: Int){
         _serverAddress = rxPreference.getString(KEY_SERVER_ADDRESS)
         _protocal = rxPreference.getString(KEY_PROTOCAL)
         _type = rxPreference.getInteger(KEY_TYPE)
-        _comet = rxPreference.getString(KEY_COMET)
         _base64QR = rxPreference.getString(KEY_QR)
         _parameter = rxPreference.getString(KEY_PARAMETER)
         setDeviceType(deviceType)
     }
 
     override fun toString(): String {
-        return "{CMDB ID : ${getCMDB()}, School ID : ${getSchoolId()}, Token : ${getToken()}, Server Address : ${getServer()}, Protocal : ${getProtocal()}, Type : ${getDeviceType()}, Comet : ${getComet()}, Parameter : ${_parameter.get()}}"
+        return "{CMDB ID : ${getCMDB()}, School ID : ${getSchoolId()}, Token : ${getToken()}, Server Address : ${getServer()}, Protocal : ${getProtocal()}, Type : ${getDeviceType()}, Parameter : ${_parameter.get()}}"
     }
 
     companion object {
@@ -66,11 +64,8 @@ class PreferenceManager private constructor(context: Context, deviceType: Int){
         private var KEY_SCHOOL_ID = "SCHOOL_ID"
         private var KEY_TOKEN = "TOKEN"
         private var KEY_SERVER_ADDRESS = "SERVER_ADDRESS"
-        private var KEY_ADDRESS_CODE = "ADDRESS_CODE"
-        private var KEY_SIP_GATEWAY = "SIP_GATEWAY"
         private var KEY_PROTOCAL = "PROTOCAL"
         private var KEY_TYPE = "TYPE"
-        private var KEY_COMET = "COMET"
         private var KEY_QR = "QR"
         private var KEY_PARAMETER = "PARAMETER"
     }
@@ -81,7 +76,6 @@ class PreferenceManager private constructor(context: Context, deviceType: Int){
     fun getServer() = _serverAddress.get()
     fun getProtocal() = _protocal.get()
     fun getDeviceType() = _type.get()
-    fun getComet() = _comet.get()
     fun getQR() = _base64QR.get()
     fun getParameter() = Gson().fromJson<Map<String, String>>(_parameter.get())?:HashMap()
     fun getURL() = "${_protocal.get()}://${_serverAddress.get()}/"
@@ -92,14 +86,9 @@ class PreferenceManager private constructor(context: Context, deviceType: Int){
     fun setServer(server: String) = _serverAddress.set(server)
     fun setProtocal(pro: String) = _protocal.set(pro)
     private fun setDeviceType(deviceType: Int) = _type.set(deviceType)
-    fun setComet(address: String) = _comet.set(address)
     fun setQR(qr: String) = _base64QR.set(qr)
     fun setParameter(param: Map<String, String>) = _parameter.set(Gson().toJson(param))
 
-    /** 人脸识别服务器内网IP **/
-    fun getEXFaceServerInt() = getParameter()["faceServerInt"]
-    /** 人脸识别服务器公网IP **/
-    fun getEXFaceServerExt() = getParameter()["faceServerExt"]
     /** 语音网关 **/
     fun getEXVoIPGateway() = getParameter()["VoIPGW"]
     /** 语音网关转发设备 **/

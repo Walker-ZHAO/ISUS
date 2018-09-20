@@ -9,4 +9,4 @@ package net.ischool.isus.model
  * Email: zhaocework@gmail.com
  * Date: 2017/9/13
  */
-data class Config(val type: Int, val comet: String, val QR: String, val parameter: Map<String, String>)
+data class Config(val type: Int, val QR: String, val parameter: Map<String, String>)

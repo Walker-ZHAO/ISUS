@@ -74,14 +74,6 @@ interface APIService {
     @POST("eqptapi/pong")
     fun _pong(@Field("token") token: String): Observable<ResponseBody>
 
-    /**
-     * 获取服务端推送指令
-     *
-     * @return  服务器推送的命令
-     */
-    @GET
-    fun _getCommand(@Url url: String): Observable<Response<Command>>
-
     object Factory {
         fun createService(client: OkHttpClient): APIService {
             val retrofit = Retrofit.Builder()
@@ -149,7 +141,6 @@ interface APIService {
                             Log.i("ISUS", "config: ${result.data}")
                             with(PreferenceManager.instance) {
                                 if (getDeviceType() == result.data.type) {
-                                    setComet(result.data.comet)
                                     setQR(result.data.QR)
                                     setParameter(result.data.parameter)
                                 } else {
@@ -167,8 +158,6 @@ interface APIService {
         }
 
         fun pong() = instance._pong(PreferenceManager.instance.getToken())
-
-        fun getCommand() = instance._getCommand(PreferenceManager.instance.getComet())
 
         /**
          * 取消所有网络请求
