@@ -6,6 +6,7 @@ import net.ischool.isus.UDP_PORT
 import net.ischool.isus.preference.PreferenceManager
 import org.jetbrains.anko.activityManager
 import org.jetbrains.anko.doAsync
+import java.io.IOException
 import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
@@ -62,7 +63,11 @@ class Syslog {
         @JvmStatic fun logI(message: String) {
             doAsync {
                 val log = createLog(PRI_INFO, message).toByteArray()
-                socket.send(DatagramPacket(log, log.size, server, UDP_PORT))
+                try {
+                    socket.send(DatagramPacket(log, log.size, server, UDP_PORT))
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
             }
         }
     }

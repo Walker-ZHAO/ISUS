@@ -10,7 +10,6 @@ group='com.github.Walker-ZHAO'
 
 android {
     compileSdkVersion COMPILE_SDK_VERSION
-    buildToolsVersion BUILD_TOOLS_VERSION
     defaultConfig {
 //        applicationId "net.ischool.isus"
         minSdkVersion MIN_SDK_VERSION
@@ -41,9 +40,7 @@ dependencies {
     })
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation("org.jetbrains.anko:anko:$anko_version") {
-        exclude group: 'com.google.android', module: 'android'
-    }
+    implementation "org.jetbrains.anko:anko:$anko_version"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$reflect_version"
     // RxKotlin
     implementation 'io.reactivex.rxjava2:rxkotlin:2.1.0'
@@ -70,7 +67,7 @@ dependencies {
     // Logger
     implementation 'com.orhanobut:logger:2.1.1'
     // Useful Extension
-    implementation 'com.github.Walker-ZHAO:Anke:0.0.15'
+    implementation 'com.github.Walker-ZHAO:Anke:0.0.16'
     // RabbitMQ
     implementation 'com.rabbitmq:amqp-client:4.7.0'
 }
