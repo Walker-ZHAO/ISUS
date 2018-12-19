@@ -35,34 +35,38 @@ class Syslog {
         private val PRI_NOTICE = 157
         private val PRI_INFO = 158
 
-        private fun createLog(pri: Int = PRI_INFO, message: String): String {
+        private fun createLog(pri: Int = PRI_INFO, message: String, tag: String): String {
             val ts = SimpleDateFormat("MMM dd HH:mm:ss", Locale.ENGLISH).format(Date())
             return with(ISUS.instance.context) {
-                val processName = activityManager.runningAppProcesses
-                        .filter { it.pid ==  Process.myPid() }
+                val tagName = if (tag.isEmpty()) {
+                    activityManager.runningAppProcesses
+                        .filter { it.pid == Process.myPid() }
                         .map { it.processName }
-                        .firstOrNull()?:"null"
-                "<$pri>$ts $processName[${Process.myPid()}]: CMDBID=${PreferenceManager.instance.getCMDB()}: $message"
+                        .firstOrNull() ?: "null"
+                } else {
+                    tag
+                }
+                "<$pri>$ts $tagName[${Process.myPid()}]: CMDBID=${PreferenceManager.instance.getCMDB()}: $message"
             }
         }
 
-        @JvmStatic fun logE(message: String) {
+        @JvmStatic fun logE(message: String, tag: String = "") {
             doAsync {
-                val log = createLog(PRI_ERROR, message).toByteArray()
+                val log = createLog(PRI_ERROR, message, tag).toByteArray()
                 socket.send(DatagramPacket(log, log.size, server, UDP_PORT))
             }
         }
 
-        @JvmStatic fun logN(message: String) {
+        @JvmStatic fun logN(message: String, tag: String = "") {
             doAsync {
-                val log = createLog(PRI_NOTICE, message).toByteArray()
+                val log = createLog(PRI_NOTICE, message, tag).toByteArray()
                 socket.send(DatagramPacket(log, log.size, server, UDP_PORT))
             }
         }
 
-        @JvmStatic fun logI(message: String) {
+        @JvmStatic fun logI(message: String, tag: String = "") {
             doAsync {
-                val log = createLog(PRI_INFO, message).toByteArray()
+                val log = createLog(PRI_INFO, message, tag).toByteArray()
                 try {
                     socket.send(DatagramPacket(log, log.size, server, UDP_PORT))
                 } catch (e: IOException) {
