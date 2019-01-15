@@ -50,6 +50,7 @@ class Syslog {
             }
         }
 
+        @JvmOverloads
         @JvmStatic fun logE(message: String, tag: String = "") {
             doAsync {
                 val log = createLog(PRI_ERROR, message, tag).toByteArray()
@@ -57,6 +58,7 @@ class Syslog {
             }
         }
 
+        @JvmOverloads
         @JvmStatic fun logN(message: String, tag: String = "") {
             doAsync {
                 val log = createLog(PRI_NOTICE, message, tag).toByteArray()
@@ -64,6 +66,7 @@ class Syslog {
             }
         }
 
+        @JvmOverloads
         @JvmStatic fun logI(message: String, tag: String = "") {
             doAsync {
                 val log = createLog(PRI_INFO, message, tag).toByteArray()
