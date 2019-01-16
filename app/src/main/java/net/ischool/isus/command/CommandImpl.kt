@@ -15,6 +15,7 @@ import okhttp3.Request
 import java.io.IOException
 import android.provider.Settings;
 import com.walker.anke.framework.reboot
+import io.reactivex.rxkotlin.subscribeBy
 import net.ischool.isus.log.Syslog
 import org.jetbrains.anko.alarmManager
 import java.io.File
@@ -39,7 +40,10 @@ class CommandImpl constructor(private val context: Context) : ICommand {
     override fun ping() {
         APIService.pong()
                 .subscribeOn(Schedulers.io())
-                .subscribe()
+                .subscribeBy(
+                    onNext = {},
+                    onError = { Syslog.logE("Response ping command failure: ${it.message}") }
+                )
     }
 
     /**
