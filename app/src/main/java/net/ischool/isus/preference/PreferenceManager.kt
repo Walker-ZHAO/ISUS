@@ -113,4 +113,6 @@ class PreferenceManager private constructor(context: Context, deviceType: Int){
     fun getClassId() = getParameter()["classId"]
     /** 设备名称（CMDB代号） **/
     fun getDeviceName() = getParameter()["deviceName"]
+    /** 显示模式 **/
+    fun getDisolayModel() = getParameter()["displayModel"]
 }
