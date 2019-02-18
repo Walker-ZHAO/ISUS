@@ -115,4 +115,10 @@ class PreferenceManager private constructor(context: Context, deviceType: Int){
     fun getDeviceName() = getParameter()["deviceName"]
     /** 显示模式 **/
     fun getDisolayModel() = getParameter()["displayModel"]
+    /** 设备所在考勤区域 **/
+    fun getAreaId() = getParameter()["areaId"]?.toInt()
+    /** 设备所在考勤检查点 **/
+    fun getCheckpointId() = getParameter()["checkpointId"]?.toInt()
+    /** 设备所在考勤通道 **/
+    fun getTunnelId() = getParameter()["tunnelId"]?.toInt()
 }
