@@ -9,8 +9,10 @@ package net.ischool.isus
  * Date: 2017/10/23
  */
 
+const val DEFAULT_DOMAIN = "i-school.net"
+
 // 默认的服务器地址
-const val END_POINT = "http://cdn.schools.i-school.net/"
+val END_POINT by lazy { "http://cdn.schools.${ISUS.instance.domain}/" }
 
 // 网络访问结果
 const val RESULT_OK = 0
@@ -28,7 +30,7 @@ const val ACTION_COMMAND = "net.ischool.isus.command"
 const val UDP_PORT = 514
 
 // RabbitMQ 相关配置
-const val MQ_DOMAIN = "cdn.schools.i-school.net"
+val MQ_DOMAIN by lazy { "cdn.schools.${ISUS.instance.domain}" }
 const val MQ_PORT = 5672
 const val MQ_USERNAME = "equipment"
 const val MQ_PASSWORD = "1835ac0a6b749651efa42dd4e09e625a"

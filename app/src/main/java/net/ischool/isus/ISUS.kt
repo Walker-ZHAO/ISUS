@@ -18,7 +18,7 @@ import org.jetbrains.anko.toast
  * Email: zhaocework@gmail.com
  * Date: 2017/9/18
  */
-class ISUS(val context: Context) {
+class ISUS(val context: Context, val domain: String) {
 
     companion object {
 
@@ -30,8 +30,8 @@ class ISUS(val context: Context) {
          * 初始化
          */
         @Synchronized
-        @JvmStatic fun init(context: Context, deviceType: Int) {
-            instance = ISUS(context.applicationContext)
+        @JvmStatic fun init(context: Context, deviceType: Int, domain: String = DEFAULT_DOMAIN) {
+            instance = ISUS(context.applicationContext, domain)
             Logger.addLogAdapter(AndroidLogAdapter())
             PreferenceManager.initPreference(context, deviceType)
             if (context is Activity) {
