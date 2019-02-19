@@ -29,6 +29,7 @@ class ISUS(val context: Context, val domain: String) {
         /**
          * 初始化
          */
+        @JvmOverloads
         @Synchronized
         @JvmStatic fun init(context: Context, deviceType: Int, domain: String = DEFAULT_DOMAIN) {
             instance = ISUS(context.applicationContext, domain)
