@@ -89,36 +89,82 @@ class PreferenceManager private constructor(context: Context, deviceType: Int){
     fun setQR(qr: String) = _base64QR.set(qr)
     fun setParameter(param: Map<String, String>) = _parameter.set(Gson().toJson(param))
 
-    /** 语音网关 **/
+    /**
+     * 语音网关
+     */
     fun getEXVoIPGateway() = getParameter()["VoIPGW"]
-    /** 语音网关转发设备 **/
+    /**
+     * 语音网关转发设备
+     */
     fun getEXVoIPSTUN() = getParameter()["VoIPSTUN"]
-    /** 设备内网IP **/
+    /**
+     * 设备内网IP
+     */
     fun getEXSelfLanIP() = getParameter()["selfLanIP"]
-    /** 设备公网IP **/
+    /**
+     * 设备公网IP
+     */
     fun getEXSelfWanIP() = getParameter()["selfWanIP"]
-    /** 用于管理员登录设备的密码 **/
+    /**
+     * 用于管理员登录设备的密码
+     */
     fun getEXSelfMKey() = getParameter()["selfMKey"]
-    /** 用于API签名的密钥**/
+    /**
+     * 用于API签名的密钥
+     */
     fun getEXSelfSKey() = getParameter()["selfSKey"]
-    /** 远程日志服务器地址（域名或IP） **/
+    /**
+     * 远程日志服务器地址（域名或IP）
+     */
     fun getSyslog() = getParameter()["syslog"]
-    /** 学校名称 **/
+    /**
+     * 学校名称
+     */
     fun getSchoolName() = getParameter()["schoolName"]
-    /** 学校Logo **/
+    /**
+     * 学校Logo
+     */
     fun getSchoolLogo() = getParameter()["schoolLogo"]
-    /** 班级名称 **/
+    /**
+     * 班级名称
+     */
     fun getClassName() = getParameter()["className"]
-    /** 班级ID **/
+    /**
+     * 班级ID
+     */
     fun getClassId() = getParameter()["classId"]
-    /** 设备名称（CMDB代号） **/
+    /**
+     * 设备名称（CMDB代号）
+     */
     fun getDeviceName() = getParameter()["deviceName"]
-    /** 显示模式 **/
-    fun getDisolayModel() = getParameter()["displayModel"]
-    /** 设备所在考勤区域 **/
+    /**
+     * 显示模式
+     *
+     * @see net.ischool.isus.DisplayModel
+     */
+    fun getDisplayModel() = getParameter()["displayModel"]
+    /**
+     * 设备所在考勤区域
+     */
     fun getAreaId() = getParameter()["areaId"]?.toInt()
-    /** 设备所在考勤检查点 **/
+    /**
+     * 设备所在考勤检查点
+     */
     fun getCheckpointId() = getParameter()["checkpointId"]?.toInt()
-    /** 设备所在考勤通道 **/
+    /**
+     * 设备所在考勤通道
+     */
     fun getTunnelId() = getParameter()["tunnelId"]?.toInt()
+    /**
+     * 考勤模式
+     *
+     * @see net.ischool.isus.AttendModel
+     */
+    fun getAttendModel() = getParameter()["attendModel"]?.toInt()
+    /**
+     * 支持的外设
+     *
+     * @see net.ischool.isus.PeripheralFlag
+     */
+    fun getPeripherals() = getParameter()["peripherals"]?.toInt()
 }
