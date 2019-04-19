@@ -9,6 +9,7 @@ package net.ischool.isus
  */
 class AttendModel {
     companion object {
+        @JvmField val NONE = 0           /** 未设置 **/
         @JvmField val BILLBOARD = 1      /** 班牌考勤 **/
         @JvmField val GATE = 2          /** 校门考勤 **/
     }
