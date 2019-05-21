@@ -48,6 +48,16 @@
                 <action android:name="net.ischool.isus.stop"/>
             </intent-filter>
         </service>
+
+        <receiver android:name=".broadcast.CMDBReceiver">
+            <intent-filter android:priority="1000">
+                <action android:name="net.ischool.isus.cmdbid"/>
+            </intent-filter>
+        </receiver>
+
+        <service android:name=".service.CMDBService"
+                 android:exported="false"/>
+
     </application>
 
 </manifest>

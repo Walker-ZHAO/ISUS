@@ -14,7 +14,7 @@ import com.walker.anke.gson.fromJson
  * Email: zhaocework@gmail.com
  * Date: 2017/9/12
  */
-class PreferenceManager private constructor(context: Context, deviceType: Int){
+class PreferenceManager private constructor(context: Context, deviceType: Int) {
 
     private val preference: SharedPreferences
     private val rxPreference: RxSharedPreferences
@@ -29,7 +29,7 @@ class PreferenceManager private constructor(context: Context, deviceType: Int){
     private val _parameter: Preference<String>       /** 额外的参数配置 **/
 
     init {
-        preference = context.getSharedPreferences(CONFIG_PATH, Context.MODE_PRIVATE);
+        preference = context.getSharedPreferences(CONFIG_PATH, Context.MODE_PRIVATE)
         rxPreference = RxSharedPreferences.create(preference)
         _cmdbId = rxPreference.getString(KEY_CMDB_ID)
         _schoolId = rxPreference.getString(KEY_SCHOOL_ID)
@@ -68,9 +68,11 @@ class PreferenceManager private constructor(context: Context, deviceType: Int){
         private var KEY_TYPE = "TYPE"
         private var KEY_QR = "QR"
         private var KEY_PARAMETER = "PARAMETER"
+
+        var needUpdateCMDB = false
     }
 
-    fun getCMDB() = _cmdbId.get()
+    fun getCMDB() = if (needUpdateCMDB) "" else _cmdbId.get()
     fun getSchoolId() = _schoolId.get()
     fun getToken() = _token.get()
     fun getServer() = _serverAddress.get()
@@ -80,7 +82,10 @@ class PreferenceManager private constructor(context: Context, deviceType: Int){
     fun getParameter() = Gson().fromJson<Map<String, String>>(_parameter.get())?:HashMap()
     fun getURL() = "${_protocal.get()}://${_serverAddress.get()}/"
 
-    fun setCMDB(cmdb: String) = _cmdbId.set(cmdb)
+    fun setCMDB(cmdb: String) {
+        _cmdbId.set(cmdb)
+        needUpdateCMDB = false
+    }
     fun setSchoolId(id: String) = _schoolId.set(id)
     fun setToken(t: String) = _token.set(t)
     fun setServer(server: String) = _serverAddress.set(server)
