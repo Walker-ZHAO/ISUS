@@ -4,6 +4,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
+import net.ischool.isus.command.CommandImpl
 import net.ischool.isus.preference.PreferenceManager
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.startService
@@ -46,10 +47,7 @@ class CMDBService : Service() {
                 file.writeText(cmdbid)
                 if (preCMDB.isNotEmpty() && preCMDB != cmdbid) {
                     PreferenceManager.needUpdateCMDB = true
-                    baseContext.packageManager.getLaunchIntentForPackage(baseContext.packageName)?.let {
-                        it.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                        startActivity(it)
-                    }
+                    CommandImpl(this@CMDBService).reboot()
                 }
                 // 发送更新cmdbid广播
                 sendBroadcast(Intent(ACTION_UPDATE_CMDBID).apply { putExtra(ARG_CMDBID, cmdbid) })
