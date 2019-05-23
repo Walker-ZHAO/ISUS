@@ -46,7 +46,7 @@ class CMDBService : Service() {
                 val preCMDB = file.readText()
                 file.writeText(cmdbid)
                 if (preCMDB.isNotEmpty() && preCMDB != cmdbid) {
-                    PreferenceManager.needUpdateCMDB = true
+                    PreferenceManager.instance.setNeedUpdate(true)
                     CommandImpl(this@CMDBService).reboot()
                 }
                 // 发送更新cmdbid广播

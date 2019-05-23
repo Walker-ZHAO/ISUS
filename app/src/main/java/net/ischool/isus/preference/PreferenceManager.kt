@@ -19,6 +19,7 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     private val preference: SharedPreferences
     private val rxPreference: RxSharedPreferences
 
+    private val _needUpdate: Preference<Boolean>     /** 是否需要更新CMDB ID **/
     private val _cmdbId: Preference<String>          /** 硬件的CMDB ID **/
     private val _schoolId: Preference<String>        /** 学校ID **/
     private val _token: Preference<String>           /** 加密后的CMDB ID **/
@@ -31,6 +32,7 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     init {
         preference = context.getSharedPreferences(CONFIG_PATH, Context.MODE_PRIVATE)
         rxPreference = RxSharedPreferences.create(preference)
+        _needUpdate = rxPreference.getBoolean(KEY_NEED_UPDATE, false)
         _cmdbId = rxPreference.getString(KEY_CMDB_ID)
         _schoolId = rxPreference.getString(KEY_SCHOOL_ID)
         _token = rxPreference.getString(KEY_TOKEN)
@@ -60,6 +62,7 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
 
         private var CONFIG_PATH = "ISUS_CONFIG"
 
+        private var KEY_NEED_UPDATE = "NEED_UPDATE"
         private var KEY_CMDB_ID = "CMDB_ID"
         private var KEY_SCHOOL_ID = "SCHOOL_ID"
         private var KEY_TOKEN = "TOKEN"
@@ -68,11 +71,9 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
         private var KEY_TYPE = "TYPE"
         private var KEY_QR = "QR"
         private var KEY_PARAMETER = "PARAMETER"
-
-        var needUpdateCMDB = false
     }
 
-    fun getCMDB() = if (needUpdateCMDB) "" else _cmdbId.get()
+    fun getCMDB() = if (_needUpdate.get()) "" else _cmdbId.get()
     fun getSchoolId() = _schoolId.get()
     fun getToken() = _token.get()
     fun getServer() = _serverAddress.get()
@@ -82,9 +83,10 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     fun getParameter() = Gson().fromJson<Map<String, String>>(_parameter.get())?:HashMap()
     fun getURL() = "${_protocal.get()}://${_serverAddress.get()}/"
 
+    fun setNeedUpdate(need: Boolean) = _needUpdate.set(need)
     fun setCMDB(cmdb: String) {
         _cmdbId.set(cmdb)
-        needUpdateCMDB = false
+        _needUpdate.set(false)
     }
     fun setSchoolId(id: String) = _schoolId.set(id)
     fun setToken(t: String) = _token.set(t)
