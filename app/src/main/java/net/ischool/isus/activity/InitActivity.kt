@@ -13,15 +13,18 @@ import com.jakewharton.rxbinding2.widget.text
 import com.trello.rxlifecycle2.android.ActivityEvent
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity
 import com.trello.rxlifecycle2.kotlin.bindUntilEvent
+import com.walker.anke.framework.visiable
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_init.*
+import net.ischool.isus.ISUS
 import net.ischool.isus.R
 import net.ischool.isus.network.APIService
 import net.ischool.isus.service.CMDBService
 import org.jetbrains.anko.indeterminateProgressDialog
+import org.jetbrains.anko.longToast
 import org.jetbrains.anko.toast
 import java.io.File
 import java.lang.Exception
@@ -44,10 +47,15 @@ class InitActivity : RxAppCompatActivity() {
         tool_bar.setTitle(R.string.device_init_title)
         setSupportActionBar(tool_bar)
 
-        RxView.clicks(ok_btn)
+        val disposable = RxView.clicks(ok_btn)
                 .debounce(1, TimeUnit.SECONDS)
                 .bindUntilEvent(this, ActivityEvent.DESTROY)
                 .subscribe { init() }
+
+        if (ISUS.instance.se) {
+            set_school_id.visiable()
+            set_pass_code.visiable()
+        }
 
         autoInit(getCMDB())
     }
@@ -64,41 +72,10 @@ class InitActivity : RxAppCompatActivity() {
 
     private fun init() {
 
-        var dialog: ProgressDialog? = null
-
-        if (set_cmdb_id.text.isEmpty()) {
-            runOnUiThread { toast("CMDB ID不能为空") }
-        } else {
-            runOnUiThread { dialog = indeterminateProgressDialog(getString(R.string.init_dialog_title)) { setCancelable(false) } }
-            APIService.getSchoolId()
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(Schedulers.io())
-                    .flatMap {
-                        val result = checkNotNull(it.body())
-                        if (result.errno == net.ischool.isus.RESULT_OK) {
-                            APIService.initDevice(set_cmdb_id.text.toString(), result.data.school_id.toString())
-                        } else {
-                            Observable.error(Throwable(result.error))
-                        }
-
-                    }.flatMap { APIService.getConfig() }
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeBy(
-                            onNext = {
-                                dialog?.dismiss()
-                                toast("设备初始化成功")
-                                setResult(Activity.RESULT_OK)
-                                finish()
-                            },
-                            onComplete = { Log.i("Walker", "onComplete") },
-                            onError = {
-                                dialog?.dismiss()
-                                toast("设备初始化失败，请稍后重试")
-                                setResult(Activity.RESULT_CANCELED)
-                                finish()
-                            }
-                    )
-        }
+        if (ISUS.instance.se)
+            initSe()
+        else
+            initPoor()
     }
 
     private fun getCMDB(): String {
@@ -113,7 +90,19 @@ class InitActivity : RxAppCompatActivity() {
 
     private fun autoInit(cmdb: String) {
         if (cmdb.isNotEmpty()) {
-            set_cmdb_id.setText(cmdb)
+            // 根据使用的是否是增强模式，完成cmdbid的不同解析逻辑
+            if (ISUS.instance.se) {
+                val args = cmdb.split('_')
+                if (args.size != 3) {
+                    longToast("命令行参数不正确！无法自动完成初始化！")
+                    return
+                }
+                set_cmdb_id.setText(args[0])
+                set_school_id.setText(args[1])
+                set_school_id.setText(args[2])
+            } else {
+                set_cmdb_id.setText(cmdb)
+            }
             ok_btn.performClick()
         }
     }
@@ -122,5 +111,56 @@ class InitActivity : RxAppCompatActivity() {
         override fun onReceive(context: Context?, intent: Intent?) {
             autoInit(intent?.getStringExtra(CMDBService.ARG_CMDBID) ?: "")
         }
+    }
+
+    /**
+     * 普通模式初始化
+     */
+    private fun initPoor() {
+        var dialog: ProgressDialog? = null
+
+        if (set_cmdb_id.text.isEmpty()) {
+            runOnUiThread { toast("CMDB ID不能为空") }
+        } else {
+            runOnUiThread { dialog = indeterminateProgressDialog(getString(R.string.init_dialog_title)) { setCancelable(false) } }
+            APIService.getSchoolId()
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .flatMap {
+                    val result = checkNotNull(it.body())
+                    if (result.errno == net.ischool.isus.RESULT_OK) {
+                        APIService.initDevice(set_cmdb_id.text.toString(), result.data.school_id.toString())
+                    } else {
+                        Observable.error(Throwable(result.error))
+                    }
+
+                }.flatMap { APIService.getConfig() }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onNext = {
+                        dialog?.dismiss()
+                        toast("设备初始化成功")
+                        setResult(Activity.RESULT_OK)
+                        finish()
+                    },
+                    onComplete = { Log.i("Walker", "onComplete") },
+                    onError = {
+                        dialog?.dismiss()
+                        toast("设备初始化失败，请稍后重试")
+                        setResult(Activity.RESULT_CANCELED)
+                        finish()
+                    }
+                )
+        }
+    }
+
+    /**
+     * 安全增强版初始化
+     */
+    private fun initSe() {
+        // TODO：下载证书
+        // TODO：解析证书
+        // TODO：设置证书
+        // TODO：初始化调用证书
     }
 }

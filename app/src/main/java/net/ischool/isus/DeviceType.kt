@@ -13,6 +13,7 @@ class DeviceType {
         @JvmField val BADGE        = 11    /** 班牌 **/
         @JvmField val VISION_PHONE = 12    /** 可视电话 **/
         @JvmField val SELFIE       = 13    /** 自拍机 **/
+        @JvmField val SWIPE        = 14    /** 刷卡机 **/
 
         /**
          * 获取设备名称
@@ -25,6 +26,7 @@ class DeviceType {
                 SELFIE -> getString(R.string.device_type_selfie)
                 BADGE -> getString(R.string.device_type_badge)
                 SECURITY -> getString(R.string.device_type_security)
+                SWIPE -> getString(R.string.device_type_swipe)
                 else -> ""
             }
         }

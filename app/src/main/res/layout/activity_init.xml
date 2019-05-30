@@ -23,6 +23,22 @@
         android:layout_height="wrap_content"
         android:hint="@string/device_init_cmdb_id"/>
 
+    <EditText
+            android:id="@+id/set_school_id"
+            android:inputType="number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/device_init_school_id"
+            android:visibility="gone"/>
+
+    <EditText
+            android:id="@+id/set_pass_code"
+            android:inputType="number"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/device_init_pass_code"
+            android:visibility="gone"/>
+
     <Button
         android:id="@+id/ok_btn"
         android:layout_width="match_parent"

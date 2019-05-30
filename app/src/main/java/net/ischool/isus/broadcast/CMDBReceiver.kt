@@ -3,12 +3,17 @@ package net.ischool.isus.broadcast
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import net.ischool.isus.ISUS
 import net.ischool.isus.service.CMDBService
 
 /**
  * CMDB ID设置的命令行广播监听
  *
- * adb shell am broadcast -a net.ischool.isus.cmdbid  --es cmdb_id "1234567"
+ * HTTP(存在校园服务器):
+ * adb shell am broadcast -a net.ischool.isus.cmdbid  --es cmdb_id "${cmdb_id}"
+ *
+ * HTTPS(不存在校园服务器):
+ * adb shell am broadcast -a net.ischool.isus.cmdbid  --es cmdb_id "${cmdb_id}_${school_id}_${pass_code}"
  *
  * Author: Walker
  * Email: zhaocework@gmail.com

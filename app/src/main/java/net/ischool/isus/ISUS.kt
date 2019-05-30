@@ -18,7 +18,7 @@ import org.jetbrains.anko.toast
  * Email: zhaocework@gmail.com
  * Date: 2017/9/18
  */
-class ISUS(val context: Context, val domain: String) {
+class ISUS(val context: Context, val domain: String, val se: Boolean) {
 
     companion object {
 
@@ -31,13 +31,13 @@ class ISUS(val context: Context, val domain: String) {
          */
         @JvmOverloads
         @Synchronized
-        @JvmStatic fun init(context: Context, deviceType: Int, domain: String = DEFAULT_DOMAIN) {
-            instance = ISUS(context.applicationContext, domain)
+        @JvmStatic fun init(context: Context, deviceType: Int, domain: String = DEFAULT_DOMAIN, securityEnhance: Boolean = false) {
+            instance = ISUS(context.applicationContext, domain, securityEnhance)
             Logger.addLogAdapter(AndroidLogAdapter())
             PreferenceManager.initPreference(context, deviceType)
             if (context is Activity) {
                 val rxPermission = RxPermissions(context)
-                rxPermission.request(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                val disposable = rxPermission.request(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         .subscribe {
                             if (!it) {
                                 context.toast(context.getString(R.string.get_permission_fail))

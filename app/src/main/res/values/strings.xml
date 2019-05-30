@@ -19,6 +19,7 @@
     <string name="device_type_selfie">自拍机</string>
     <string name="device_type_badge">班牌</string>
     <string name="device_type_security">校园安全控制台</string>
+    <string name="device_type_swipe">刷卡机</string>
 
     <string name="external_syslog">Log发送地址</string>
     <string name="external_school_name">学校名</string>
@@ -35,6 +36,8 @@
 
     <string name="device_init_title">设备初始化</string>
     <string name="device_init_cmdb_id">请输入CMDB ID</string>
+    <string name="device_init_school_id">请输入学校 ID</string>
+    <string name="device_init_pass_code">请输入授权码</string>
 
     <string name="button_ok">确定</string>
 
