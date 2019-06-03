@@ -12,7 +12,10 @@ package net.ischool.isus
 const val DEFAULT_DOMAIN = "i-school.net"
 
 // 默认的服务器地址
-val END_POINT by lazy { "http://cdn.schools.${ISUS.instance.domain}/" }
+val END_POINT by lazy { "${if (ISUS.instance.se) "https://cc" else "http://cdn.schools"}.${ISUS.instance.domain}/" }
+
+// RSA密钥部分口令
+val CONFIG_RSA_PASS = "6f7084632667a86cbcba2ff128d46440"
 
 // 网络访问结果
 const val RESULT_OK = 0

@@ -9,24 +9,29 @@ import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
 import com.jakewharton.rxbinding2.view.RxView
-import com.jakewharton.rxbinding2.widget.text
 import com.trello.rxlifecycle2.android.ActivityEvent
 import com.trello.rxlifecycle2.components.support.RxAppCompatActivity
 import com.trello.rxlifecycle2.kotlin.bindUntilEvent
+import com.walker.anke.foundation.md5
 import com.walker.anke.framework.visiable
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_init.*
+import net.ischool.isus.CONFIG_RSA_PASS
 import net.ischool.isus.ISUS
 import net.ischool.isus.R
 import net.ischool.isus.network.APIService
+import net.ischool.isus.network.callback.StringCallback
+import net.ischool.isus.preference.PreferenceManager
 import net.ischool.isus.service.CMDBService
+import okhttp3.Request
 import org.jetbrains.anko.indeterminateProgressDialog
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.toast
 import java.io.File
+import java.io.IOException
 import java.lang.Exception
 import java.util.concurrent.TimeUnit
 
@@ -99,7 +104,7 @@ class InitActivity : RxAppCompatActivity() {
                 }
                 set_cmdb_id.setText(args[0])
                 set_school_id.setText(args[1])
-                set_school_id.setText(args[2])
+                set_pass_code.setText(args[2])
             } else {
                 set_cmdb_id.setText(cmdb)
             }
@@ -158,9 +163,51 @@ class InitActivity : RxAppCompatActivity() {
      * 安全增强版初始化
      */
     private fun initSe() {
-        // TODO：下载证书
-        // TODO：解析证书
-        // TODO：设置证书
-        // TODO：初始化调用证书
+        val schoolId = set_school_id.text.toString()
+        val passCode = set_pass_code.text.toString()
+        val cmdbId = set_cmdb_id.text.toString()
+
+        if (schoolId.isEmpty() || passCode.isEmpty() || cmdbId.isEmpty()) {
+            runOnUiThread { toast("缺少必要参数") }
+            return
+        }
+
+        var dialog: ProgressDialog? = null
+        runOnUiThread { dialog = indeterminateProgressDialog(getString(R.string.init_dialog_title)) { setCancelable(false) } }
+
+        val url = "http://update.${ISUS.instance.domain}/zxedu-system-images/schools/schoolcdn-$schoolId-$passCode.pem"
+        APIService.downloadAsync(url, filesDir.absolutePath, object : StringCallback {
+            override fun onResponse(string: String) {
+                PreferenceManager.instance.setSePemPath(string)
+                PreferenceManager.instance.setKeyPass(genPrivateKeyPass(passCode))
+                APIService.initDevice(cmdbId, schoolId)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeBy(
+                        onNext = {
+                            dialog?.dismiss()
+                            toast("设备初始化成功")
+                            setResult(Activity.RESULT_OK)
+                            finish()
+                        },
+                        onError = {
+                            dialog?.dismiss()
+                            toast("设备初始化失败，请稍后重试")
+                            setResult(Activity.RESULT_CANCELED)
+                            finish()
+                        }
+                    )
+            }
+
+            override fun onFailure(request: Request, e: IOException) {
+                runOnUiThread {
+                    dialog?.dismiss()
+                    toast("证书下载失败，请尝试重新初始化！")
+                    longToast("Error: ${e.message}")
+                }
+            }
+        })
     }
+
+    private fun genPrivateKeyPass(pass: String) = "zxedu$pass$CONFIG_RSA_PASS".md5()
 }

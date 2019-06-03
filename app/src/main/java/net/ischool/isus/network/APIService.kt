@@ -11,6 +11,7 @@ import net.ischool.isus.model.*
 import net.ischool.isus.network.callback.StringCallback
 import net.ischool.isus.network.interceptor.CacheInterceptor
 import net.ischool.isus.network.interceptor.URLInterceptor
+import net.ischool.isus.network.se.SSLSocketFactoryProvider
 import net.ischool.isus.preference.PreferenceManager
 import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
@@ -74,6 +75,12 @@ interface APIService {
     @POST("eqptapi/pong")
     fun _pong(@Field("token") token: String): Observable<ResponseBody>
 
+    /**
+     * 获取用户列表
+     */
+    @GET("www/schoolcdn/getAllUids")
+    fun _getUids(): Observable<Response<Result<Uids>>>
+
     object Factory {
         fun createService(client: OkHttpClient): APIService {
             val retrofit = Retrofit.Builder()
@@ -96,7 +103,7 @@ interface APIService {
             val cacheSize = 10 * 1024 * 1024
             val cache = Cache(cacheFile, cacheSize.toLong())
 
-            OkHttpClient.Builder()
+            val builder = OkHttpClient.Builder()
                     .connectTimeout(10, TimeUnit.SECONDS)
                     .writeTimeout(10, TimeUnit.SECONDS)
                     .readTimeout(30, TimeUnit.SECONDS)
@@ -106,7 +113,12 @@ interface APIService {
                     .addInterceptor(HttpLoggingInterceptor().apply {
                         level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
                     })
-                    .build()
+            if (ISUS.instance.se) {
+                builder
+                    .sslSocketFactory(SSLSocketFactoryProvider.getSSLSocketFactory())
+                    .hostnameVerifier { hostname, session -> true }
+            }
+            builder.build()
         }
 
         private val delivery: Handler by lazy { Handler(Looper.getMainLooper()) }
@@ -159,6 +171,8 @@ interface APIService {
 
         fun pong() = instance._pong(PreferenceManager.instance.getToken())
 
+        fun getUids() = instance._getUids()
+
         /**
          * 取消所有网络请求
          */
@@ -177,7 +191,8 @@ interface APIService {
             val request = Request.Builder()
                     .url(url)
                     .build()
-            val call = checkNotNull(client).newCall(request)
+            // 下载文件使用独立的Http Client
+            val call = checkNotNull(OkHttpClient.Builder().build()).newCall(request)
             call.enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     sendFailedStringCallback(request, e, callback)
@@ -223,13 +238,13 @@ interface APIService {
         }
 
         private fun sendFailedStringCallback(request: Request, e: IOException, callback: StringCallback) {
-            delivery.post() {
+            delivery.post {
                 callback.onFailure(request, e)
             }
         }
 
         private fun sendSuccessStringCallback(string: String, callback: StringCallback) {
-            delivery.post() {
+            delivery.post {
                 callback.onResponse(string)
             }
         }

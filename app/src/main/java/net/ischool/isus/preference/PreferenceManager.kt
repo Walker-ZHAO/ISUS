@@ -19,6 +19,8 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     private val preference: SharedPreferences
     private val rxPreference: RxSharedPreferences
 
+    private val _sePemPath: Preference<String>       /** 安全增强模式下的PEM证书路径 **/
+    private val _keyPass: Preference<String>       /** 安全增强模式下的私钥口令 **/
     private val _needUpdate: Preference<Boolean>     /** 是否需要更新CMDB ID **/
     private val _cmdbId: Preference<String>          /** 硬件的CMDB ID **/
     private val _schoolId: Preference<String>        /** 学校ID **/
@@ -32,6 +34,8 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     init {
         preference = context.getSharedPreferences(CONFIG_PATH, Context.MODE_PRIVATE)
         rxPreference = RxSharedPreferences.create(preference)
+        _sePemPath = rxPreference.getString(KEY_SE_PEM_PATH)
+        _keyPass = rxPreference.getString(KEY_KEY_PASS)
         _needUpdate = rxPreference.getBoolean(KEY_NEED_UPDATE, false)
         _cmdbId = rxPreference.getString(KEY_CMDB_ID)
         _schoolId = rxPreference.getString(KEY_SCHOOL_ID)
@@ -62,7 +66,12 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
 
         private var CONFIG_PATH = "ISUS_CONFIG"
 
+        /** ISUS 内部**/
         private var KEY_NEED_UPDATE = "NEED_UPDATE"
+        private var KEY_SE_PEM_PATH = "SE_PEM_PATH"
+        private var KEY_KEY_PASS = "KEY_PASS"
+
+        /** 初始化时网络获取 **/
         private var KEY_CMDB_ID = "CMDB_ID"
         private var KEY_SCHOOL_ID = "SCHOOL_ID"
         private var KEY_TOKEN = "TOKEN"
@@ -73,6 +82,8 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
         private var KEY_PARAMETER = "PARAMETER"
     }
 
+    fun getSePemPath() = _sePemPath.get()
+    fun getKeyPass() = _keyPass.get()
     fun getCMDB() = if (_needUpdate.get()) "" else _cmdbId.get()
     fun getSchoolId() = _schoolId.get()
     fun getToken() = _token.get()
@@ -83,6 +94,8 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     fun getParameter() = Gson().fromJson<Map<String, String>>(_parameter.get())?:HashMap()
     fun getURL() = "${_protocal.get()}://${_serverAddress.get()}/"
 
+    fun setSePemPath(path: String) = _sePemPath.set(path)
+    fun setKeyPass(pass: String) = _keyPass.set(pass)
     fun setNeedUpdate(need: Boolean) = _needUpdate.set(need)
     fun setCMDB(cmdb: String) {
         _cmdbId.set(cmdb)

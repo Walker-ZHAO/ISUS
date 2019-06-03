@@ -67,7 +67,7 @@ dependencies {
     // Logger
     implementation 'com.orhanobut:logger:2.1.1'
     // Useful Extension
-    implementation 'com.github.Walker-ZHAO:Anke:0.0.17'
+    implementation 'com.github.Walker-ZHAO:Anke:0.0.18'
     // RabbitMQ
     implementation 'com.rabbitmq:amqp-client:4.7.0'
 }

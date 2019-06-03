@@ -33,7 +33,6 @@
 
     <EditText
             android:id="@+id/set_pass_code"
-            android:inputType="number"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/device_init_pass_code"
