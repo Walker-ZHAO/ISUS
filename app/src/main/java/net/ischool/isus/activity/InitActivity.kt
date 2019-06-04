@@ -182,6 +182,7 @@ class InitActivity : RxAppCompatActivity() {
                 PreferenceManager.instance.setKeyPass(genPrivateKeyPass(passCode))
                 APIService.initDevice(cmdbId, schoolId)
                     .subscribeOn(Schedulers.io())
+                    .flatMap { APIService.getConfig() }
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeBy(
                         onNext = {

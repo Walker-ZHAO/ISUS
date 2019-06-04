@@ -12,7 +12,7 @@ package net.ischool.isus
 const val DEFAULT_DOMAIN = "i-school.net"
 
 // 默认的服务器地址
-val END_POINT by lazy { "${if (ISUS.instance.se) "https://cc" else "http://cdn.schools"}.${ISUS.instance.domain}/" }
+val END_POINT by lazy { "${if (ISUS.instance.se) "https://cc" else "http://cdn.schools"}.${ISUS.instance.domain}/www/" }
 
 // RSA密钥部分口令
 val CONFIG_RSA_PASS = "6f7084632667a86cbcba2ff128d46440"
@@ -33,11 +33,20 @@ const val ACTION_COMMAND = "net.ischool.isus.command"
 const val UDP_PORT = 514
 
 // RabbitMQ 相关配置
+// 通用配置
+const val MQ_VHOST = "/"
+// 非安全增强模式配置
 val MQ_DOMAIN by lazy { "cdn.schools.${ISUS.instance.domain}" }
 const val MQ_PORT = 5672
 const val MQ_USERNAME = "equipment"
 const val MQ_PASSWORD = "1835ac0a6b749651efa42dd4e09e625a"
-const val MQ_VHOST = "/"
 const val MQ_EXCHANGE_NAME = "equipment"
 const val MQ_EXCHANGE_TYPE = "topic"
 const val MQ_ROUTING_KEY_PREFIX = "$MQ_EXCHANGE_NAME.cmdb"
+
+// 安全增强模式配置
+val MQ_DOMAIN_SE by lazy { "cdnmq.i-school.net" }
+const val MQ_PORT_SE = 5671
+const val MQ_ROUTING_KEY_SE = "sync.schools.#"
+const val MQ_ROUTING_KEY_USER = "sync.schools.user"
+const val MQ_ROUTING_KEY_COMET = "sync.schools.sys.comet"

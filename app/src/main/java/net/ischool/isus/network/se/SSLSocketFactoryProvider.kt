@@ -17,7 +17,7 @@ import java.lang.Exception
 class SSLSocketFactoryProvider {
     companion object {
 
-        fun getSSLSocketFactory(): SSLSocketFactory {
+        fun getSSLContext(): SSLContext {
             val password = PreferenceManager.instance.getKeyPass()
             val certType = "X.509"
             val protocol = "TLS"
@@ -45,13 +45,15 @@ class SSLSocketFactoryProvider {
 
                 val ssContext = SSLContext.getInstance(protocol)
                 ssContext.init(keyManagerFactory.keyManagers, arrayOf(NullX509TrustManager()), null)
-                return ssContext.socketFactory
+                return ssContext
             } catch (e: Exception) {
                 val ssContext = SSLContext.getInstance(protocol)
                 ssContext.init(arrayOf(), arrayOf(NullX509TrustManager()), null)
-                return ssContext.socketFactory
+                return ssContext
             }
         }
+
+        fun getSSLSocketFactory(): SSLSocketFactory = getSSLContext().socketFactory
 
         private fun emptyKeyStore(password: String)=  KeyStore.getInstance(KeyStore.getDefaultType()).apply { load(null, password.toCharArray()) }
     }
