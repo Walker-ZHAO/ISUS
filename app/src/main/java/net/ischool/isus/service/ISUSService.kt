@@ -9,11 +9,13 @@ import com.google.gson.Gson
 import com.rabbitmq.client.*
 import com.rabbitmq.client.impl.DefaultExceptionHandler
 import com.walker.anke.gson.fromJson
+import io.reactivex.rxkotlin.subscribeBy
 import net.ischool.isus.*
 import net.ischool.isus.command.CommandParser
 import net.ischool.isus.log.Syslog
 import net.ischool.isus.model.Command
 import net.ischool.isus.model.SECommand
+import net.ischool.isus.model.SEUserSync
 import net.ischool.isus.network.APIService
 import net.ischool.isus.network.se.SSLSocketFactoryProvider
 import net.ischool.isus.preference.PreferenceManager
@@ -108,17 +110,19 @@ class ISUSService : Service() {
                         }
                         MQ_ROUTING_KEY_USER -> {    // 增量同步用户信息
                             Syslog.logI("syncUser SE Info: $msg")
-                            // TODO: 用户信息同步
+                            Gson().fromJson<SEUserSync>(it).payload.uid.apply {
+                                syncUserInfo(
+                                    toInt(),
+                                    ack = { channel?.basicAck(envelope.deliveryTag, false) },
+                                    reject = { channel?.basicReject(envelope.deliveryTag, true) })
+                            }
                         }
                         else -> {
-
+                            // 其他路由消息，拒收
+                            channel?.basicReject(envelope?.deliveryTag!!, true)
                         }
                     }
                 }
-
-                // 应答
-                // channel?.basicAck(envelope?.deliveryTag!!, false)
-                // channel?.basicReject(envelope?.deliveryTag!!, true)
             }
 
             override fun handleShutdownSignal(consumerTag: String?, sig: ShutdownSignalException?) {
@@ -334,5 +338,36 @@ class ISUSService : Service() {
                 subscribe()
             }
         }
+    }
+
+    /**
+     * 同步用户信息
+     */
+    private fun syncUserInfo(uid: Int, ack: () -> Unit, reject: () -> Unit) {
+        APIService.getUserInfo(uid).subscribeBy(
+            onNext = {
+                val result = checkNotNull(it.body())
+                when (result.errno) {
+                    0 -> {  // 更新用户信息，ack
+                        // TODO 更新用户信息到数据库
+                        Log.w("ISUS", "update ${result.data}")
+                        ack()
+                    }
+                    5 -> {  // 删除用户信息，ack
+                        // TODO 删除用户信息到数据库
+                        Log.w("ISUS", "delete ${result.data}")
+                        ack()
+                    }
+                    else -> {   // 其他错误，拒收消息
+                        Syslog.logI("同步用户信息失败(${result.error}) uid: $uid")
+                        reject()
+                    }
+                }
+            },
+            onError = {
+                Syslog.logI("同步用户信息失败(${it.message}) uid: $uid")
+                reject()
+            }
+        )
     }
 }

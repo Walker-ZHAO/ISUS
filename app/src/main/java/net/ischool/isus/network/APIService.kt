@@ -94,6 +94,10 @@ interface APIService {
         }
     }
 
+    @FormUrlEncoded
+    @POST("schoolcdn/getUserInfoSimple")
+    fun _getUserInfo(@Field("uid") uid: Int): Observable<Response<Result<User>>>
+
     companion object {
 
         private val instance: APIService by lazy { Factory.createService(client) }
@@ -173,6 +177,8 @@ interface APIService {
         fun pong() = instance._pong(PreferenceManager.instance.getToken())
 
         fun getUids() = instance._getUids()
+
+        fun getUserInfo(uid: Int) = instance._getUserInfo(uid)
 
         /**
          * 取消所有网络请求

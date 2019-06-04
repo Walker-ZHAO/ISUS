@@ -244,7 +244,7 @@ class KeyImport {
                     0x02 -> integers.add(BigInteger(contents))  // Integer
                     0x04 -> byteStrings?.add(contents)  // byte string
                     0x06 -> oids?.add(contents) // OID
-                    0x05 -> print("Ignore this.  It comes up in the RSA format, but only as a placeholder.")
+                    0x05 -> { } // Ignore this.  It comes up in the RSA format, but only as a placeholder.
                     else -> throw KeyImportException("Unsupported ASN.1 tag $tag encountered.  Is this a valid RSA key?")
 
                 }
