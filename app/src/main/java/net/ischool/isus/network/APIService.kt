@@ -96,7 +96,7 @@ interface APIService {
 
     @FormUrlEncoded
     @POST("schoolcdn/getUserInfoSimple")
-    fun _getUserInfo(@Field("uid") uid: Int): Observable<Response<Result<User>>>
+    fun _getUserInfo(@Field("uid") uid: Long): Observable<Response<Result<User>>>
 
     companion object {
 
@@ -178,7 +178,7 @@ interface APIService {
 
         fun getUids() = instance._getUids()
 
-        fun getUserInfo(uid: Int) = instance._getUserInfo(uid)
+        fun getUserInfo(uid: Long) = instance._getUserInfo(uid)
 
         /**
          * 取消所有网络请求
@@ -192,9 +192,10 @@ interface APIService {
          *
          * @param url           下载地址
          * @param destFileDir   本地下载目录
+         * @param fileName      下载的文件名，若不传，自动使用url地址命名
          * @param callback      下载结果回调
          */
-        fun downloadAsync(url: String, destFileDir: String, callback: StringCallback) {
+        fun downloadAsync(url: String, destFileDir: String, fileName: String = "", callback: StringCallback) {
             val request = Request.Builder()
                     .url(url)
                     .build()
@@ -212,7 +213,9 @@ interface APIService {
                     var fos: FileOutputStream? = null
                     try {
                         inputStream = response.body()?.byteStream()
-                        val file = File(destFileDir, getFileName(url))
+                        val file = File(destFileDir, if (fileName.isEmpty()) getFileName(url) else fileName)
+                        file.parentFile.mkdir()
+                        file.createNewFile()
                         fos = FileOutputStream(file)
                         len = inputStream?.read(buf)!!
                         while ( len != -1 ) {

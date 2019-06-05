@@ -9,4 +9,4 @@ import com.google.gson.annotations.SerializedName
  * Email: zhaocework@gmail.com
  * Date: 2019-05-30
  */
-data class Uids(@SerializedName(value = "list") val uids: List<Int>)
+data class Uids(@SerializedName(value = "list") val uids: List<Long>)

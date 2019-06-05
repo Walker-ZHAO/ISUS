@@ -50,3 +50,6 @@ const val MQ_PORT_SE = 5671
 const val MQ_ROUTING_KEY_SE = "sync.schools.#"
 const val MQ_ROUTING_KEY_USER = "sync.schools.user"
 const val MQ_ROUTING_KEY_COMET = "sync.schools.sys.comet"
+
+// 头像缓存目录
+val AVATAR_CACHE_DIR = "${ISUS.instance.context.filesDir.absolutePath}/img"

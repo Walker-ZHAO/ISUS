@@ -96,7 +96,7 @@ class CommandImpl constructor(private val context: Context) : ICommand {
      */
     override fun update(url: String?) {
         url?.let {
-            APIService.downloadAsync(it, Environment.getExternalStorageDirectory().path, object : StringCallback {
+            APIService.downloadAsync(it, Environment.getExternalStorageDirectory().path, callback = object : StringCallback {
                 override fun onResponse(string: String) {
                     execRuntimeProcess("pm install -r $string")
                 }

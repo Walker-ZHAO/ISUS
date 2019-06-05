@@ -7,6 +7,7 @@ import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import com.tbruyelle.rxpermissions2.RxPermissions
 import net.ischool.isus.command.CommandParser
+import net.ischool.isus.db.ObjectBox
 import net.ischool.isus.preference.PreferenceManager
 import net.ischool.isus.service.ISUSService
 import org.jetbrains.anko.toast
@@ -35,6 +36,7 @@ class ISUS(val context: Context, val domain: String, val se: Boolean) {
             instance = ISUS(context.applicationContext, domain, securityEnhance)
             Logger.addLogAdapter(AndroidLogAdapter())
             PreferenceManager.initPreference(context, deviceType)
+            ObjectBox.init(context)
             if (context is Activity) {
                 val rxPermission = RxPermissions(context)
                 val disposable = rxPermission.request(Manifest.permission.WRITE_EXTERNAL_STORAGE)

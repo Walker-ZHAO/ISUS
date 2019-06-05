@@ -12,14 +12,18 @@ import com.walker.anke.gson.fromJson
 import io.reactivex.rxkotlin.subscribeBy
 import net.ischool.isus.*
 import net.ischool.isus.command.CommandParser
+import net.ischool.isus.db.ObjectBox
 import net.ischool.isus.log.Syslog
 import net.ischool.isus.model.Command
 import net.ischool.isus.model.SECommand
 import net.ischool.isus.model.SEUserSync
 import net.ischool.isus.network.APIService
+import net.ischool.isus.network.callback.StringCallback
 import net.ischool.isus.network.se.SSLSocketFactoryProvider
 import net.ischool.isus.preference.PreferenceManager
+import okhttp3.Request
 import org.jetbrains.anko.doAsync
+import java.io.IOException
 
 /**
  * 统一推送服务
@@ -112,9 +116,9 @@ class ISUSService : Service() {
                             Syslog.logI("syncUser SE Info: $msg")
                             Gson().fromJson<SEUserSync>(it).payload.uid.apply {
                                 syncUserInfo(
-                                    toInt(),
-                                    ack = { channel?.basicAck(envelope.deliveryTag, false) },
-                                    reject = { channel?.basicReject(envelope.deliveryTag, true) })
+                                    toLong(),
+                                    success = { channel?.basicAck(envelope.deliveryTag, false) },
+                                    fail = { channel?.basicReject(envelope.deliveryTag, true) })
                             }
                         }
                         else -> {
@@ -218,6 +222,54 @@ class ISUSService : Service() {
             val intent = Intent(context, ISUSService::class.java)
             intent.action = COMMAND_STOP
             context.startService(intent)
+        }
+
+        /**
+         * 同步用户信息
+         */
+        fun syncUserInfo(uid: Long, success: () -> Unit, fail: () -> Unit) {
+            APIService.getUserInfo(uid).subscribeBy(
+                onNext = {
+                    val result = checkNotNull(it.body())
+                    when (result.errno) {
+                        0 -> {  // 更新用户信息，ack
+                            val user = result.data
+                            APIService.downloadAsync(
+                                user.avatar,
+                                AVATAR_CACHE_DIR,
+                                "${user.uid}.jpg",
+                                object : StringCallback {
+                                    override fun onResponse(string: String) {
+                                        doAsync {
+                                            user.cacheAvatar = string
+                                            ObjectBox.userBox.put(user)
+                                            success()
+                                        }
+                                    }
+
+                                    override fun onFailure(request: Request, e: IOException) {
+                                        doAsync {
+                                            Syslog.logI("同步用户信息失败，头像缓存错误(${e.message}) uid: $uid")
+                                            fail()
+                                        }
+                                    }
+                                })
+                        }
+                        5 -> {  // 删除用户信息，ack
+                            ObjectBox.userBox.remove(result.data.uid)
+                            success()
+                        }
+                        else -> {   // 其他错误，拒收消息
+                            Syslog.logI("同步用户信息失败，服务器错误(${result.error}) uid: $uid")
+                            fail()
+                        }
+                    }
+                },
+                onError = {
+                    Syslog.logI("同步用户信息失败，内部错误(${it.message}) uid: $uid")
+                    fail()
+                }
+            )
         }
     }
 
@@ -338,36 +390,5 @@ class ISUSService : Service() {
                 subscribe()
             }
         }
-    }
-
-    /**
-     * 同步用户信息
-     */
-    private fun syncUserInfo(uid: Int, ack: () -> Unit, reject: () -> Unit) {
-        APIService.getUserInfo(uid).subscribeBy(
-            onNext = {
-                val result = checkNotNull(it.body())
-                when (result.errno) {
-                    0 -> {  // 更新用户信息，ack
-                        // TODO 更新用户信息到数据库
-                        Log.w("ISUS", "update ${result.data}")
-                        ack()
-                    }
-                    5 -> {  // 删除用户信息，ack
-                        // TODO 删除用户信息到数据库
-                        Log.w("ISUS", "delete ${result.data}")
-                        ack()
-                    }
-                    else -> {   // 其他错误，拒收消息
-                        Syslog.logI("同步用户信息失败(${result.error}) uid: $uid")
-                        reject()
-                    }
-                }
-            },
-            onError = {
-                Syslog.logI("同步用户信息失败(${it.message}) uid: $uid")
-                reject()
-            }
-        )
     }
 }
