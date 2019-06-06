@@ -44,12 +44,14 @@ class ISUSService : Service() {
         val errorMsg = "RabbitMQ $type shutdown: ${cause.reason}"
         Log.e("ISIS", errorMsg)
         Syslog.logE(errorMsg)
+        changeState(QueueState.STATE_BLOCK)
     }
     private val recoveryListener = object : RecoveryListener {
         override fun handleRecovery(recoverable: Recoverable?) {
             val msg = "RabbitMQ connect recovery completed"
             Log.i("ISUS", msg)
             Syslog.logI(msg)
+            changeState(QueueState.STATE_STANDBY)
         }
 
         override fun handleRecoveryStarted(recoverable: Recoverable?) {
@@ -60,82 +62,78 @@ class ISUSService : Service() {
     }
 
     // 普通模式下的消费者，连接校园服务器
-    private val consumer by lazy {
-        object : DefaultConsumer(channel) {
-            override fun handleDelivery(
-                consumerTag: String?,
-                envelope: Envelope?,
-                properties: AMQP.BasicProperties?,
-                body: ByteArray?
-            ) {
-                super.handleDelivery(consumerTag, envelope, properties, body)
-                val msg = body?.toString(charset("UTF-8"))
-                Log.e("ISUS", "RabbitMQ message: $msg")
-                Syslog.logI("getCommand Info: $msg")
-                msg?.let {
-                    val command = Gson().fromJson<Command>(it)
-                    CommandParser.instance.processCommand(command)
-                }
+    inner class PoorConsumer(channel: Channel?): DefaultConsumer(channel) {
+        override fun handleDelivery(
+            consumerTag: String?,
+            envelope: Envelope?,
+            properties: AMQP.BasicProperties?,
+            body: ByteArray?
+        ) {
+            super.handleDelivery(consumerTag, envelope, properties, body)
+            val msg = body?.toString(charset("UTF-8"))
+            Log.e("ISUS", "RabbitMQ message: $msg")
+            Syslog.logI("getCommand Info: $msg")
+            msg?.let {
+                val command = Gson().fromJson<Command>(it)
+                CommandParser.instance.processCommand(command)
             }
+        }
 
-            override fun handleShutdownSignal(consumerTag: String?, sig: ShutdownSignalException?) {
-                super.handleShutdownSignal(consumerTag, sig)
-                val errorMsg = "RabbitMQ consume($consumerTag) get ShutdownSignalException, ${sig?.reason}"
-                Log.e("ISIS", errorMsg)
-                Syslog.logE(errorMsg)
-            }
+        override fun handleShutdownSignal(consumerTag: String?, sig: ShutdownSignalException?) {
+            super.handleShutdownSignal(consumerTag, sig)
+            val errorMsg = "RabbitMQ consume($consumerTag) get ShutdownSignalException, ${sig?.reason}"
+            Log.e("ISIS", errorMsg)
+            Syslog.logE(errorMsg)
         }
     }
 
     // 安全增强模式下的消费者，连接公网服务器
-    private val seConsumer by lazy {
-        object : DefaultConsumer(channel) {
-            override fun handleDelivery(
-                consumerTag: String?,
-                envelope: Envelope?,
-                properties: AMQP.BasicProperties?,
-                body: ByteArray?
-            ) {
-                super.handleDelivery(consumerTag, envelope, properties, body)
-                val msg = body?.toString(charset("UTF-8"))
+    inner class SeConsumer(channel: Channel?): DefaultConsumer(channel) {
+        override fun handleDelivery(
+            consumerTag: String?,
+            envelope: Envelope?,
+            properties: AMQP.BasicProperties?,
+            body: ByteArray?
+        ) {
+            super.handleDelivery(consumerTag, envelope, properties, body)
+            val msg = body?.toString(charset("UTF-8"))
 
-                Log.e("ISUS", "RabbitMQ SE message: $msg")
-                Log.e("ISUS", "RabbitMQ SE routing key: ${envelope?.routingKey}")
+            Log.e("ISUS", "RabbitMQ SE message: $msg")
+            Log.e("ISUS", "RabbitMQ SE routing key: ${envelope?.routingKey}")
 
-                msg?.let {
-                    when (envelope?.routingKey) {
-                        MQ_ROUTING_KEY_COMET -> {   // 普通命令
-                            Syslog.logI("getCommand SE Info: $it")
-                            // 直接ack
-                            channel?.basicAck(envelope.deliveryTag, false)
-                            Gson().fromJson<SECommand>(it).payload.payload.apply {
-                                if (cmdbid == PreferenceManager.instance.getCMDB())
-                                    CommandParser.instance.processCommand(this)
-                            }
+            msg?.let {
+                when (envelope?.routingKey) {
+                    MQ_ROUTING_KEY_COMET -> {   // 普通命令
+                        Syslog.logI("getCommand SE Info: $it")
+                        // 直接ack
+                        channel?.basicAck(envelope.deliveryTag, false)
+                        Gson().fromJson<SECommand>(it).payload.payload.apply {
+                            if (cmdbid == PreferenceManager.instance.getCMDB())
+                                CommandParser.instance.processCommand(this)
                         }
-                        MQ_ROUTING_KEY_USER -> {    // 增量同步用户信息
-                            Syslog.logI("syncUser SE Info: $msg")
-                            Gson().fromJson<SEUserSync>(it).payload.uid.apply {
-                                syncUserInfo(
-                                    toLong(),
-                                    success = { doAsync { channel?.basicAck(envelope.deliveryTag, false) } },
-                                    fail = { doAsync { channel?.basicReject(envelope.deliveryTag, true) } })
-                            }
+                    }
+                    MQ_ROUTING_KEY_USER -> {    // 增量同步用户信息
+                        Syslog.logI("syncUser SE Info: $msg")
+                        Gson().fromJson<SEUserSync>(it).payload.uid.apply {
+                            syncUserInfo(
+                                toLong(),
+                                success = { doAsync { channel?.basicAck(envelope.deliveryTag, false) } },
+                                fail = { doAsync { channel?.basicReject(envelope.deliveryTag, true) } })
                         }
-                        else -> {
-                            // 其他路由消息，拒收
-                            channel?.basicReject(envelope?.deliveryTag!!, true)
-                        }
+                    }
+                    else -> {
+                        // 其他路由消息，拒收
+                        channel?.basicReject(envelope?.deliveryTag!!, true)
                     }
                 }
             }
+        }
 
-            override fun handleShutdownSignal(consumerTag: String?, sig: ShutdownSignalException?) {
-                super.handleShutdownSignal(consumerTag, sig)
-                val errorMsg = "RabbitMQ SE consume($consumerTag) get ShutdownSignalException, ${sig?.reason}"
-                Log.e("ISIS", errorMsg)
-                Syslog.logE(errorMsg)
-            }
+        override fun handleShutdownSignal(consumerTag: String?, sig: ShutdownSignalException?) {
+            super.handleShutdownSignal(consumerTag, sig)
+            val errorMsg = "RabbitMQ SE consume($consumerTag) get ShutdownSignalException, ${sig?.reason}"
+            Log.e("ISIS", errorMsg)
+            Syslog.logE(errorMsg)
         }
     }
 
@@ -223,6 +221,7 @@ class ISUSService : Service() {
         const val COMMAND_START = "net.ischool.isus.start"
         const val COMMAND_STOP = "net.ischool.isus.stop"
         var isRunning = false
+        var queueState = QueueState.STATE_BLOCK
 
         fun start(context: Context) {
             val intent = Intent(context, ISUSService::class.java)
@@ -385,7 +384,9 @@ class ISUSService : Service() {
                     // 根据路由键将队列绑定到交换机上（需要知道交换机名称和路由键名称）
                     channel?.queueBind(queueSe?.queue, exchangeNameSe, MQ_ROUTING_KEY_SE)
                     // 创建消费者获取RabbitMQ上的消息。每当获取到一条消息后，就会回调handleDelivery方法，该方法可以获取到消息数据并进行相应处理
-                    channel?.basicConsume(queueSe?.queue, false, seConsumer)
+                    channel?.basicConsume(queueSe?.queue, false, SeConsumer(channel))
+                    // 未抛出异常，认为连接建立成功
+                    changeState(QueueState.STATE_STANDBY)
                 } else {    // 普通模式，连接内网校园服务器
                     // 队列名称规则：学校ID.设备类型.CMDBID
                     val queueName =
@@ -401,15 +402,25 @@ class ISUSService : Service() {
                         "$MQ_ROUTING_KEY_PREFIX${PreferenceManager.instance.getCMDB()}"
                     )
                     // 创建消费者获取RabbitMQ上的消息。每当获取到一条消息后，就会回调handleDelivery方法，该方法可以获取到消息数据并进行相应处理
-                    channel?.basicConsume(queue?.queue, true, consumer)
+                    channel?.basicConsume(queue?.queue, true, PoorConsumer(channel))
+                    // 未抛出异常，认为连接建立成功
+                    changeState(QueueState.STATE_STANDBY)
                 }
             } catch (e: Exception) { // 初次创建连接及相关Topology失败时，不会自动修复连接，需要手动处理
-                val errorMsg = "RabbitMQ initial connect and topology failed: ${e.cause}"
+                val errorMsg = "RabbitMQ initial connect and topology failed: ${e.message}"
                 Log.e("ISUS", errorMsg)
                 Syslog.logE(errorMsg)
                 Thread.sleep(5000)
                 subscribe()
             }
         }
+    }
+
+    /**
+     * RabbitMQ连接状态改变
+     */
+    private fun changeState(state: QueueState) {
+        queueState = state
+        sendBroadcast(Intent(ACTION_QUEUE_STATE_CHANGE))
     }
 }

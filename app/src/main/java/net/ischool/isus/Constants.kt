@@ -28,6 +28,8 @@ const val EXTRA_ARGS = "args"
 
 // 广播的command的action
 const val ACTION_COMMAND = "net.ischool.isus.command"
+// 广播RabbitMQ连接状态的action
+const val ACTION_QUEUE_STATE_CHANGE = "net.ischool.isus.queue_state"
 
 // Syslog 的 UDP 端口
 const val UDP_PORT = 514
