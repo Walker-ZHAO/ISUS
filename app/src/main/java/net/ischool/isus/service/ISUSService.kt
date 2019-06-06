@@ -123,7 +123,7 @@ class ISUSService : Service() {
                     }
                     else -> {
                         // 其他路由消息，拒收
-                        hannel?.basicReject(envelope?.deliveryTag!!, false)
+                        channel?.basicReject(envelope?.deliveryTag!!, false)
                     }
                 }
             }
