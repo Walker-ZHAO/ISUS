@@ -20,7 +20,8 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     private val rxPreference: RxSharedPreferences
 
     private val _sePemPath: Preference<String>       /** 安全增强模式下的PEM证书路径 **/
-    private val _keyPass: Preference<String>       /** 安全增强模式下的私钥口令 **/
+    private val _keyPass: Preference<String>         /** 安全增强模式下的私钥口令 **/
+    private val _syncCount: Preference<Int>          /** 用户信息全量同步次数 **/
     private val _needUpdate: Preference<Boolean>     /** 是否需要更新CMDB ID **/
     private val _cmdbId: Preference<String>          /** 硬件的CMDB ID **/
     private val _schoolId: Preference<String>        /** 学校ID **/
@@ -36,6 +37,7 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
         rxPreference = RxSharedPreferences.create(preference)
         _sePemPath = rxPreference.getString(KEY_SE_PEM_PATH)
         _keyPass = rxPreference.getString(KEY_KEY_PASS)
+        _syncCount = rxPreference.getInteger(KEY_SYNC_COUNT, 0)
         _needUpdate = rxPreference.getBoolean(KEY_NEED_UPDATE, false)
         _cmdbId = rxPreference.getString(KEY_CMDB_ID)
         _schoolId = rxPreference.getString(KEY_SCHOOL_ID)
@@ -70,6 +72,7 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
         private var KEY_NEED_UPDATE = "NEED_UPDATE"
         private var KEY_SE_PEM_PATH = "SE_PEM_PATH"
         private var KEY_KEY_PASS = "KEY_PASS"
+        private var KEY_SYNC_COUNT = "SYNC_COUNT"
 
         /** 初始化时网络获取 **/
         private var KEY_CMDB_ID = "CMDB_ID"
@@ -84,6 +87,7 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
 
     fun getSePemPath() = _sePemPath.get()
     fun getKeyPass() = _keyPass.get()
+    fun getSyncCount() = _syncCount.get()
     fun getCMDB() = if (_needUpdate.get()) "" else _cmdbId.get()
     fun getSchoolId() = _schoolId.get()
     fun getToken() = _token.get()
@@ -96,6 +100,7 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
 
     fun setSePemPath(path: String) = _sePemPath.set(path)
     fun setKeyPass(pass: String) = _keyPass.set(pass)
+    fun setSyncCount(count: Int) = _syncCount.set(count)
     fun setNeedUpdate(need: Boolean) = _needUpdate.set(need)
     fun setCMDB(cmdb: String) {
         _cmdbId.set(cmdb)

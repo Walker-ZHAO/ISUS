@@ -40,5 +40,7 @@
     <string name="device_init_pass_code">请输入授权码</string>
 
     <string name="button_ok">确定</string>
+    <string name="user_sync_title">用户信息同步</string>
+    <string name="progress_text">%d%%</string>
 
 </resources>

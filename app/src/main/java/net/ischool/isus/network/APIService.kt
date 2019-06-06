@@ -125,6 +125,8 @@ interface APIService {
             builder.build()
         }
 
+        private val downloadClient: OkHttpClient by lazy { OkHttpClient.Builder().build() }
+
         private val delivery: Handler by lazy { Handler(Looper.getMainLooper()) }
 
         fun getSchoolId() = instance._getSchoolId()
@@ -200,7 +202,7 @@ interface APIService {
                     .url(url)
                     .build()
             // 下载文件使用独立的Http Client
-            val call = checkNotNull(OkHttpClient.Builder().build()).newCall(request)
+            val call = downloadClient.newCall(request)
             call.enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     sendFailedStringCallback(request, e, callback)

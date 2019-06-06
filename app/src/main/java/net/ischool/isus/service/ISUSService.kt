@@ -10,6 +10,7 @@ import com.rabbitmq.client.*
 import com.rabbitmq.client.impl.DefaultExceptionHandler
 import com.walker.anke.gson.fromJson
 import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 import net.ischool.isus.*
 import net.ischool.isus.command.CommandParser
 import net.ischool.isus.db.ObjectBox
@@ -38,7 +39,7 @@ class ISUSService : Service() {
     private val factory by lazy { ConnectionFactory() }
     private var connection: Connection? = null
     private var channel: Channel? = null
-    private val shutdownListener =  { cause: ShutdownSignalException ->
+    private val shutdownListener = { cause: ShutdownSignalException ->
         val type = if (cause.isHardError) "Connection" else "Channel"
         val errorMsg = "RabbitMQ $type shutdown: ${cause.reason}"
         Log.e("ISIS", errorMsg)
@@ -117,8 +118,8 @@ class ISUSService : Service() {
                             Gson().fromJson<SEUserSync>(it).payload.uid.apply {
                                 syncUserInfo(
                                     toLong(),
-                                    success = { channel?.basicAck(envelope.deliveryTag, false) },
-                                    fail = { channel?.basicReject(envelope.deliveryTag, true) })
+                                    success = { doAsync { channel?.basicAck(envelope.deliveryTag, false) } },
+                                    fail = { doAsync { channel?.basicReject(envelope.deliveryTag, true) } })
                             }
                         }
                         else -> {
@@ -153,14 +154,24 @@ class ISUSService : Service() {
             Syslog.logE(msg)
         }
 
-        override fun handleTopologyRecoveryException(conn: Connection?, ch: Channel?, exception: TopologyRecoveryException?) {
+        override fun handleTopologyRecoveryException(
+            conn: Connection?,
+            ch: Channel?,
+            exception: TopologyRecoveryException?
+        ) {
             super.handleTopologyRecoveryException(conn, ch, exception)
             val msg = "RabbitMQ Topology Recovery Exception: ${exception?.cause}"
             Log.e("ISUS", msg)
             Syslog.logE(msg)
         }
 
-        override fun handleConsumerException(channel: Channel?, exception: Throwable?, consumer: Consumer?, consumerTag: String?, methodName: String?) {
+        override fun handleConsumerException(
+            channel: Channel?,
+            exception: Throwable?,
+            consumer: Consumer?,
+            consumerTag: String?,
+            methodName: String?
+        ) {
             super.handleConsumerException(channel, exception, consumer, consumerTag, methodName)
             val msg = "RabbitMQ Consumer($consumerTag) Exception: ${exception?.cause}"
             Log.e("ISUS", msg)
@@ -205,11 +216,12 @@ class ISUSService : Service() {
             Syslog.logE(msg)
         }
     }
+
     /** RabbitMQ End **/
 
     companion object {
         const val COMMAND_START = "net.ischool.isus.start"
-        const val COMMAND_STOP  = "net.ischool.isus.stop"
+        const val COMMAND_STOP = "net.ischool.isus.stop"
         var isRunning = false
 
         fun start(context: Context) {
@@ -226,50 +238,53 @@ class ISUSService : Service() {
 
         /**
          * 同步用户信息
+         *
+         * @param uid       用户ID
+         * @param success   同步成功回调，UI线程
+         * @param fail      同步失败回调，UI线程
          */
         fun syncUserInfo(uid: Long, success: () -> Unit, fail: () -> Unit) {
-            APIService.getUserInfo(uid).subscribeBy(
-                onNext = {
-                    val result = checkNotNull(it.body())
-                    when (result.errno) {
-                        0 -> {  // 更新用户信息，ack
-                            val user = result.data
-                            APIService.downloadAsync(
-                                user.avatar,
-                                AVATAR_CACHE_DIR,
-                                "${user.uid}.jpg",
-                                object : StringCallback {
-                                    override fun onResponse(string: String) {
-                                        doAsync {
+            APIService.getUserInfo(uid)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribeBy(
+                    onNext = {
+                        val result = checkNotNull(it.body())
+                        when (result.errno) {
+                            0 -> {  // 更新用户信息，ack
+                                val user = result.data
+                                APIService.downloadAsync(
+                                    user.avatar,
+                                    AVATAR_CACHE_DIR,
+                                    "${user.uid}.jpg",
+                                    object : StringCallback {
+                                        override fun onResponse(string: String) {
                                             user.cacheAvatar = string
-                                            ObjectBox.userBox.put(user)
+                                            ObjectBox.updateUser(user)
                                             success()
                                         }
-                                    }
 
-                                    override fun onFailure(request: Request, e: IOException) {
-                                        doAsync {
-                                            Syslog.logI("同步用户信息失败，头像缓存错误(${e.message}) uid: $uid")
+                                        override fun onFailure(request: Request, e: IOException) {
+                                            Syslog.logE("同步用户信息失败，头像缓存错误(${e.message}) uid: $uid")
                                             fail()
                                         }
-                                    }
-                                })
+                                    })
+                            }
+                            5 -> {  // 删除用户信息，ack
+                                ObjectBox.removeUser(result.data.uid)
+                                success()
+                            }
+                            else -> {   // 其他错误，拒收消息
+                                Syslog.logE("同步用户信息失败，服务器错误(${result.error}) uid: $uid")
+                                fail()
+                            }
                         }
-                        5 -> {  // 删除用户信息，ack
-                            ObjectBox.userBox.remove(result.data.uid)
-                            success()
-                        }
-                        else -> {   // 其他错误，拒收消息
-                            Syslog.logI("同步用户信息失败，服务器错误(${result.error}) uid: $uid")
-                            fail()
-                        }
+                    },
+                    onError = {
+                        Syslog.logE("同步用户信息失败，内部错误(${it.message}) uid: $uid")
+                        fail()
                     }
-                },
-                onError = {
-                    Syslog.logI("同步用户信息失败，内部错误(${it.message}) uid: $uid")
-                    fail()
-                }
-            )
+                )
         }
     }
 
@@ -279,15 +294,16 @@ class ISUSService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         intent?.let {
-            when(it.action) {
-                COMMAND_START ->  {
+            when (it.action) {
+                COMMAND_START -> {
                     isRunning = true
                 }
                 COMMAND_STOP -> {
                     isRunning = false
                     APIService.cancel()
                 }
-                else    -> {}
+                else -> {
+                }
             }
             if (isRunning) {
                 setUpConnectionFactory()
@@ -372,13 +388,18 @@ class ISUSService : Service() {
                     channel?.basicConsume(queueSe?.queue, false, seConsumer)
                 } else {    // 普通模式，连接内网校园服务器
                     // 队列名称规则：学校ID.设备类型.CMDBID
-                    val queueName = PreferenceManager.instance.let { "${it.getSchoolId()}.${it.getDeviceType()}.${it.getCMDB()}" }
+                    val queueName =
+                        PreferenceManager.instance.let { "${it.getSchoolId()}.${it.getDeviceType()}.${it.getCMDB()}" }
                     // 声明交换机类型
                     channel?.exchangeDeclare(MQ_EXCHANGE_NAME, MQ_EXCHANGE_TYPE, true)
                     // 声明队列（持久的、非独占的、连接断开后队列会自动删除）
                     val queue = channel?.queueDeclare(queueName, true, false, false, null)
                     // 根据路由键将队列绑定到交换机上（需要知道交换机名称和路由键名称）
-                    channel?.queueBind(queue?.queue, MQ_EXCHANGE_NAME, "$MQ_ROUTING_KEY_PREFIX${PreferenceManager.instance.getCMDB()}")
+                    channel?.queueBind(
+                        queue?.queue,
+                        MQ_EXCHANGE_NAME,
+                        "$MQ_ROUTING_KEY_PREFIX${PreferenceManager.instance.getCMDB()}"
+                    )
                     // 创建消费者获取RabbitMQ上的消息。每当获取到一条消息后，就会回调handleDelivery方法，该方法可以获取到消息数据并进行相应处理
                     channel?.basicConsume(queue?.queue, true, consumer)
                 }
