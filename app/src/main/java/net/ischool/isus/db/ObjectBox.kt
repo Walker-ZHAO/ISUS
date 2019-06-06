@@ -28,12 +28,10 @@ class ObjectBox {
                 .androidContext(context.applicationContext)
                 .build()
 
-            if (BuildConfig.DEBUG) {
-                // 浏览器可查看数据
-                // 'adb forward tcp:[pc port] tcp:[device port]'
-                // http://localhost:pc_port/index.html
-                AndroidObjectBrowser(boxStore).start(context.applicationContext)
-            }
+            // 浏览器可查看数据
+            // 'adb forward tcp:[pc port] tcp:[device port]'
+            // http://localhost:pc_port/index.html
+            AndroidObjectBrowser(boxStore).start(context.applicationContext)
         }
 
         // 用户实体操作类
