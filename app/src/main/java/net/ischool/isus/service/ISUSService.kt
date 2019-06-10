@@ -221,7 +221,7 @@ class ISUSService : Service() {
         const val COMMAND_START = "net.ischool.isus.start"
         const val COMMAND_STOP = "net.ischool.isus.stop"
         var isRunning = false
-        var queueState = QueueState.STATE_BLOCK
+        @JvmField var queueState = QueueState.STATE_BLOCK
 
         fun start(context: Context) {
             val intent = Intent(context, ISUSService::class.java)
