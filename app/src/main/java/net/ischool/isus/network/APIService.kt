@@ -77,6 +77,7 @@ interface APIService {
 
     /**
      * 获取用户列表
+     * http://192.168.0.20/campus/API/学校CDN服务器接口文档.md
      */
     @GET("schoolcdn/getAllUids")
     fun _getUids(): Observable<Response<Result<Uids>>>
@@ -94,6 +95,10 @@ interface APIService {
         }
     }
 
+    /**
+     * 获取用户信息（简版）
+     * http://192.168.0.20/campus/API/学校CDN服务器接口文档.md
+     */
     @FormUrlEncoded
     @POST("schoolcdn/getUserInfoSimple")
     fun _getUserInfo(@Field("uid") uid: Long): Observable<Response<Result<User>>>
