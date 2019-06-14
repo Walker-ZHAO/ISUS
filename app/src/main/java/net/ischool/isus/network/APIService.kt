@@ -214,6 +214,12 @@ interface APIService {
                 }
 
                 override fun onResponse(call: Call, response: okhttp3.Response) {
+                    // 非200代表下载失败
+                    val code = response.code()
+                    if (code != 200) {
+                        sendFailedStringCallback(request, IOException("Http Code : $code"), callback)
+                        return
+                    }
                     var inputStream: InputStream? = null
                     val buf = ByteArray(2048)
                     var len: Int
