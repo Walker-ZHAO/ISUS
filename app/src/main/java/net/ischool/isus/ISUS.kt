@@ -62,4 +62,12 @@ class ISUS(val context: Context, val domain: String, val se: Boolean) {
     fun stopService() {
         ISUSService.stop(context)
     }
+
+    /**
+     * 销毁相关资源
+     */
+    fun destroy() {
+        ObjectBox.destroy()
+        stopService()
+    }
 }

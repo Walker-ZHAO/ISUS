@@ -36,7 +36,7 @@ import java.lang.Exception
 import java.util.concurrent.TimeUnit
 
 /**
- * 可视电话初始化界面
+ * 初始化界面
  *
  * Author: Walker
  * Email: zhaocework@gmail.com

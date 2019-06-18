@@ -253,7 +253,7 @@ class KeyImport {
 
         private fun stretchKey(password: String, salt: ByteArray, iterationCount: Int): ByteArray {
             val pbeKeySpec = PBEKeySpec(password.toCharArray(), salt, iterationCount, 192) // length of a DES3 key
-            val fact = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1")
+            val fact = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256")
             return fact.generateSecret(pbeKeySpec).encoded
         }
 

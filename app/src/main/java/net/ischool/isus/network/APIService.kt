@@ -109,7 +109,7 @@ interface APIService {
 
         private val client: OkHttpClient by lazy {
             val cacheFile = File(ISUS.instance.context.externalCacheDir.toString(), "cache")
-            val cacheSize = 10 * 1024 * 1024
+            val cacheSize = 5 * 10 * 1024 * 1024
             val cache = Cache(cacheFile, cacheSize.toLong())
 
             val builder = OkHttpClient.Builder()

@@ -41,6 +41,7 @@
 
     <string name="button_ok">确定</string>
     <string name="user_sync_title">用户信息同步</string>
+    <string name="user_sync_tip">用户信息同步中...</string>
     <string name="progress_text">%d%%</string>
 
 </resources>

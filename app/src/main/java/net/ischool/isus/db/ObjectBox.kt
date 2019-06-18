@@ -58,5 +58,13 @@ class ObjectBox {
          * @param cardNum   卡号
          */
         fun findUser(cardNum: String) = userBox.query { equal(User_.cardNum, cardNum) }.findFirst()
+
+        /**
+         * 关闭数据库
+         */
+        fun destroy() {
+            if (!boxStore.isClosed)
+                boxStore.close()
+        }
     }
 }

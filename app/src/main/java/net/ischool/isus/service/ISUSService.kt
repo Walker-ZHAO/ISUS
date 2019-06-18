@@ -9,6 +9,7 @@ import com.google.gson.Gson
 import com.rabbitmq.client.*
 import com.rabbitmq.client.impl.DefaultExceptionHandler
 import com.walker.anke.gson.fromJson
+import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import net.ischool.isus.*
@@ -245,7 +246,7 @@ class ISUSService : Service() {
         fun syncUserInfo(uid: Long, success: () -> Unit, fail: () -> Unit) {
             APIService.getUserInfo(uid)
                 .subscribeOn(Schedulers.io())
-                .observeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
                     onNext = {
                         val result = checkNotNull(it.body())
@@ -264,8 +265,9 @@ class ISUSService : Service() {
                                         }
 
                                         override fun onFailure(request: Request, e: IOException) {
-                                            Syslog.logE("同步用户信息失败，头像缓存错误(${e.message}) uid: $uid")
-                                            fail()
+                                            user.cacheAvatar = ""
+                                            ObjectBox.updateUser(user)
+                                            success()
                                         }
                                     })
                             }

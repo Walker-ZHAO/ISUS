@@ -26,6 +26,8 @@ import org.jetbrains.anko.toast
 class UserSyncActivity : AppCompatActivity() {
 
     private val disposables = CompositeDisposable()
+    private val uids = mutableListOf<Long>()
+    private var syncCount = 0   // 已成功同步的联系人数目
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,7 +45,6 @@ class UserSyncActivity : AppCompatActivity() {
 
     private fun startSync() {
         // 已同步成功的用户集
-        val finishSet = mutableSetOf<Long>()
         val disposable = APIService.getUids()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
@@ -58,31 +59,8 @@ class UserSyncActivity : AppCompatActivity() {
                     }
                     // 真正开始全量同步前，先清除用户数据，防止脏数据产生
                     ObjectBox.clearUser()
-                    val total = result.data.uids.size
-                    result.data.uids.forEach { uid ->
-                        ISUSService.syncUserInfo(
-                            uid,
-                            success = {
-                                finishSet.add(uid)
-                                val progress = (finishSet.size / total) * 100
-                                progress_bar.progress = progress
-                                progress_text.text = getString(R.string.progress_text, progress)
-                                if (finishSet.size == total) {
-                                    // 全量同步计数
-                                    PreferenceManager.instance.apply {
-                                        setSyncCount(getSyncCount() + 1)
-                                    }
-                                    Syslog.logI("用户信息全量同步成功")
-                                    longToast("用户信息同步成功")
-                                    finish()
-                                }
-                            },
-                            fail = {
-                                // 提醒&结束页面
-                                longToast("用户信息($uid)获取失败, 请稍后重试")
-                                finish()
-                            })
-                    }
+                    uids.addAll(result.data.uids)
+                    syncSingle()
                 },
                 onError = {
                     longToast("用户信息列表获取失败, 请稍后重试")
@@ -91,6 +69,38 @@ class UserSyncActivity : AppCompatActivity() {
                 }
             )
         disposables.add(disposable)
+    }
+
+    /**
+     * 单个用户同步
+     */
+    private fun syncSingle() {
+        val index = syncCount++
+        if (index < uids.size) {
+            ISUSService.syncUserInfo(
+                uids[index],
+                success = {
+                    val progress = ((index + 1).toFloat() / uids.size) * 100
+                    progress_bar.progress = progress.toInt()
+                    progress_text.text = getString(R.string.progress_text, progress.toInt())
+                    if (index == uids.size - 1) {
+                        // 全量同步计数
+                        PreferenceManager.instance.apply {
+                            setSyncCount(getSyncCount() + 1)
+                        }
+                        Syslog.logI("用户信息全量同步成功")
+                        longToast("用户信息同步成功")
+                        finish()
+                    } else {
+                        syncSingle()
+                    }
+                },
+                fail = {
+                    // 提醒&结束页面
+                    longToast("用户信息(${uids[index]})获取失败, 请稍后重试")
+                    finish()
+                })
+        }
     }
 
     override fun onBackPressed() {
