@@ -20,7 +20,7 @@ import org.jetbrains.anko.newTask
  */
 class UserSyncReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
-        if (PreferenceManager.instance.getCMDB().isEmpty())
+        if (!PreferenceManager.instance.getInitialized())
             Toast.makeText(ISUS.instance.context, "请先对设备进行初始化操作", Toast.LENGTH_LONG).show()
         else
             context?.startActivity(Intent(context, UserSyncActivity::class.java).newTask())

@@ -23,6 +23,7 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     private val _keyPass: Preference<String>         /** 安全增强模式下的私钥口令 **/
     private val _syncCount: Preference<Int>          /** 用户信息全量同步次数 **/
     private val _needUpdate: Preference<Boolean>     /** 是否需要更新CMDB ID **/
+    private val _initialized: Preference<Boolean>    /** 设备是否已经初始化 **/
     private val _cmdbId: Preference<String>          /** 硬件的CMDB ID **/
     private val _schoolId: Preference<String>        /** 学校ID **/
     private val _token: Preference<String>           /** 加密后的CMDB ID **/
@@ -39,6 +40,7 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
         _keyPass = rxPreference.getString(KEY_KEY_PASS)
         _syncCount = rxPreference.getInteger(KEY_SYNC_COUNT, 0)
         _needUpdate = rxPreference.getBoolean(KEY_NEED_UPDATE, false)
+        _initialized = rxPreference.getBoolean(KEY_INITED, false)
         _cmdbId = rxPreference.getString(KEY_CMDB_ID)
         _schoolId = rxPreference.getString(KEY_SCHOOL_ID)
         _token = rxPreference.getString(KEY_TOKEN)
@@ -69,26 +71,28 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
         private var CONFIG_PATH = "ISUS_CONFIG"
 
         /** ISUS 内部**/
-        private var KEY_NEED_UPDATE = "NEED_UPDATE"
-        private var KEY_SE_PEM_PATH = "SE_PEM_PATH"
-        private var KEY_KEY_PASS = "KEY_PASS"
-        private var KEY_SYNC_COUNT = "SYNC_COUNT"
+        private const val  KEY_NEED_UPDATE = "NEED_UPDATE"
+        private const val  KEY_SE_PEM_PATH = "SE_PEM_PATH"
+        private const val  KEY_KEY_PASS = "KEY_PASS"
+        private const val  KEY_SYNC_COUNT = "SYNC_COUNT"
+        private const val  KEY_INITED = "INITED"
 
         /** 初始化时网络获取 **/
-        private var KEY_CMDB_ID = "CMDB_ID"
-        private var KEY_SCHOOL_ID = "SCHOOL_ID"
-        private var KEY_TOKEN = "TOKEN"
-        private var KEY_SERVER_ADDRESS = "SERVER_ADDRESS"
-        private var KEY_PROTOCAL = "PROTOCAL"
-        private var KEY_TYPE = "TYPE"
-        private var KEY_QR = "QR"
-        private var KEY_PARAMETER = "PARAMETER"
+        private const val  KEY_CMDB_ID = "CMDB_ID"
+        private const val  KEY_SCHOOL_ID = "SCHOOL_ID"
+        private const val  KEY_TOKEN = "TOKEN"
+        private const val  KEY_SERVER_ADDRESS = "SERVER_ADDRESS"
+        private const val  KEY_PROTOCAL = "PROTOCAL"
+        private const val  KEY_TYPE = "TYPE"
+        private const val  KEY_QR = "QR"
+        private const val  KEY_PARAMETER = "PARAMETER"
     }
 
     fun getSePemPath() = _sePemPath.get()
     fun getKeyPass() = _keyPass.get()
     fun getSyncCount() = _syncCount.get()
-    fun getCMDB() = if (_needUpdate.get()) "" else _cmdbId.get()
+    fun getInitialized() = if (_needUpdate.get()) false else _initialized.get()
+    fun getCMDB() = _cmdbId.get()
     fun getSchoolId() = _schoolId.get()
     fun getToken() = _token.get()
     fun getServer() = _serverAddress.get()
@@ -102,10 +106,11 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     fun setKeyPass(pass: String) = _keyPass.set(pass)
     fun setSyncCount(count: Int) = _syncCount.set(count)
     fun setNeedUpdate(need: Boolean) = _needUpdate.set(need)
-    fun setCMDB(cmdb: String) {
-        _cmdbId.set(cmdb)
-        _needUpdate.set(false)
+    fun setInitialized(init: Boolean) {
+        _initialized.set(init)
+        if (init) _needUpdate.set(false)
     }
+    fun setCMDB(cmdb: String) = _cmdbId.set(cmdb)
     fun setSchoolId(id: String) = _schoolId.set(id)
     fun setToken(t: String) = _token.set(t)
     fun setServer(server: String) = _serverAddress.set(server)

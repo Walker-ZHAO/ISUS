@@ -108,7 +108,7 @@ interface APIService {
         private val instance: APIService by lazy { Factory.createService(client) }
 
         private val client: OkHttpClient by lazy {
-            val cacheFile = File(ISUS.instance.context.externalCacheDir.toString(), "cache")
+            val cacheFile = File(ISUS.instance.context.externalCacheDir?.toString()?:"", "cache")
             val cacheSize = 5 * 10 * 1024 * 1024
             val cache = Cache(cacheFile, cacheSize.toLong())
 
@@ -167,6 +167,7 @@ interface APIService {
                                 if (getDeviceType() == result.data.type) {
                                     setQR(result.data.QR)
                                     setParameter(result.data.parameter)
+                                    setInitialized(true)
                                 } else {
                                     /** 设备类型不匹配，可能是CMDB ID配置错误，重置应用 **/
                                     ISUS.instance.context.runOnUiThread { toast(getString(R.string.device_error)) }
