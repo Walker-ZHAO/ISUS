@@ -265,6 +265,7 @@ class ISUSService : Service() {
                                         }
 
                                         override fun onFailure(request: Request, e: IOException) {
+                                            Syslog.logN("同步头像($uid)下载失败: ${e.message}")
                                             user.cacheAvatar = ""
                                             ObjectBox.updateUser(user)
                                             success()
