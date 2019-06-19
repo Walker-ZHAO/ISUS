@@ -11,6 +11,7 @@ import net.ischool.isus.db.ObjectBox
 import net.ischool.isus.network.APIService
 import net.ischool.isus.preference.PreferenceManager
 import net.ischool.isus.service.ISUSService
+import net.ischool.isus.service.StatusPostService
 import org.jetbrains.anko.toast
 
 /**
@@ -47,6 +48,9 @@ class ISUS(val context: Context, val domain: String, val se: Boolean) {
                             }
                         }
             }
+            // 已初始化的设备，非SE模式下，启动状态上报服务
+            if (PreferenceManager.instance.getInitialized() && !securityEnhance)
+                StatusPostService.startService(context)
         }
     }
 
