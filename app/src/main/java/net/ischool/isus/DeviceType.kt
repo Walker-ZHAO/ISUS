@@ -15,6 +15,10 @@ class DeviceType {
         @JvmField val SELFIE       = 13    /** 自拍机 **/
         @JvmField val SWIPE        = 14    /** 刷卡机 **/
 
+        const val BADGE_ID = "10016"        /** 班牌标识，用于状态上报 **/
+        const val SECURITY_ID = "10017"     /** 校园安全控制台标识，用于状态上报 **/
+        const val VISION_PHONE_ID = "10018" /** 可视电话标识，用于状态上报 **/
+
         /**
          * 获取设备名称
          *
@@ -29,6 +33,13 @@ class DeviceType {
                 SWIPE -> getString(R.string.device_type_swipe)
                 else -> ""
             }
+        }
+
+        @JvmStatic fun getDeviceTypeId(type: Int): String = when (type) {
+            VISION_PHONE -> VISION_PHONE_ID
+            BADGE -> BADGE_ID
+            SECURITY -> SECURITY_ID
+            else -> ""
         }
     }
 }

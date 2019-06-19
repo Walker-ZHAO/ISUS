@@ -13,6 +13,7 @@ import net.ischool.isus.network.interceptor.CacheInterceptor
 import net.ischool.isus.network.interceptor.URLInterceptor
 import net.ischool.isus.network.se.SSLSocketFactoryProvider
 import net.ischool.isus.preference.PreferenceManager
+import net.ischool.isus.service.StatusPostService
 import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
 import org.jetbrains.anko.runOnUiThread
@@ -103,6 +104,22 @@ interface APIService {
     @POST("schoolcdn/getUserInfoSimple")
     fun _getUserInfo(@Field("uid") uid: Long): Observable<Response<Result<User>>>
 
+    /**
+     * 状态上报（每分钟一次）
+     * http://192.168.0.20/campus/API/校内监控.md
+     * @param sid           学校id
+     * @param deviceTypeId  监控项id
+     * @param cmdb_id       设备cmdbid
+     * @param labelId       是否正常，当前固定为1
+     * @param info          当前状态描述信息
+     * @param label         当前状态
+     * @param ts            每分钟整的时间戳(单位秒)
+     * @param type          数据类型，当前固定为3
+     */
+    @FormUrlEncoded
+    @POST("sgrid/psi/hungribles")
+    fun _postStatus(@Field("sid") sid: String, @Field("element_id") deviceTypeId: String, @Field("service_id") cmdb_id: String, @Field("label_character") labelId: Int, @Field("info") info: String, @Field("label") label: String, @Field("uptime") ts: Long, @Field("type") type: Int): Observable<ResponseBody>
+
     companion object {
 
         private val instance: APIService by lazy { Factory.createService(client) }
@@ -168,6 +185,11 @@ interface APIService {
                                     setQR(result.data.QR)
                                     setParameter(result.data.parameter)
                                     setInitialized(true)
+                                    // 初始化成功，非SE模式下，启动状态上报服务
+                                    ISUS.instance.apply {
+                                        if (!se)
+                                            StatusPostService.startService(context)
+                                    }
                                 } else {
                                     /** 设备类型不匹配，可能是CMDB ID配置错误，重置应用 **/
                                     ISUS.instance.context.runOnUiThread { toast(getString(R.string.device_error)) }
@@ -189,10 +211,30 @@ interface APIService {
         fun getUserInfo(uid: Long) = instance._getUserInfo(uid)
 
         /**
+         * 状态上报（每分钟一次）
+         *
+         * @param info  当前状态描述信息
+         * @param label 当前状态
+         */
+        fun postStatus(info: String = "Normal", label: String = "Normal"): Observable<ResponseBody> {
+            val ts = System.currentTimeMillis() / 1000
+            val extra = ts % 60
+            return instance._postStatus(PreferenceManager.instance.getSchoolId(),
+                DeviceType.getDeviceTypeId(PreferenceManager.instance.getDeviceType()),
+                PreferenceManager.instance.getCMDB(),
+                1,
+                info,
+                label,
+                ts - extra,
+                3)
+        }
+
+        /**
          * 取消所有网络请求
          */
-        public fun cancel() {
+        fun cancel() {
             client.dispatcher().cancelAll()
+            downloadClient.dispatcher().cancelAll()
         }
 
         /**

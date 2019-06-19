@@ -8,6 +8,7 @@ import com.orhanobut.logger.Logger
 import com.tbruyelle.rxpermissions2.RxPermissions
 import net.ischool.isus.command.CommandParser
 import net.ischool.isus.db.ObjectBox
+import net.ischool.isus.network.APIService
 import net.ischool.isus.preference.PreferenceManager
 import net.ischool.isus.service.ISUSService
 import org.jetbrains.anko.toast
@@ -69,5 +70,6 @@ class ISUS(val context: Context, val domain: String, val se: Boolean) {
     fun destroy() {
         ObjectBox.destroy()
         stopService()
+        APIService.cancel()
     }
 }

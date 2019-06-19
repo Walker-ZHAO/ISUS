@@ -71,6 +71,9 @@
             </intent-filter>
         </receiver>
 
+        <service android:name=".service.StatusPostService"
+                 android:exported="false"/>
+
     </application>
 
 </manifest>
