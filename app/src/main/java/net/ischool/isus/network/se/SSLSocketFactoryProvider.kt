@@ -17,29 +17,40 @@ import java.lang.Exception
 class SSLSocketFactoryProvider {
     companion object {
 
-        @JvmStatic fun getSSLContext(): SSLContext {
-            val password = PreferenceManager.instance.getKeyPass()
-            val certType = "X.509"
-            val protocol = "TLS"
+        const val X509 = "X.509"
+        const val P12  = "PKCS12"
 
+        @JvmStatic fun getSSLContext(type: String = P12): SSLContext {
+            val password = PreferenceManager.instance.getKeyPass()
+            val protocol = "TLS"
             try {
                 val file = File(PreferenceManager.instance.getSePemPath())
-                val keyStore = emptyKeyStore(password)
+                val keyStore = when (type) {
+                    X509 -> {
+                        val keyStore = emptyKeyStore(password)
 
-                // 证书
-                val certificates = file.inputStream().use { CertificateFactory.getInstance(certType)?.generateCertificates(it) }
-                certificates?.forEachIndexed { index, certificate ->
-                    keyStore.setCertificateEntry("$index", certificate)
+                        // 证书
+                        val certificates = file.inputStream().use { CertificateFactory.getInstance(type)?.generateCertificates(it) }
+                        certificates?.forEachIndexed { index, certificate ->
+                            keyStore.setCertificateEntry("$index", certificate)
+                        }
+
+                        // 私钥
+                        keyStore.setKeyEntry(
+                            "",
+                            file.inputStream().use { KeyImport.readPrivateKey(it, password) },
+                            password.toCharArray(),
+                            certificates?.toTypedArray()
+                        )
+                        keyStore
+                    }
+                    P12 -> {
+                        val keyStore = KeyStore.getInstance(type)
+                        file.inputStream().use { keyStore.load(it, password.toCharArray()) }
+                        keyStore
+                    }
+                    else -> emptyKeyStore(password)
                 }
-
-                // 私钥
-                keyStore.setKeyEntry(
-                    "",
-                    file.inputStream().use { KeyImport.readPrivateKey(it, password) },
-                    password.toCharArray(),
-                    certificates?.toTypedArray()
-                )
-
                 val keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm())
                 keyManagerFactory.init(keyStore, password.toCharArray())
 

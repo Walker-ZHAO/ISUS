@@ -175,7 +175,7 @@ class InitActivity : RxAppCompatActivity() {
         var dialog: ProgressDialog? = null
         runOnUiThread { dialog = indeterminateProgressDialog(getString(R.string.init_dialog_title)) { setCancelable(false) } }
 
-        val url = "http://update.${ISUS.instance.domain}/zxedu-system-images/schools/schoolcdn-$schoolId-$passCode.pem"
+        val url = "http://update.${ISUS.instance.domain}/zxedu-system-images/schools/schoolcdn-$schoolId-$passCode.p12"
         APIService.downloadAsync(url, filesDir.absolutePath, callback = object : StringCallback {
             override fun onResponse(string: String) {
                 PreferenceManager.instance.setSePemPath(string)
