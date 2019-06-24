@@ -16,6 +16,7 @@ import net.ischool.isus.preference.PreferenceManager
 import net.ischool.isus.service.StatusPostService
 import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
+import org.jetbrains.anko.longToast
 import org.jetbrains.anko.runOnUiThread
 import org.jetbrains.anko.toast
 import retrofit2.Response
@@ -181,20 +182,30 @@ interface APIService {
                         if (result.errno == RESULT_OK) {
                             Log.i("ISUS", "config: ${result.data}")
                             with(PreferenceManager.instance) {
-                                if (getDeviceType() == result.data.type) {
-                                    setQR(result.data.QR)
-                                    setParameter(result.data.parameter)
-                                    setInitialized(true)
-                                    // 初始化成功，非SE模式下，启动状态上报服务
-                                    ISUS.instance.apply {
-                                        if (!se)
-                                            StatusPostService.startService(context)
+                                when (result.data.parameter["internalICReaderType"]?.toInt()) {
+                                    CReaderType.AUTO -> {
+                                        /** 读卡器配置错误，需要明确指明读卡器类型，重置应用 **/
+                                        ISUS.instance.context.runOnUiThread { longToast(getString(R.string.ic_reader_error)) }
+                                        Thread.sleep(2 * 1000)
+                                        CommandParser.instance.processCommand(CommandParser.instance.genCommand(ICommand.COMMAND_RESET, null))
                                     }
-                                } else {
-                                    /** 设备类型不匹配，可能是CMDB ID配置错误，重置应用 **/
-                                    ISUS.instance.context.runOnUiThread { toast(getString(R.string.device_error)) }
-                                    Thread.sleep(2 * 1000)
-                                    CommandParser.instance.processCommand(CommandParser.instance.genCommand(ICommand.COMMAND_RESET, null))
+                                    else -> {
+                                        if (getDeviceType() == result.data.type) {
+                                            setQR(result.data.QR)
+                                            setParameter(result.data.parameter)
+                                            setInitialized(true)
+                                            // 初始化成功，非SE模式下，启动状态上报服务
+                                            ISUS.instance.apply {
+                                                if (!se)
+                                                    StatusPostService.startService(context)
+                                            }
+                                        } else {
+                                            /** 设备类型不匹配，可能是CMDB ID配置错误，重置应用 **/
+                                            ISUS.instance.context.runOnUiThread { longToast(getString(R.string.device_error)) }
+                                            Thread.sleep(2 * 1000)
+                                            CommandParser.instance.processCommand(CommandParser.instance.genCommand(ICommand.COMMAND_RESET, null))
+                                        }
+                                    }
                                 }
                             }
                             Observable.just(it)

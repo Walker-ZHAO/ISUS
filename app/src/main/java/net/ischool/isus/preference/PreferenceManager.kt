@@ -197,4 +197,11 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
      * @see net.ischool.isus.PeripheralFlag
      */
     fun getPeripherals() = getParameter()["peripherals"]?.toInt()
+
+    /**
+     * 读卡器类型
+     *
+     * @see net.ischool.isus.CReaderType
+     */
+    fun getCReaderType() = getParameter()["internalICReaderType"]?.toInt()
 }

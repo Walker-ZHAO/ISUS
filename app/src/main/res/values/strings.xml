@@ -3,6 +3,7 @@
 
     <string name="get_permission_fail">禁止读写手机存储，可能会导致某些功能无法使用！！请在设置中赋予该权限！</string>
     <string name="device_error">设别类型错误，请重新配置</string>
+    <string name="ic_reader_error">读卡器类型错误，不支持自动识别，需在CMDB配置页指定读卡器类型</string>
     <string name="warning">警告</string>
     <string name="warning_reset">重置后将会清除数据，您需要重新设置软件。</string>
     <string name="init_dialog_title">正在初始化&#8230;</string>
