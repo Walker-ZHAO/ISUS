@@ -18,6 +18,7 @@ class DeviceType {
         const val BADGE_ID = "10016"        /** 班牌标识，用于状态上报 **/
         const val SECURITY_ID = "10017"     /** 校园安全控制台标识，用于状态上报 **/
         const val VISION_PHONE_ID = "10018" /** 可视电话标识，用于状态上报 **/
+        const val SELFIE_ID = "10021"       /** 自拍机 **/
 
         /**
          * 获取设备名称
@@ -39,6 +40,7 @@ class DeviceType {
             VISION_PHONE -> VISION_PHONE_ID
             BADGE -> BADGE_ID
             SECURITY -> SECURITY_ID
+            SELFIE -> SELFIE_ID
             else -> ""
         }
     }
