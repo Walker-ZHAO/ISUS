@@ -17,5 +17,6 @@ class CReaderType {
         @JvmField val T_S1 = 4              /** 串口，纯IC，ttyS1，115220波特率，8字节长度:0x02 四字节卡号（ASCII） 0x0D 0x0A 0x03(绵竹) **/
         @JvmField val T_S2 = 5              /** 串口，纯IC，ttyS0，19200波特率，12字节长度，7-10字节为卡号（木兰） **/
         @JvmField val T_S3 = 6              /** 串口，纯IC，纵横六合 **/
+        @JvmField val T_S4 = 7              /** 串口，纯IC，ttyS3，9600波特率，世纪凯城 **/
     }
 }
