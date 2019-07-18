@@ -204,4 +204,14 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
      * @see net.ischool.isus.CReaderType
      */
     fun getCReaderType() = getParameter()["internalICReaderType"]?.toInt()
+
+    /**
+     * 获取经度
+     */
+    fun getLongitude() = getParameter()["longitude"]
+
+    /**
+     * 获取纬度
+     */
+    fun getLatitude() = getParameter()["latitude"]
 }
