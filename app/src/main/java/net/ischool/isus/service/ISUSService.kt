@@ -273,7 +273,8 @@ class ISUSService : Service() {
                                     })
                             }
                             5 -> {  // 删除用户信息，ack
-                                ObjectBox.removeUser(result.data.uid)
+                                if (uid != 0L)   // 增加健壮性，后台如果传0，删除会抛出异常，因为uid为主键，不能为0
+                                    ObjectBox.removeUser(uid)
                                 success()
                             }
                             else -> {   // 其他错误，拒收消息
