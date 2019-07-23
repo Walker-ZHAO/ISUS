@@ -151,6 +151,7 @@ class InitActivity : RxAppCompatActivity() {
                     onComplete = { Log.i("Walker", "onComplete") },
                     onError = {
                         dialog?.dismiss()
+                        Log.e("ISUS", "${it.message}")
                         toast("设备初始化失败，请稍后重试")
                         setResult(Activity.RESULT_CANCELED)
                         finish()
@@ -194,6 +195,8 @@ class InitActivity : RxAppCompatActivity() {
                         onError = {
                             dialog?.dismiss()
                             toast("设备初始化失败，请稍后重试")
+                            Log.e("ISUS", "${it.message}")
+                            toast("${it.message}")
                             setResult(Activity.RESULT_CANCELED)
                             finish()
                         }

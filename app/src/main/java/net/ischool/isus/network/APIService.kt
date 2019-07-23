@@ -170,7 +170,7 @@ interface APIService {
                             }
                             Observable.just(it)
                         } else {
-                            Observable.error(Throwable(result.error))
+                            Observable.error(Throwable("init(cmdbid: $cmdbid, sid: $sid): ${result.errno} : ${result.error}"))
                         }
                     }
         }
@@ -210,7 +210,7 @@ interface APIService {
                             }
                             Observable.just(it)
                         } else {
-                            Observable.error(Throwable(result.error))
+                            Observable.error(Throwable("config: ${result.errno} : ${result.error}"))
                         }
                     }
         }
