@@ -152,7 +152,7 @@ class InitActivity : RxAppCompatActivity() {
                     onError = {
                         dialog?.dismiss()
                         Log.e("ISUS", "${it.message}")
-                        toast("设备初始化失败，请稍后重试")
+                        longToast("设备初始化失败，请稍后重试!（${it.message}）")
                         setResult(Activity.RESULT_CANCELED)
                         finish()
                     }
@@ -194,7 +194,7 @@ class InitActivity : RxAppCompatActivity() {
                         },
                         onError = {
                             dialog?.dismiss()
-                            toast("设备初始化失败，请稍后重试")
+                            longToast("设备初始化失败，请稍后重试!（${it.message}）")
                             Log.e("ISUS", "${it.message}")
                             toast("${it.message}")
                             setResult(Activity.RESULT_CANCELED)
