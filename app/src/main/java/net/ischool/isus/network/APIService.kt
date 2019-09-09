@@ -111,6 +111,7 @@ interface APIService {
      * @param sid           学校id
      * @param deviceTypeId  监控项id
      * @param cmdb_id       设备cmdbid
+     * @param name          监控项注释、说明
      * @param labelId       是否正常，当前固定为1
      * @param info          当前状态描述信息
      * @param label         当前状态
@@ -119,7 +120,7 @@ interface APIService {
      */
     @FormUrlEncoded
     @POST("sgrid/psi/hungribles")
-    fun _postStatus(@Field("sid") sid: String, @Field("element_id") deviceTypeId: String, @Field("service_id") cmdb_id: String, @Field("label_character") labelId: Int, @Field("info") info: String, @Field("label") label: String, @Field("uptime") ts: Long, @Field("type") type: Int): Observable<ResponseBody>
+    fun _postStatus(@Field("sid") sid: String, @Field("element_id") deviceTypeId: String, @Field("service_id") cmdb_id: String, @Field("element_name_tail") name: String, @Field("label_character") labelId: Int, @Field("info") info: String, @Field("label") label: String, @Field("uptime") ts: Long, @Field("type") type: Int): Observable<ResponseBody>
 
     companion object {
 
@@ -233,6 +234,7 @@ interface APIService {
             return instance._postStatus(PreferenceManager.instance.getSchoolId(),
                 DeviceType.getDeviceTypeId(PreferenceManager.instance.getDeviceType()),
                 PreferenceManager.instance.getCMDB(),
+                "CmdbId=${PreferenceManager.instance.getCMDB()}",
                 1,
                 info,
                 label,
