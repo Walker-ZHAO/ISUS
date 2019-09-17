@@ -119,6 +119,15 @@ class CommandImpl constructor(private val context: Context) : ICommand {
     }
 
     /**
+     * 命令方式进入指定页面
+     *
+     * Note：需要系统签名
+     */
+    override fun launchPage(component: String?) {
+        execRuntimeProcess("am start -n $component")
+    }
+
+    /**
      * 延时进入主目录
      * @param triggerAtMillis: 延迟时间，单位毫秒
      *

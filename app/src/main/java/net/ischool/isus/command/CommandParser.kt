@@ -22,13 +22,15 @@ class CommandParser private constructor(context: Context){
 
     init {
         // 命令注册
-        commandMap.put(ICommand.COMMAND_PING, 201708)
-        commandMap.put(ICommand.COMMAND_CONFIG, 201708)
-        commandMap.put(ICommand.COMMAND_RESET, 201708)
-        commandMap.put(ICommand.COMMAND_REBOOT, 201708)
-        commandMap.put(ICommand.COMMAND_QUIT, 201708)
-        commandMap.put(ICommand.COMMAND_UPDATE, 201708)
-        commandMap.put(ICommand.COMMAND_SETTING, 201708)
+
+        commandMap[ICommand.COMMAND_PING] = 201708
+        commandMap[ICommand.COMMAND_CONFIG] = 201708
+        commandMap[ICommand.COMMAND_RESET] = 201708
+        commandMap[ICommand.COMMAND_REBOOT] = 201708
+        commandMap[ICommand.COMMAND_QUIT] = 201708
+        commandMap[ICommand.COMMAND_UPDATE] = 201708
+        commandMap[ICommand.COMMAND_SETTING] = 201708
+        commandMap[ICommand.COMMAND_LAUNCH_PAGE] = 201708
     }
 
     companion object {
@@ -49,6 +51,7 @@ class CommandParser private constructor(context: Context){
                 ICommand.COMMAND_QUIT -> processor.quit()
                 ICommand.COMMAND_UPDATE -> processor.update(command.args["url"])
                 ICommand.COMMAND_SETTING -> processor.setting()
+                ICommand.COMMAND_LAUNCH_PAGE -> processor.launchPage(command.args["intent"])
             }
         } else {
             // 广播无法处理的command

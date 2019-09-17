@@ -10,13 +10,14 @@ package net.ischool.isus.command
 interface ICommand {
 
     companion object {
-        val COMMAND_PING    =   "ping"
-        val COMMAND_CONFIG  =   "config"
-        val COMMAND_RESET   =   "reset"
-        val COMMAND_REBOOT  =   "reboot"
-        val COMMAND_QUIT    =   "quit"
-        val COMMAND_UPDATE  =   "update"
-        val COMMAND_SETTING =   "setting"
+        const val COMMAND_PING    =   "ping"
+        const val COMMAND_CONFIG  =   "config"
+        const val COMMAND_RESET   =   "reset"
+        const val COMMAND_REBOOT  =   "reboot"
+        const val COMMAND_QUIT    =   "quit"
+        const val COMMAND_UPDATE  =   "update"
+        const val COMMAND_SETTING =   "setting"
+        const val COMMAND_LAUNCH_PAGE =   "amstart"
     }
 
     /**
@@ -55,16 +56,21 @@ interface ICommand {
     fun setting()
 
     /**
+     * 启动指定页面
+     */
+    fun launchPage(component: String?)
+
+    /**
      * 执行cmd命令
      */
     fun execRuntimeProcess(cmd: String): Process? {
         var p: Process? = null
         try {
-            p = Runtime.getRuntime().exec(cmd);
+            p = Runtime.getRuntime().exec(cmd)
             p?.waitFor()
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        return p;
+        return p
     }
 }
