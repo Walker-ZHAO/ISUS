@@ -214,4 +214,10 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
      * 获取纬度
      */
     fun getLatitude() = getParameter()["latitude"]
+
+    /**
+     * 获取锁屏模式
+     * @see net.ischool.isus.LockScreenMode
+     */
+    fun getLockScreen() = getParameter()["lockScreen"]?.toInt()
 }
