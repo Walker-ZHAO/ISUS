@@ -26,7 +26,10 @@ class Syslog {
         private val socket: DatagramSocket by lazy { DatagramSocket() }
         private val server: InetAddress by lazy {
             val host = with(PreferenceManager.instance) {
-                getSyslog() ?: getServer()
+                if (getSyslog().isEmpty())
+                    getServer()
+                else
+                    getSyslog()
             }
             InetAddress.getByName(host)
         }

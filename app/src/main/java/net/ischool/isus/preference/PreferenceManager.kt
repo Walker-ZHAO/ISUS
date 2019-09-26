@@ -6,6 +6,7 @@ import com.f2prateek.rx.preferences2.Preference
 import com.f2prateek.rx.preferences2.RxSharedPreferences
 import com.google.gson.Gson
 import com.walker.anke.gson.fromJson
+import net.ischool.isus.*
 
 /**
  * Preference 管理器
@@ -122,102 +123,102 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     /**
      * 语音网关
      */
-    fun getEXVoIPGateway() = getParameter()["VoIPGW"]
+    fun getEXVoIPGateway() = getParameter()["VoIPGW"] ?: ""
     /**
      * 语音网关转发设备
      */
-    fun getEXVoIPSTUN() = getParameter()["VoIPSTUN"]
+    fun getEXVoIPSTUN() = getParameter()["VoIPSTUN"] ?: ""
     /**
      * 设备内网IP
      */
-    fun getEXSelfLanIP() = getParameter()["selfLanIP"]
+    fun getEXSelfLanIP() = getParameter()["selfLanIP"] ?: ""
     /**
      * 设备公网IP
      */
-    fun getEXSelfWanIP() = getParameter()["selfWanIP"]
+    fun getEXSelfWanIP() = getParameter()["selfWanIP"] ?: ""
     /**
      * 用于管理员登录设备的密码
      */
-    fun getEXSelfMKey() = getParameter()["selfMKey"]
+    fun getEXSelfMKey() = getParameter()["selfMKey"] ?: ""
     /**
      * 用于API签名的密钥
      */
-    fun getEXSelfSKey() = getParameter()["selfSKey"]
+    fun getEXSelfSKey() = getParameter()["selfSKey"] ?: ""
     /**
      * 远程日志服务器地址（域名或IP）
      */
-    fun getSyslog() = getParameter()["syslog"]
+    fun getSyslog() = getParameter()["syslog"] ?: ""
     /**
      * 学校名称
      */
-    fun getSchoolName() = getParameter()["schoolName"]
+    fun getSchoolName() = getParameter()["schoolName"] ?: ""
     /**
      * 学校Logo
      */
-    fun getSchoolLogo() = getParameter()["schoolLogo"]
+    fun getSchoolLogo() = getParameter()["schoolLogo"] ?: ""
     /**
      * 班级名称
      */
-    fun getClassName() = getParameter()["className"]
+    fun getClassName() = getParameter()["className"] ?: ""
     /**
      * 班级ID
      */
-    fun getClassId() = getParameter()["classId"]
+    fun getClassId() = getParameter()["classId"] ?: ""
     /**
      * 设备名称（CMDB代号）
      */
-    fun getDeviceName() = getParameter()["deviceName"]
+    fun getDeviceName() = getParameter()["deviceName"] ?: ""
     /**
      * 显示模式
      *
      * @see net.ischool.isus.DisplayModel
      */
-    fun getDisplayModel() = getParameter()["displayModel"]
+    fun getDisplayModel() = getParameter()["displayModel"] ?: DisplayModel.LEGACY
     /**
      * 设备所在考勤区域
      */
-    fun getAreaId() = getParameter()["areaId"]?.toInt()
+    fun getAreaId() = getParameter()["areaId"]?.toInt() ?: 0
     /**
      * 设备所在考勤检查点
      */
-    fun getCheckpointId() = getParameter()["checkpointId"]?.toInt()
+    fun getCheckpointId() = getParameter()["checkpointId"]?.toInt() ?: 0
     /**
      * 设备所在考勤通道
      */
-    fun getTunnelId() = getParameter()["tunnelId"]?.toInt()
+    fun getTunnelId() = getParameter()["tunnelId"]?.toInt() ?: 0
     /**
      * 考勤模式
      *
      * @see net.ischool.isus.AttendModel
      */
-    fun getAttendModel() = getParameter()["attendModel"]?.toInt()
+    fun getAttendModel() = getParameter()["attendModel"]?.toInt() ?: AttendModel.NONE
     /**
      * 支持的外设
      *
      * @see net.ischool.isus.PeripheralFlag
      */
-    fun getPeripherals() = getParameter()["peripherals"]?.toInt()
+    fun getPeripherals() = getParameter()["peripherals"]?.toInt() ?: PeripheralFlag.NONE
 
     /**
      * 读卡器类型
      *
      * @see net.ischool.isus.CReaderType
      */
-    fun getCReaderType() = getParameter()["internalICReaderType"]?.toInt()
+    fun getCReaderType() = getParameter()["internalICReaderType"]?.toInt() ?: CReaderType.NONE
 
     /**
      * 获取经度
      */
-    fun getLongitude() = getParameter()["longitude"]
+    fun getLongitude() = getParameter()["longitude"] ?: ""
 
     /**
      * 获取纬度
      */
-    fun getLatitude() = getParameter()["latitude"]
+    fun getLatitude() = getParameter()["latitude"] ?: ""
 
     /**
      * 获取锁屏模式
      * @see net.ischool.isus.LockScreenMode
      */
-    fun getLockScreen() = getParameter()["lockScreen"]?.toInt()
+    fun getLockScreen() = getParameter()["lockScreen"]?.toInt() ?: LockScreenMode.NONE
 }
