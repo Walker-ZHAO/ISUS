@@ -17,12 +17,11 @@ import net.ischool.isus.preference.PreferenceManager
  */
 class CommandParser private constructor(context: Context){
 
-    private val processor = CommandImpl(context)
+    private var processor: ICommand? = null
     private val commandMap = mutableMapOf<String, Long>()
 
     init {
         // 命令注册
-
         commandMap[ICommand.COMMAND_PING] = 201708
         commandMap[ICommand.COMMAND_CONFIG] = 201708
         commandMap[ICommand.COMMAND_RESET] = 201708
@@ -34,7 +33,14 @@ class CommandParser private constructor(context: Context){
     }
 
     companion object {
-        val instance: CommandParser by lazy { CommandParser(ISUS.instance.context) }
+        fun init(commandProcessor: ICommand? = null) {
+            instance = CommandParser(ISUS.instance.context)
+            if (commandProcessor != null)
+                instance.processor = commandProcessor
+            else
+                instance.processor = CommandImpl(ISUS.instance.context)
+        }
+        lateinit var instance: CommandParser
     }
 
     /**
@@ -44,14 +50,14 @@ class CommandParser private constructor(context: Context){
         Syslog.logI("ISUS process command: $command")
         if (canProcess(command)) {
             when (command.cmd.toLowerCase()) {
-                ICommand.COMMAND_PING -> processor.ping()
-                ICommand.COMMAND_CONFIG -> processor.config()
-                ICommand.COMMAND_RESET -> processor.reset()
-                ICommand.COMMAND_REBOOT -> processor.reboot()
-                ICommand.COMMAND_QUIT -> processor.quit()
-                ICommand.COMMAND_UPDATE -> processor.update(command.args["url"])
-                ICommand.COMMAND_SETTING -> processor.setting()
-                ICommand.COMMAND_LAUNCH_PAGE -> processor.launchPage(command.args["intent"])
+                ICommand.COMMAND_PING -> processor?.ping()
+                ICommand.COMMAND_CONFIG -> processor?.config()
+                ICommand.COMMAND_RESET -> processor?.reset()
+                ICommand.COMMAND_REBOOT -> processor?.reboot()
+                ICommand.COMMAND_QUIT -> processor?.quit()
+                ICommand.COMMAND_UPDATE -> processor?.update(command.args["url"])
+                ICommand.COMMAND_SETTING -> processor?.setting()
+                ICommand.COMMAND_LAUNCH_PAGE -> processor?.launchPage(command.args["intent"])
             }
         } else {
             // 广播无法处理的command

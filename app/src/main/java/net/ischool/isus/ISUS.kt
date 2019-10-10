@@ -7,6 +7,7 @@ import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import com.tbruyelle.rxpermissions2.RxPermissions
 import net.ischool.isus.command.CommandParser
+import net.ischool.isus.command.ICommand
 import net.ischool.isus.db.ObjectBox
 import net.ischool.isus.network.APIService
 import net.ischool.isus.preference.PreferenceManager
@@ -34,8 +35,9 @@ class ISUS(val context: Context, val domain: String, val se: Boolean) {
          */
         @JvmOverloads
         @Synchronized
-        @JvmStatic fun init(context: Context, deviceType: Int, domain: String = DEFAULT_DOMAIN, securityEnhance: Boolean = false) {
+        @JvmStatic fun init(context: Context, deviceType: Int, domain: String = DEFAULT_DOMAIN, securityEnhance: Boolean = false, commandProcessor: ICommand? = null) {
             instance = ISUS(context.applicationContext, domain, securityEnhance)
+            CommandParser.init(commandProcessor)
             Logger.addLogAdapter(AndroidLogAdapter())
             PreferenceManager.initPreference(context, deviceType)
             ObjectBox.init(context)
