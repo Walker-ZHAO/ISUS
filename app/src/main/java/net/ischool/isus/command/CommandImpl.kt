@@ -128,6 +128,21 @@ class CommandImpl constructor(private val context: Context) : ICommand {
     }
 
     /**
+     * 从当前页返回
+     */
+    override fun backPage() {
+        execRuntimeProcess("input keyevent BACK\n")
+    }
+
+    /**
+     * 开启ADB
+     * 仅海康设备有效，海康SDK无法暴露给ISUS使用，因为默认的命令解析器不实现
+     */
+    override fun openAdb() {
+
+    }
+
+    /**
      * 延时进入主目录
      * @param triggerAtMillis: 延迟时间，单位毫秒
      *

@@ -17,6 +17,8 @@ interface ICommand {
         const val COMMAND_QUIT    =   "quit"
         const val COMMAND_UPDATE  =   "update"
         const val COMMAND_SETTING =   "setting"
+        const val COMMAND_BACK =   "back"
+        const val COMMAND_ADB =   "adb"
         const val COMMAND_LAUNCH_PAGE =   "amstart"
     }
 
@@ -59,6 +61,16 @@ interface ICommand {
      * 启动指定页面
      */
     fun launchPage(component: String?)
+
+    /**
+     * 从当前页返回
+     */
+    fun backPage()
+
+    /**
+     * 开启adb调试(仅海康设备有效)
+     */
+    fun openAdb()
 
     /**
      * 执行cmd命令
