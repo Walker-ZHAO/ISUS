@@ -143,6 +143,18 @@ class CommandImpl constructor(private val context: Context) : ICommand {
     }
 
     /**
+     * 更新应用配置信息
+     */
+    override fun reload() {
+        APIService.getConfig()
+            .subscribeOn(Schedulers.io())
+            .subscribeBy(
+                onNext = { reboot() },
+                onError = { Syslog.logE("Reload config failure: ${it.message}") }
+            )
+    }
+
+    /**
      * 延时进入主目录
      * @param triggerAtMillis: 延迟时间，单位毫秒
      *

@@ -31,6 +31,7 @@ class CommandParser private constructor(context: Context){
         commandMap[ICommand.COMMAND_SETTING] = 201708
         commandMap[ICommand.COMMAND_BACK] = 201708
         commandMap[ICommand.COMMAND_ADB] = 201708
+        commandMap[ICommand.COMMAND_RELOAD] = 201708
         commandMap[ICommand.COMMAND_LAUNCH_PAGE] = 201708
     }
 
@@ -61,6 +62,7 @@ class CommandParser private constructor(context: Context){
                 ICommand.COMMAND_SETTING -> processor?.setting()
                 ICommand.COMMAND_BACK -> processor?.backPage()
                 ICommand.COMMAND_ADB -> processor?.openAdb()
+                ICommand.COMMAND_RELOAD -> processor?.reload()
                 ICommand.COMMAND_LAUNCH_PAGE -> processor?.launchPage(command.args["intent"])
             }
         } else {

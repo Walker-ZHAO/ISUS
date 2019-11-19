@@ -221,4 +221,10 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
      * @see net.ischool.isus.LockScreenMode
      */
     fun getLockScreen() = getParameter()["lockScreen"]?.toInt() ?: LockScreenMode.NONE
+
+    /**
+     * 获取设备型号
+     * @see net.ischool.isus.DeviceId
+     */
+    fun getDeviceId() = getParameter()["zxprdid"] ?: ""
 }
