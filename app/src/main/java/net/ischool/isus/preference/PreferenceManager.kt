@@ -227,4 +227,9 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
      * @see net.ischool.isus.DeviceId
      */
     fun getDeviceId() = getParameter()["zxprdid"] ?: ""
+
+    /**
+     * 获取新消息提醒区域ID
+     */
+    fun getBeepPagingAreaId() = getParameter()["beepPagingAreaId"] ?: "0"
 }
