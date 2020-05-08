@@ -4,6 +4,9 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import io.reactivex.Observable
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import net.ischool.isus.*
 import net.ischool.isus.command.CommandParser
 import net.ischool.isus.command.ICommand
@@ -110,17 +113,19 @@ interface APIService {
      * http://192.168.0.20/campus/API/校内监控.md
      * @param sid           学校id
      * @param deviceTypeId  监控项id
-     * @param cmdb_id       设备cmdbid
+     * @param service_id    设备cmdbid,后续可能会变更为其它值
      * @param name          监控项注释、说明
      * @param labelId       是否正常，当前固定为1
      * @param info          当前状态描述信息
      * @param label         当前状态
      * @param ts            每分钟整的时间戳(单位秒)
      * @param type          数据类型，当前固定为3
+     * @param cmdb_id       扩展信息，设备cmdbid
+     * @param client_cdn_ip 设备上解析到CDN服务器的IP地址
      */
     @FormUrlEncoded
     @POST("sgrid/psi/hungribles")
-    fun _postStatus(@Field("sid") sid: String, @Field("element_id") deviceTypeId: String, @Field("service_id") cmdb_id: String, @Field("element_name_tail") name: String, @Field("label_character") labelId: Int, @Field("info") info: String, @Field("label") label: String, @Field("uptime") ts: Long, @Field("type") type: Int): Observable<ResponseBody>
+    fun _postStatus(@Field("sid") sid: String, @Field("element_id") deviceTypeId: String, @Field("service_id") service_id: String, @Field("element_name_tail") name: String, @Field("label_character") labelId: Int, @Field("info") info: String, @Field("label") label: String, @Field("uptime") ts: Long, @Field("type") type: Int, @Field("ext_cmdbid") cmdb_id: String, @Field("client_cdn_ip") cdn_ip: String): Observable<ResponseBody>
 
     companion object {
 
@@ -228,9 +233,10 @@ interface APIService {
          * @param info  当前状态描述信息
          * @param label 当前状态
          */
-        fun postStatus(info: String = "Normal", label: String = "Normal"): Observable<ResponseBody> {
+        suspend fun postStatus(info: String = "Normal", label: String = "Normal"): Observable<ResponseBody> {
             val ts = System.currentTimeMillis() / 1000
             val extra = ts % 60
+            val ip = parseHostGetIPAddress()
             return instance._postStatus(PreferenceManager.instance.getSchoolId(),
                 DeviceType.getDeviceTypeId(PreferenceManager.instance.getDeviceType()),
                 PreferenceManager.instance.getCMDB(),
@@ -239,7 +245,9 @@ interface APIService {
                 info,
                 label,
                 ts - extra,
-                3)
+                3,
+                PreferenceManager.instance.getCMDB(),
+                ip)
         }
 
         /**
