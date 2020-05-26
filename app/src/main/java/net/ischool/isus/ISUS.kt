@@ -53,6 +53,9 @@ class ISUS(val context: Context, val domain: String, val se: Boolean) {
             // 已初始化的设备，非SE模式下，启动状态上报服务
             if (PreferenceManager.instance.getInitialized() && !securityEnhance)
                 StatusPostService.startService(context)
+
+            // 启动ZeroConf广播服务
+            context.startZXBS()
         }
     }
 

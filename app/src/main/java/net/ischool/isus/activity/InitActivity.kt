@@ -26,6 +26,7 @@ import net.ischool.isus.network.APIService
 import net.ischool.isus.network.callback.StringCallback
 import net.ischool.isus.preference.PreferenceManager
 import net.ischool.isus.service.CMDBService
+import net.ischool.isus.startZXBS
 import okhttp3.Request
 import org.jetbrains.anko.indeterminateProgressDialog
 import org.jetbrains.anko.longToast
@@ -145,6 +146,8 @@ class InitActivity : RxAppCompatActivity() {
                     onNext = {
                         dialog?.dismiss()
                         toast("设备初始化成功")
+                        // 启动ZXBS服务
+                        startZXBS()
                         setResult(Activity.RESULT_OK)
                         finish()
                     },
@@ -189,6 +192,8 @@ class InitActivity : RxAppCompatActivity() {
                         onNext = {
                             dialog?.dismiss()
                             toast("设备初始化成功")
+                            // 启动ZXBS服务
+                            startZXBS()
                             setResult(Activity.RESULT_OK)
                             finish()
                         },
