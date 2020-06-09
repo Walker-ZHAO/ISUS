@@ -30,9 +30,11 @@ fun Context.startZXBS() {
         val version = "${label}:v${info.versionName}"
         val intent = Intent().apply {
             component = ComponentName(PACKAGE_NAME, SERVICE_NAME)
-            putExtra(EXTRA_SCHOOL_ID, PreferenceManager.instance.getSchoolId())
-            putExtra(EXTRA_CMDB_ID, PreferenceManager.instance.getCMDB())
-            putExtra(EXTRA_VERSION_INFO, version)
+            if (PreferenceManager.instance.getInitialized()) {
+                putExtra(EXTRA_SCHOOL_ID, PreferenceManager.instance.getSchoolId())
+                putExtra(EXTRA_CMDB_ID, PreferenceManager.instance.getCMDB())
+                putExtra(EXTRA_VERSION_INFO, version)
+            }
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             applicationContext.startForegroundService(intent)
