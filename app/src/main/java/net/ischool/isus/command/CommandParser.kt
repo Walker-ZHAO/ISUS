@@ -7,6 +7,8 @@ import net.ischool.isus.*
 import net.ischool.isus.log.Syslog
 import net.ischool.isus.model.Command
 import net.ischool.isus.preference.PreferenceManager
+import java.util.*
+import kotlin.collections.HashMap
 
 /**
  * 命令解析器
@@ -41,7 +43,7 @@ class CommandParser private constructor(context: Context){
             if (commandProcessor != null)
                 instance.processor = commandProcessor
             else
-                instance.processor = CommandImpl(ISUS.instance.context)
+                instance.processor = if (isHikDevice()) HikVisionCommandImpl(ISUS.instance.context) else CommandImpl(ISUS.instance.context)
         }
         lateinit var instance: CommandParser
     }
@@ -52,7 +54,7 @@ class CommandParser private constructor(context: Context){
     fun processCommand(command: Command) {
         Syslog.logI("ISUS process command: $command")
         if (canProcess(command)) {
-            when (command.cmd.toLowerCase()) {
+            when (command.cmd.toLowerCase(Locale.getDefault())) {
                 ICommand.COMMAND_PING -> processor?.ping()
                 ICommand.COMMAND_CONFIG -> processor?.config()
                 ICommand.COMMAND_RESET -> processor?.reset()
@@ -85,7 +87,7 @@ class CommandParser private constructor(context: Context){
      */
     private fun canProcess(command: Command): Boolean {
         val cmdbid = PreferenceManager.instance.getCMDB()
-        val version = commandMap[command.cmd.toLowerCase()] ?: -1
+        val version = commandMap[command.cmd.toLowerCase(Locale.getDefault())] ?: -1
         if (version >= command.cmd_version && cmdbid == command.cmdbid) {
             return true
         }
@@ -93,7 +95,7 @@ class CommandParser private constructor(context: Context){
     }
 
     fun genCommand(cmd: String, args: HashMap<String, String>?): Command {
-        val version = commandMap[cmd.toLowerCase()] ?: 0
+        val version = commandMap[cmd.toLowerCase(Locale.getDefault())] ?: 0
         return Command(version, args ?: hashMapOf(), cmd, PreferenceManager.instance.getCMDB())
     }
 }

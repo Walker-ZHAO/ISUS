@@ -1,6 +1,7 @@
 package net.ischool.isus
 
 import android.util.Log
+import com.hikvision.dmb.system.InfoSystemApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.net.InetAddress
@@ -33,4 +34,15 @@ suspend fun parseHostGetIPAddress(host: String = DEFAULT_HOST): String {
         }
         return@back ""
     }
+}
+
+/**
+ * 判断是否是海康设备
+ */
+fun isHikDevice(): Boolean {
+    try {   // 通过使用海康SDK获取主板信息判断是否为海康设备
+        InfoSystemApi.getMotherboardType()
+        return true
+    } catch (e: Exception) { }
+    return false
 }
