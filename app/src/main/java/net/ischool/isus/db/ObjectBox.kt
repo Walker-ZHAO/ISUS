@@ -5,7 +5,6 @@ import io.objectbox.BoxStore
 import io.objectbox.android.AndroidObjectBrowser
 import io.objectbox.kotlin.boxFor
 import io.objectbox.kotlin.query
-import net.ischool.isus.BuildConfig
 import net.ischool.isus.model.MyObjectBox
 import net.ischool.isus.model.User
 import net.ischool.isus.model.User_

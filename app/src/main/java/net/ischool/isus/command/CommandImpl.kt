@@ -7,7 +7,6 @@ import android.content.Intent
 import android.os.Environment
 import android.os.Process
 import com.orhanobut.logger.Logger
-import io.reactivex.schedulers.Schedulers
 import net.ischool.isus.activity.ConfigActivity
 import net.ischool.isus.network.APIService
 import net.ischool.isus.network.callback.StringCallback
@@ -15,7 +14,8 @@ import okhttp3.Request
 import java.io.IOException
 import android.provider.Settings;
 import com.walker.anke.framework.reboot
-import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
 import net.ischool.isus.log.Syslog
 import org.jetbrains.anko.alarmManager
 import java.io.File

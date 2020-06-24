@@ -9,9 +9,9 @@ import com.google.gson.Gson
 import com.rabbitmq.client.*
 import com.rabbitmq.client.impl.DefaultExceptionHandler
 import com.walker.anke.gson.fromJson
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
 import net.ischool.isus.*
 import net.ischool.isus.command.CommandParser
 import net.ischool.isus.db.ObjectBox

@@ -10,40 +10,52 @@
       "properties": [
         {
           "id": "2:3795752247493481468",
-          "name": "uid"
+          "name": "uid",
+          "type": 6,
+          "flags": 129
         },
         {
           "id": "3:6882226334490694830",
-          "name": "username"
+          "name": "username",
+          "type": 9
         },
         {
           "id": "4:3584545862703980558",
+          "name": "cardNum",
           "indexId": "2:5740154632471342171",
-          "name": "cardNum"
+          "type": 9,
+          "flags": 2048
         },
         {
           "id": "5:5598589013785218423",
-          "name": "avatar"
+          "name": "avatar",
+          "type": 9
         },
         {
           "id": "6:973845672994519228",
-          "name": "groupId"
+          "name": "groupId",
+          "type": 6,
+          "flags": 4
         },
         {
           "id": "7:1934593503610795992",
-          "name": "groupName"
+          "name": "groupName",
+          "type": 9
         },
         {
           "id": "8:4571669989309631428",
-          "name": "userType"
+          "name": "userType",
+          "type": 9
         },
         {
           "id": "9:1860189553688583079",
-          "name": "studentType"
+          "name": "studentType",
+          "type": 9
         },
         {
           "id": "10:5962202212170151706",
-          "name": "cacheAvatar"
+          "name": "cacheAvatar",
+          "type": 9
         }
       ],
       "relations": []
@@ -53,8 +65,8 @@
   "lastIndexId": "2:5740154632471342171",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
-  "modelVersion": 4,
-  "modelVersionParserMinimum": 4,
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
   "retiredEntityUids": [],
   "retiredIndexUids": [
     8575306868456860239

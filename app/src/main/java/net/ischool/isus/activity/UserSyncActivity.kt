@@ -1,11 +1,11 @@
 package net.ischool.isus.activity
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
+import androidx.appcompat.app.AppCompatActivity
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_user_sync.*
 import net.ischool.isus.R
 import net.ischool.isus.db.ObjectBox

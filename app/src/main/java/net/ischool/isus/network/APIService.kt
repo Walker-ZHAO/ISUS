@@ -3,10 +3,7 @@ package net.ischool.isus.network
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import io.reactivex.Observable
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import io.reactivex.rxjava3.core.Observable
 import net.ischool.isus.*
 import net.ischool.isus.command.CommandParser
 import net.ischool.isus.command.ICommand
@@ -21,10 +18,9 @@ import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.runOnUiThread
-import org.jetbrains.anko.toast
 import retrofit2.Response
 import retrofit2.Retrofit
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
+import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.*
 import java.io.File
@@ -93,7 +89,7 @@ interface APIService {
                     .baseUrl(END_POINT)
                     .client(client)
                     .addConverterFactory(GsonConverterFactory.create())
-                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                    .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                     .build()
 
             return retrofit.create(APIService::class.java)

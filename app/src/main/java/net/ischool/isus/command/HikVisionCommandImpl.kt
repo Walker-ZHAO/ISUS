@@ -8,8 +8,8 @@ import android.provider.Settings
 import com.hikvision.dmb.system.InfoSystemApi
 import com.hikvision.dmb.util.InfoUtilApi
 import com.orhanobut.logger.Logger
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
 import net.ischool.isus.activity.ConfigActivity
 import net.ischool.isus.log.Syslog
 import net.ischool.isus.network.APIService

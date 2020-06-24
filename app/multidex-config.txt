@@ -1,0 +1,1 @@
+net/ischool/isus/App.class

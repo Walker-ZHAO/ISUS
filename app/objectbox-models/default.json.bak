@@ -9,12 +9,7 @@
       "name": "User",
       "properties": [
         {
-          "id": "1:487201099717290296",
-          "name": "id"
-        },
-        {
           "id": "2:3795752247493481468",
-          "indexId": "1:8575306868456860239",
           "name": "uid"
         },
         {
@@ -61,8 +56,12 @@
   "modelVersion": 4,
   "modelVersionParserMinimum": 4,
   "retiredEntityUids": [],
-  "retiredIndexUids": [],
-  "retiredPropertyUids": [],
+  "retiredIndexUids": [
+    8575306868456860239
+  ],
+  "retiredPropertyUids": [
+    487201099717290296
+  ],
   "retiredRelationUids": [],
   "version": 1
 }

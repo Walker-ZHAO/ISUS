@@ -8,16 +8,16 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
-import com.jakewharton.rxbinding2.view.RxView
-import com.trello.rxlifecycle2.android.ActivityEvent
-import com.trello.rxlifecycle2.components.support.RxAppCompatActivity
-import com.trello.rxlifecycle2.kotlin.bindUntilEvent
+import com.jakewharton.rxbinding4.view.clicks
+import com.trello.rxlifecycle4.android.ActivityEvent
+import com.trello.rxlifecycle4.components.support.RxAppCompatActivity
+import com.trello.rxlifecycle4.kotlin.bindUntilEvent
 import com.walker.anke.foundation.md5
 import com.walker.anke.framework.visiable
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_init.*
 import net.ischool.isus.CONFIG_RSA_PASS
 import net.ischool.isus.ISUS
@@ -53,10 +53,10 @@ class InitActivity : RxAppCompatActivity() {
         tool_bar.setTitle(R.string.device_init_title)
         setSupportActionBar(tool_bar)
 
-        val disposable = RxView.clicks(ok_btn)
-                .debounce(1, TimeUnit.SECONDS)
-                .bindUntilEvent(this, ActivityEvent.DESTROY)
-                .subscribe { init() }
+        ok_btn.clicks()
+            .debounce(1, TimeUnit.SECONDS)
+            .bindUntilEvent(this, ActivityEvent.DESTROY)
+            .subscribe { init() }
 
         if (ISUS.instance.se) {
             set_school_id.visiable()
