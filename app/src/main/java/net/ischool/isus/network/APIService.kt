@@ -83,19 +83,6 @@ interface APIService {
     @GET("schoolcdn/getAllUids")
     fun _getUids(): Observable<Response<Result<Uids>>>
 
-    object Factory {
-        fun createService(client: OkHttpClient): APIService {
-            val retrofit = Retrofit.Builder()
-                    .baseUrl(END_POINT)
-                    .client(client)
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
-                    .build()
-
-            return retrofit.create(APIService::class.java)
-        }
-    }
-
     /**
      * 获取用户信息（简版）
      * http://192.168.0.20/campus/API/学校CDN服务器接口文档.md
@@ -122,6 +109,25 @@ interface APIService {
     @FormUrlEncoded
     @POST("sgrid/psi/hungribles")
     fun _postStatus(@Field("sid") sid: String, @Field("element_id") deviceTypeId: String, @Field("service_id") service_id: String, @Field("element_name_tail") name: String, @Field("label_character") labelId: Int, @Field("info") info: String, @Field("label") label: String, @Field("uptime") ts: Long, @Field("type") type: Int, @Field("ext_cmdbid") cmdb_id: String, @Field("client_cdn_ip") cdn_ip: String): Observable<ResponseBody>
+
+    /**
+     * 获取网络状态信息
+     */
+    @GET("schoolsrv/ping?v=2")
+    fun _getNetworkStatus(): Observable<Response<Result<NetworkStatus>>>
+
+    object Factory {
+        fun createService(client: OkHttpClient): APIService {
+            val retrofit = Retrofit.Builder()
+                .baseUrl(END_POINT)
+                .client(client)
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
+                .build()
+
+            return retrofit.create(APIService::class.java)
+        }
+    }
 
     companion object {
 
@@ -245,6 +251,8 @@ interface APIService {
                 PreferenceManager.instance.getCMDB(),
                 ip)
         }
+
+        fun getNetworkStatus() = instance._getNetworkStatus()
 
         /**
          * 取消所有网络请求
