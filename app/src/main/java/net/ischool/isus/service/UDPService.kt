@@ -27,6 +27,7 @@ import java.net.InetSocketAddress
 object UDPService {
     private const val PORT = 8800
     private const val TIMEOUT = 30 * 1000
+    private const val BROADCAST_IP = "255.255.255.255"
     private var socket: DatagramSocket? = null
     // UDP服务是否激活
     private var udpRunning = false
@@ -78,7 +79,7 @@ object UDPService {
         try {
             socket?.let {
                 if (it.isBound && !it.isClosed)
-                    socket?.send(DatagramPacket(data, data.size,InetSocketAddress("255.255.255.255", PORT)))
+                    socket?.send(DatagramPacket(data, data.size,InetSocketAddress(BROADCAST_IP, PORT)))
             }
         } catch (e: Exception) {
             e.printStackTrace()
