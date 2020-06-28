@@ -26,7 +26,7 @@ data class UDPMessage(var bytes: ByteArray) {
             payload = bytes[1]
             receiver = String(bytes, 2, 16)
             sender = String(bytes, 18, 16)
-            data = bytes.drop(MSG_HEAD).toByteArray()
+            data = bytes.drop(MSG_HEAD).takeWhile { it != 0.toByte() }.toByteArray()
         }
     }
 

@@ -1,11 +1,18 @@
 package net.ischool.isus.service
 
 import android.util.Log
+import com.google.gson.Gson
+import com.walker.anke.gson.fromJson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import net.ischool.isus.command.CommandParser
+import net.ischool.isus.command.CommandResult
+import net.ischool.isus.getDeviceID
+import net.ischool.isus.model.Command
 import net.ischool.isus.model.UDPMessage
 import java.io.IOException
+import java.lang.Exception
 import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetSocketAddress
@@ -21,13 +28,12 @@ object UDPService {
     private const val PORT = 8800
     private const val TIMEOUT = 30 * 1000
     private var socket: DatagramSocket? = null
-    private val bytes = ByteArray(UDPMessage.MSG_SIZE)
-    private val packet: DatagramPacket by lazy { DatagramPacket(bytes, bytes.size) }
     // UDP服务是否激活
     private var udpRunning = false
     private var udpLifeOver = true
     private const val TAG = "UDPService"
 
+    @ExperimentalStdlibApi
     fun start() {
         if (udpRunning || !udpLifeOver)
             return
@@ -43,10 +49,17 @@ object UDPService {
             udpLifeOver = false
             while (udpRunning) {
                 try {
+                    val bytes = ByteArray(UDPMessage.MSG_SIZE)
+                    val packet = DatagramPacket(bytes, bytes.size)
                     socket?.receive(packet)
                     val msg = UDPMessage(packet.data)
-                    Log.i(TAG, "version: ${msg.version}, payload: ${msg.payload}, receiver: ${msg.receiver}, sender: ${msg.sender}, data: ${msg.data}")
-                    // TODO: 本地UUID与receiver比对；data解析成Command；分析Command并执行
+                    Log.i(TAG, "version: ${msg.version}, payload: ${msg.payload}, receiver: ${msg.receiver}, sender: ${msg.sender}, data: ${msg.data.decodeToString()}")
+
+                    // 本地UUID与receiver比对
+                    if (msg.receiver == getDeviceID()) {
+                        val command = Gson().fromJson<Command>(msg.data.decodeToString())
+                        CommandParser.instance.processCommand(command)
+                    }
                 } catch (e: IOException) {
                     e.printStackTrace()
                 }
@@ -61,7 +74,44 @@ object UDPService {
         udpRunning = false
     }
 
-    fun send() {
+    private fun send(data: ByteArray) {
+        try {
+            socket?.let {
+                if (it.isBound && !it.isClosed)
+                    socket?.send(DatagramPacket(data, data.size,InetSocketAddress("255.255.255.255", PORT)))
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 
+    /**
+     * 发送基于UDP的命令回执
+     */
+    @ExperimentalStdlibApi
+    fun sendResult(result: CommandResult, remoteUUID: String) {
+        // 仅当remoteUUID存在，才向目标发送回执
+        if (remoteUUID.isNotBlank()) {
+            val json = Gson().toJson(result) ?: ""
+            val data = json.encodeToByteArray()
+            send(pack(data, remoteUUID))
+        }
+    }
+
+    /**
+     * 按协议格式进行数据打包
+     */
+    @ExperimentalStdlibApi
+    private fun pack(data: ByteArray, remoteUUID: String): ByteArray {
+        /**
+         * message version 0x01
+         * version: 1 byte
+         * payload type: 1 byte
+         * receiver uuid: 16 bytes
+         * sender uuid: 16 bytes
+         * data: 0-1024 bytes
+         */
+
+        return byteArrayOf(0x01, 0x01) + remoteUUID.encodeToByteArray() + getDeviceID().encodeToByteArray() + data
     }
 }

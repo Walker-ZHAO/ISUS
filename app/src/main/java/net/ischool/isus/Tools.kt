@@ -1,11 +1,14 @@
 package net.ischool.isus
 
+import android.annotation.SuppressLint
+import android.provider.Settings
 import android.util.Log
 import com.hikvision.dmb.system.InfoSystemApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.net.InetAddress
 import java.net.UnknownHostException
+import java.util.*
 
 /**
  * 工具类
@@ -46,3 +49,12 @@ fun isHikDevice(): Boolean {
     } catch (e: Exception) { }
     return false
 }
+
+/**
+ * 获取设备ID
+ */
+@SuppressLint("HardwareIds")
+fun getDeviceID(): String = Settings.Secure.getString(
+    ISUS.instance.context.contentResolver,
+    Settings.Secure.ANDROID_ID
+).toUpperCase(Locale.getDefault())

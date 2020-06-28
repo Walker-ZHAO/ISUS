@@ -1,12 +1,12 @@
 package net.ischool.isus.command
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import net.ischool.isus.*
 import net.ischool.isus.log.Syslog
 import net.ischool.isus.model.Command
 import net.ischool.isus.preference.PreferenceManager
+import net.ischool.isus.service.UDPService
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -17,7 +17,7 @@ import kotlin.collections.HashMap
  * Email: zhaocework@gmail.com
  * Date: 2017/9/19
  */
-class CommandParser private constructor(context: Context){
+class CommandParser private constructor() {
 
     private var processor: ICommand? = null
     private val commandMap = mutableMapOf<String, Long>()
@@ -38,12 +38,15 @@ class CommandParser private constructor(context: Context){
     }
 
     companion object {
+        @ExperimentalStdlibApi
         fun init(commandProcessor: ICommand? = null) {
-            instance = CommandParser(ISUS.instance.context)
+            instance = CommandParser()
             if (commandProcessor != null)
                 instance.processor = commandProcessor
             else
-                instance.processor = if (isHikDevice()) HikVisionCommandImpl(ISUS.instance.context) else CommandImpl(ISUS.instance.context)
+                instance.processor = if (isHikDevice()) CommandProcessorHik(ISUS.instance.context) else CommandProcessorCommon(ISUS.instance.context)
+            // 添加基于UDP协议的命令结果回调
+            instance.processor?.addResultCallback(UDPService::sendResult)
         }
         lateinit var instance: CommandParser
     }
@@ -51,21 +54,21 @@ class CommandParser private constructor(context: Context){
     /**
      * 命令处理器
      */
-    fun processCommand(command: Command) {
+    fun processCommand(command: Command, remoteUUID: String = "") {
         Syslog.logI("ISUS process command: $command")
         if (canProcess(command)) {
             when (command.cmd.toLowerCase(Locale.getDefault())) {
-                ICommand.COMMAND_PING -> processor?.ping()
-                ICommand.COMMAND_CONFIG -> processor?.config()
-                ICommand.COMMAND_RESET -> processor?.reset()
-                ICommand.COMMAND_REBOOT -> processor?.reboot()
-                ICommand.COMMAND_QUIT -> processor?.quit()
-                ICommand.COMMAND_UPDATE -> processor?.update(command.args["url"])
-                ICommand.COMMAND_SETTING -> processor?.setting()
-                ICommand.COMMAND_BACK -> processor?.backPage()
-                ICommand.COMMAND_ADB -> processor?.openAdb()
-                ICommand.COMMAND_RELOAD -> processor?.reload()
-                ICommand.COMMAND_LAUNCH_PAGE -> processor?.launchPage(command.args["intent"])
+                ICommand.COMMAND_PING -> processor?.ping(remoteUUID)
+                ICommand.COMMAND_CONFIG -> processor?.config(remoteUUID)
+                ICommand.COMMAND_RESET -> processor?.reset(remoteUUID)
+                ICommand.COMMAND_REBOOT -> processor?.reboot(remoteUUID)
+                ICommand.COMMAND_QUIT -> processor?.quit(remoteUUID)
+                ICommand.COMMAND_UPDATE -> processor?.update(command.args["url"], remoteUUID)
+                ICommand.COMMAND_SETTING -> processor?.setting(remoteUUID)
+                ICommand.COMMAND_BACK -> processor?.backPage(remoteUUID)
+                ICommand.COMMAND_ADB -> processor?.openAdb(remoteUUID)
+                ICommand.COMMAND_RELOAD -> processor?.reload(remoteUUID)
+                ICommand.COMMAND_LAUNCH_PAGE -> processor?.launchPage(command.args["intent"], remoteUUID)
             }
         } else {
             // 广播无法处理的command

@@ -33,6 +33,7 @@ class ISUS(val context: Context, val domain: String, val se: Boolean) {
         /**
          * 初始化
          */
+        @ExperimentalStdlibApi
         @JvmOverloads
         @Synchronized
         @JvmStatic fun init(context: Context, deviceType: Int, domain: String = DEFAULT_DOMAIN, securityEnhance: Boolean = false, commandProcessor: ICommand? = null) {

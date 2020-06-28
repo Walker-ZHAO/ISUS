@@ -24,59 +24,65 @@ interface ICommand {
     }
 
     /**
+     * 命令结果回调管理
+     */
+    fun addResultCallback(callback: (CommandResult, String) -> Unit): Boolean
+    fun removeResultCallback(callback: (CommandResult, String) -> Unit): Boolean
+
+    /**
      * 调用/eqptapi/pong响应
      */
-    fun ping()
+    fun ping(remoteUUID: String)
 
     /**
      * 进入设置界面
      */
-    fun config()
+    fun config(remoteUUID: String)
 
     /**
      * 重置APP
      */
-    fun reset()
+    fun reset(remoteUUID: String)
 
     /**
      * 重启设备
      */
-    fun reboot()
+    fun reboot(remoteUUID: String)
 
     /**
      * 退出到桌面
      */
-    fun quit()
+    fun quit(remoteUUID: String)
 
     /**
      * 更新
      */
-    fun update(url: String?)
+    fun update(url: String?, remoteUUID: String)
 
     /**
      * 进入设置页
      */
-    fun setting()
+    fun setting(remoteUUID: String)
 
     /**
      * 启动指定页面
      */
-    fun launchPage(component: String?)
+    fun launchPage(component: String?, remoteUUID: String)
 
     /**
      * 从当前页返回
      */
-    fun backPage()
+    fun backPage(remoteUUID: String)
 
     /**
      * 开启adb调试(仅海康设备有效)
      */
-    fun openAdb()
+    fun openAdb(remoteUUID: String)
 
     /**
      * 更新配置信息
      */
-    fun reload()
+    fun reload(remoteUUID: String)
 
     /**
      * 执行cmd命令
