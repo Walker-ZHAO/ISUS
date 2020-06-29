@@ -59,7 +59,7 @@ object UDPService {
                     // 本地UUID与receiver比对
                     if (msg.receiver == getDeviceID()) {
                         val command = Gson().fromJson<Command>(msg.data.decodeToString())
-                        CommandParser.instance.processCommand(command)
+                        CommandParser.instance.processCommand(command, msg.sender)
                     }
                 } catch (e: IOException) {
                     e.printStackTrace()
