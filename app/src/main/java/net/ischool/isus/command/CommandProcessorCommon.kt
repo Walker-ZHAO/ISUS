@@ -15,8 +15,13 @@ import java.io.IOException
 import com.walker.anke.framework.reboot
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import net.ischool.isus.QueryType
+import net.ischool.isus.RESULT_OK
 import net.ischool.isus.activity.ConfigActivity
 import net.ischool.isus.log.Syslog
+import net.ischool.isus.preference.PreferenceManager
+import net.ischool.isus.service.ISUSService
+import net.ischool.isus.service.QueueState
 import org.jetbrains.anko.alarmManager
 import java.io.File
 
@@ -201,6 +206,52 @@ open class CommandProcessorCommon constructor(protected val context: Context) : 
                     finish(result, remoteUUID)
                 }
             )
+    }
+
+    override fun queryStatus(type: String?, remoteUUID: String) {
+        val result = CommandResult(ICommand.COMMAND_QUERY_STATUS)
+        if (type == null) {
+            result.fail("Illegal Query Status Type: null")
+            finish(result, remoteUUID)
+            return
+        }
+
+        when (type.toInt()) {
+            QueryType.QUERY_HTTP -> {
+                APIService.getNetworkStatus()
+                    .subscribeOn(Schedulers.io())
+                    .subscribeBy(
+                        onNext = {
+                            val status = checkNotNull(it.body())
+                            if (status.errno == RESULT_OK) {
+                                if (status.data.sids.contains(PreferenceManager.instance.getSchoolId()))
+                                    result.success("HTTP Status: Online")
+                                else
+                                    result.fail("HTTP Status: Offline[Can't match SchoolId]")
+                                finish(result, remoteUUID)
+                            } else {
+                                result.fail("HTTP Status: Offline[${status.error}]")
+                                finish(result, remoteUUID)
+                            }
+                        },
+                        onError = {
+                            result.fail("HTTP Status: Offline[${it.message}]")
+                            finish(result, remoteUUID)
+                        }
+                    )
+            }
+            QueryType.QUERY_RABBITMQ -> {
+                when (ISUSService.queueState) {
+                    QueueState.STATE_BLOCK -> result.fail("RabbitMQ Status: Offline")
+                    QueueState.STATE_STANDBY -> result.success("RabbitMQ Status: Online")
+                }
+                finish(result, remoteUUID)
+            }
+            else -> {
+                result.fail("Unsupported Query Status Type: $type")
+                finish(result, remoteUUID)
+            }
+        }
     }
 
     /**

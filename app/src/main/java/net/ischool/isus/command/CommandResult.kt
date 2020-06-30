@@ -9,7 +9,7 @@ package net.ischool.isus.command
  */
 class CommandResult(cmd: String, var args: HashMap<String, String> = hashMapOf()) {
 
-    private val cmd = "echo"
+    private val cmd = "result"
 
     init {
         args["response"] = cmd
@@ -20,5 +20,10 @@ class CommandResult(cmd: String, var args: HashMap<String, String> = hashMapOf()
     fun fail(reason: String?) {
         args["code"] = "-1"
         args["reason"] = reason ?: ""
+    }
+
+    fun success(text: String) {
+        args["code"] = "0"
+        args["reason"] = text
     }
 }

@@ -21,6 +21,7 @@ interface ICommand {
         const val COMMAND_ADB =   "adb"
         const val COMMAND_RELOAD = "reload"
         const val COMMAND_LAUNCH_PAGE =   "amstart"
+        const val COMMAND_QUERY_STATUS = "query_status"
     }
 
     /**
@@ -83,6 +84,11 @@ interface ICommand {
      * 更新配置信息
      */
     fun reload(remoteUUID: String)
+
+    /**
+     * 查询状态信息
+     */
+    fun queryStatus(type: String?, remoteUUID: String)
 
     /**
      * 执行cmd命令

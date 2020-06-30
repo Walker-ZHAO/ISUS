@@ -113,7 +113,7 @@ interface APIService {
     /**
      * 获取网络状态信息
      */
-    @GET("schoolsrv/ping?v=2")
+    @GET("ischoolsrv/ping?v=2")
     fun _getNetworkStatus(): Observable<Response<Result<NetworkStatus>>>
 
     object Factory {
