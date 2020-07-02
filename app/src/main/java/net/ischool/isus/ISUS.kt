@@ -13,6 +13,7 @@ import net.ischool.isus.network.APIService
 import net.ischool.isus.preference.PreferenceManager
 import net.ischool.isus.service.ISUSService
 import net.ischool.isus.service.StatusPostService
+import net.ischool.isus.service.UDPService
 import org.jetbrains.anko.toast
 
 /**
@@ -57,6 +58,9 @@ class ISUS(val context: Context, val domain: String, val se: Boolean) {
 
             // 启动ZeroConf广播服务
             context.startZXBS()
+
+            // 启动UDP监听
+            UDPService.start()
         }
     }
 
@@ -80,6 +84,7 @@ class ISUS(val context: Context, val domain: String, val se: Boolean) {
     fun destroy() {
         ObjectBox.destroy()
         stopService()
+        UDPService.stop()
         APIService.cancel()
     }
 }
