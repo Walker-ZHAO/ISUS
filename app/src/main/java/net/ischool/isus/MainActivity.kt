@@ -218,20 +218,20 @@ class MainActivity : RxAppCompatActivity() {
         return OkHttpClient.Builder().readTimeout(10, TimeUnit.SECONDS).build().newCall(request).execute()
     }
 
-    fun installAPP() {
-        val file = File("${Environment.getExternalStorageDirectory().path}/app-debug.apk")
-        if (!file.exists())
-            return
-        val intent = Intent(Intent.ACTION_VIEW)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            intent.setDataAndType(FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".provider", file), "application/vnd.android.package-archive");
-        } else {
-            intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
-        }
-        startActivity(intent)
-    }
+//    fun installAPP() {
+//        val file = File("${Environment.getExternalStorageDirectory().path}/app-debug.apk")
+//        if (!file.exists())
+//            return
+//        val intent = Intent(Intent.ACTION_VIEW)
+//        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//            intent.setDataAndType(FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".provider", file), "application/vnd.android.package-archive");
+//        } else {
+//            intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
+//        }
+//        startActivity(intent)
+//    }
 
     fun execRuntimeProcess(cmd: String): Process? {
         var map = mapOf("1" to 1, "2" to 2)
