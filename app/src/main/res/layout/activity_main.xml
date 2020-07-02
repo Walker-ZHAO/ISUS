@@ -8,6 +8,33 @@
     tools:context="net.ischool.isus.MainActivity">
 
     <Button
+            android:id="@+id/udp_start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
+            android:text="UDP Start"
+            android:layout_gravity="center_horizontal"/>
+
+    <Button
+            android:id="@+id/udp_stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
+            android:text="UDP Stop"
+            android:layout_gravity="center_horizontal"/>
+
+    <Button
+            android:id="@+id/power_off"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
+            android:text="Power Off"
+            android:layout_gravity="center_horizontal"/>
+
+    <Button
         android:id="@+id/init"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -68,5 +95,32 @@
         android:layout_marginTop="8dp"
         android:text="MQTest"
         android:layout_gravity="center_horizontal"/>
+
+    <Button
+            android:id="@+id/sync"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
+            android:text="Sync"
+            android:layout_gravity="center_horizontal"/>
+
+    <Button
+            android:id="@+id/sync_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
+            android:text="Sync Count"
+            android:layout_gravity="center_horizontal"/>
+
+    <Button
+            android:id="@+id/find_user"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="8dp"
+            android:text="Find User"
+            android:layout_gravity="center_horizontal"/>
 
 </LinearLayout>

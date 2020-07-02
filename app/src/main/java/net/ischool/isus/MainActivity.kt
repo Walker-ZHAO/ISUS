@@ -1,6 +1,5 @@
 package net.ischool.isus
 
-import android.app.ProgressDialog
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -10,27 +9,34 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.speech.tts.TextToSpeech
-import android.support.v4.content.FileProvider
+import androidx.core.content.FileProvider
 import android.util.Log
-import com.jakewharton.rxbinding2.view.RxView
+import com.hikvision.dmb.system.InfoSystemApi
+import com.hikvision.dmb.time.InfoTimeApi
+import com.jakewharton.rxbinding4.view.clicks
 import com.rabbitmq.client.*
-import com.trello.rxlifecycle2.android.ActivityEvent
-import com.trello.rxlifecycle2.components.support.RxAppCompatActivity
-import com.trello.rxlifecycle2.kotlin.bindUntilEvent
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.schedulers.Schedulers
+import com.trello.rxlifecycle4.android.ActivityEvent
+import com.trello.rxlifecycle4.components.support.RxAppCompatActivity
+import com.trello.rxlifecycle4.kotlin.bindUntilEvent
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import net.ischool.isus.activity.ConfigActivity
 import net.ischool.isus.activity.InitActivity
+import net.ischool.isus.broadcast.UserSyncReceiver
+import net.ischool.isus.db.ObjectBox
 import net.ischool.isus.network.APIService
+import net.ischool.isus.preference.PreferenceManager
+import net.ischool.isus.service.ISUSService
+import net.ischool.isus.service.UDPService
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.startActivity
+import org.jetbrains.anko.*
 import java.io.*
+import java.text.SimpleDateFormat
 import java.util.concurrent.TimeUnit
 
 /**
@@ -45,29 +51,40 @@ class MainActivity : RxAppCompatActivity() {
     var connection: Connection? = null
     var channel: Channel? = null
 
+    @ExperimentalStdlibApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        ISUS.init(this, DeviceType.SECURITY)
+        ISUS.init(this, DeviceType.BADGE)
 
         init.setOnClickListener { startActivity<InitActivity>() }
 
         config.setOnClickListener { startActivity<ConfigActivity>() }
 
-        RxView.clicks(ping)
+        ping.clicks()
                 .debounce(500, TimeUnit.MICROSECONDS)
                 .bindUntilEvent(this, ActivityEvent.DESTROY)
                 .observeOn(Schedulers.io())
                 .flatMap { APIService.pong().bindUntilEvent(this, ActivityEvent.DESTROY) }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
-                        onNext = { Log.i("Walker", "it") },
+                        onNext = {
+                            Log.i("Walker", "$it")
+                            Log.i("Walker", "area:${PreferenceManager.instance.getAreaId()}")
+                            Log.i("Walker", "checkpoint: ${PreferenceManager.instance.getCheckpointId()}")
+                            Log.i("Walker", "tunnel: ${PreferenceManager.instance.getTunnelId()}")
+                            Log.i("Walker", "attend: ${PreferenceManager.instance.getAttendModel()}")
+                            Log.i("Walker", "peripherals: ${PreferenceManager.instance.getPeripherals()}")
+                        },
                         onComplete = {Log.i("Walker", "onComplete")},
                         onError = { Log.e("Walker", "$it") }
                 )
 
-        RxView.clicks(reset)
+        reset.clicks()
+            .debounce(500, TimeUnit.MICROSECONDS)
+            .bindUntilEvent(this, ActivityEvent.DESTROY)
+            .observeOn(Schedulers.io())
                 .subscribeBy {
 //                    APIService.downloadAsync("http://download.i-school.net/apk/ischool_teacher_8.8.0.apk", "/sdcard", object : StringCallback {
 //                        override fun onResponse(string: String) {
@@ -89,7 +106,12 @@ class MainActivity : RxAppCompatActivity() {
 //                    startActivity(intent)
 
 //                    reboot(null)
+//                    SSLSocketFactoryProvider.getSSLSocketFactory(assets.open("test.pem"))
 
+                    APIService.getUids().subscribeBy(
+                        onError = { e -> Log.e("Walker", "getUids error: $e") },
+                        onNext = { result -> Log.i("Walker", "getUids success: ${result.body()?.data?.uids?.size}") }
+                    )
                 }
 
         btn_start.setOnClickListener {
@@ -112,18 +134,59 @@ class MainActivity : RxAppCompatActivity() {
             testMQ()
         }
 
-        registerReceiver(register, IntentFilter(ACTION_COMMAND))
+        sync.setOnClickListener {
+            sendBroadcast(Intent("net.ischool.isus.sync"))
+        }
+
+        sync_count.setOnClickListener {
+            toast("sync count: ${PreferenceManager.instance.getSyncCount()}")
+        }
+
+        find_user.setOnClickListener {
+            ObjectBox.findUser("D5D69AF4A1FD")?.let {
+                longToast("$it")
+                Log.i("ISUS", "$it")
+            }
+        }
+
+        power_off.setOnClickListener {
+            if (isHikDevice()) {
+                val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                val offTime = sdf.parse("2020-06-12 13:42:00")
+                val onTime = sdf.parse("2020-06-12 13:44:00")
+                InfoTimeApi.setTimeSwitch(offTime.time, onTime.time)
+            }
+        }
+
+        udp_start.setOnClickListener { UDPService.start() }
+        udp_stop.setOnClickListener { UDPService.stop() }
+
 //        Syslog.logI("Hello syslog")
 
 //        disableBar()
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        Log.i("ISUS", MQ_DOMAIN)
+        registerReceiver(register, IntentFilter(ACTION_COMMAND))
+        registerReceiver(syncReceiver, IntentFilter("net.ischool.isus.sync"))
+        registerReceiver(stateRecevier, IntentFilter(ACTION_QUEUE_STATE_CHANGE))
+    }
+
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver(register)
+        unregisterReceiver(syncReceiver)
+        unregisterReceiver(stateRecevier)
+    }
+
     fun testInit(): Response {
         val url = "https://www.i-school.net/eqptapi/init"
         val formBody = FormBody.Builder()
-                .add("cmdbid", "14")
-                .add("sid", "1110599")
+                .add("cmdbid", "153")
+                .add("sid", "1117164")
                 .build()
         val request = Request.Builder()
                 .url(url)
@@ -232,6 +295,16 @@ class MainActivity : RxAppCompatActivity() {
         }
     }
 
+    val syncReceiver by lazy { UserSyncReceiver() }
+
+    val stateRecevier = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == ACTION_QUEUE_STATE_CHANGE) {
+                longToast("RabbitMQ State: ${ISUSService.queueState}")
+            }
+        }
+    }
+
     private fun testMQ() {
         setUpConnectionFactory()
         doAsync {
@@ -288,5 +361,18 @@ class MainActivity : RxAppCompatActivity() {
         factory.virtualHost = "/"
         // 设置连接恢复
         factory.isAutomaticRecoveryEnabled = true
+    }
+
+    override fun onDestroy() {
+        ISUS.instance.destroy()
+        super.onDestroy()
+    }
+
+    fun isHikDevice(): Boolean {
+        try {   // 通过使用海康SDK获取主板信息判断是否为海康设备
+            InfoSystemApi.getMotherboardType()
+            return true
+        } catch (e: Exception) { }
+        return false
     }
 }
