@@ -1,6 +1,7 @@
 package net.ischool.isus
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.provider.Settings
 import android.util.Log
 import com.hikvision.dmb.system.InfoSystemApi
@@ -48,6 +49,17 @@ fun isHikDevice(): Boolean {
         return true
     } catch (e: Exception) { }
     return false
+}
+
+/**
+ * 判断是否是触沃设备
+ */
+fun isTouchWoDevice(): Boolean {
+    val intent = Intent(Intent.ACTION_MAIN, null).apply { addCategory(Intent.CATEGORY_LAUNCHER) }
+    val info = ISUS.instance.context.packageManager.queryIntentActivities(intent, 0).find { app ->
+        app.activityInfo.packageName.contains("adtv")
+    }
+    return info != null
 }
 
 /**
