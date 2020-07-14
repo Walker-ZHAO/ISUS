@@ -3,7 +3,6 @@ package net.ischool.isus
 import android.Manifest
 import android.app.Activity
 import android.content.Context
-import android.util.Log
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import com.tbruyelle.rxpermissions2.RxPermissions
@@ -62,8 +61,6 @@ class ISUS(val context: Context, val domain: String, val se: Boolean) {
 
             // 启动UDP监听
             UDPService.start()
-
-            Log.i("Walker", "version: ${BuildConfig.VERSION_NAME}")
         }
     }
 
