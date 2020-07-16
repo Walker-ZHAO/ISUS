@@ -81,15 +81,17 @@ class WatchDogService: Service() {
                 onNext = { response ->
                     val status = checkNotNull(response.body())
                     if (status.errno == RESULT_OK) {
-                        if (status.data.sids.contains(PreferenceManager.instance.getSchoolId()))
+                        if (status.data.sids.contains(PreferenceManager.instance.getSchoolId())) {
                             sendBroadcast(Intent(WATCH_DOG_ACTION))
+                            Syslog.logI("Network fine", "WatchDog")
+                        }
                         else
-                            Syslog.logI(
+                            Syslog.logE(
                                 "Network status get wrong school id [${status.data.sids}], current school id: ${PreferenceManager.instance.getSchoolId()}",
                                 "WatchDog"
                             )
                     } else {
-                        Syslog.logI(
+                        Syslog.logE(
                             "Network status error[${status.errno}]: ${status.error}",
                             "WatchDog"
                         )
@@ -98,10 +100,9 @@ class WatchDogService: Service() {
                         Observable.timer(1, TimeUnit.MINUTES).subscribe { updateNetwork() })
                 },
                 onError = {
+                    // 网络访问失败，不再重新尝试
                     it.printStackTrace()
                     Syslog.logI("Network status call error: ${it.message}", "WatchDog")
-                    disposables.add(
-                        Observable.timer(1, TimeUnit.MINUTES).subscribe { updateNetwork() })
                 }
             )
         disposables.add(disposable)
