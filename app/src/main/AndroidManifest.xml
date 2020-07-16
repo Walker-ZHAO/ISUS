@@ -77,6 +77,9 @@
         <service android:name=".service.StatusPostService"
                  android:exported="false"/>
 
+        <service android:name=".service.WatchDogService"
+                android:exported="false" />
+
     </application>
 
 </manifest>

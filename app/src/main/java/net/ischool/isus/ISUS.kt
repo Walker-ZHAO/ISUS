@@ -14,6 +14,7 @@ import net.ischool.isus.preference.PreferenceManager
 import net.ischool.isus.service.ISUSService
 import net.ischool.isus.service.StatusPostService
 import net.ischool.isus.service.UDPService
+import net.ischool.isus.service.WatchDogService
 import org.jetbrains.anko.toast
 
 /**
@@ -69,12 +70,16 @@ class ISUS(val context: Context, val domain: String, val se: Boolean) {
      */
     fun startService() {
         ISUSService.start(context)
+        // 启动网络监控服务
+        WatchDogService.start(context)
     }
 
     /**
      * 停止统一推送服务
      */
     fun stopService() {
+        // 关闭网络监控服务
+        WatchDogService.stop(context)
         ISUSService.stop(context)
     }
 
