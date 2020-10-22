@@ -232,4 +232,9 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
      * 获取新消息提醒区域ID
      */
     fun getBeepPagingAreaId() = getParameter()["beepPagingAreaId"] ?: "0"
+
+    /**
+     * 获取设备关联的环境监测通道ID列表，用 , 分隔
+     */
+    fun getEnvironmentTunnels() = getParameter()["environment_tunnels"] ?: ""
 }
