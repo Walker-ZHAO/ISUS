@@ -20,5 +20,6 @@ class CReaderType {
         @JvmField val T_S2 = 5              /** 串口，纯IC，ttyS0，19200波特率，12字节长度，7-10字节为卡号（木兰） **/
         @JvmField val T_S3 = 6              /** 串口，纯IC，纵横六合 **/
         @JvmField val T_S4 = 7              /** 串口，纯IC，ttyS3，9600波特率，世纪凯城 **/
+        @JvmField val T_N1 = 10             /** NFC，M1卡，MifareClassic协议，希沃 **/
     }
 }

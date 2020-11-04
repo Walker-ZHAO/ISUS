@@ -45,7 +45,11 @@ class CommandParser private constructor() {
             if (commandProcessor != null)
                 instance.processor = commandProcessor
             else
-                instance.processor = if (isHikDevice()) CommandProcessorHik(ISUS.instance.context) else CommandProcessorCommon(ISUS.instance.context)
+                instance.processor = when {
+                    isHikDevice() -> CommandProcessorHik(ISUS.instance.context)
+                    isSeeWoDevice() -> CommandProcessorSeeWo(ISUS.instance.context)
+                    else -> CommandProcessorCommon(ISUS.instance.context)
+                }
             // 添加基于UDP协议的命令结果回调
             instance.processor?.addResultCallback(UDPService::sendResult)
         }
