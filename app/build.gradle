@@ -55,7 +55,7 @@ android {
 }
 
 dependencies {
-    api project(path: ':seewo-sdk')
+    implementation project(path: ':seewo-sdk')
     api fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.google.android.material:material:1.0.0'
