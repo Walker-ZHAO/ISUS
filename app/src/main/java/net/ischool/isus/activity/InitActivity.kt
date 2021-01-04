@@ -8,6 +8,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import com.jakewharton.rxbinding4.view.clicks
 import com.trello.rxlifecycle4.android.ActivityEvent
 import com.trello.rxlifecycle4.components.support.RxAppCompatActivity
@@ -128,7 +129,10 @@ class InitActivity : RxAppCompatActivity() {
         if (set_cmdb_id.text.isEmpty()) {
             runOnUiThread { toast("CMDB ID不能为空") }
         } else {
-            runOnUiThread { dialog = indeterminateProgressDialog(getString(R.string.init_dialog_title)) { setCancelable(false) } }
+            runOnUiThread { dialog = indeterminateProgressDialog(getString(R.string.init_dialog_title)) {
+                setCancelable(false)
+                window?.attributes?.gravity = Gravity.CENTER
+            } }
             APIService.getSchoolId()
                 .subscribeOn(Schedulers.io())
                 .observeOn(Schedulers.io())
@@ -177,7 +181,10 @@ class InitActivity : RxAppCompatActivity() {
         }
 
         var dialog: ProgressDialog? = null
-        runOnUiThread { dialog = indeterminateProgressDialog(getString(R.string.init_dialog_title)) { setCancelable(false) } }
+        runOnUiThread { dialog = indeterminateProgressDialog(getString(R.string.init_dialog_title)) {
+            setCancelable(false)
+            window?.attributes?.gravity = Gravity.CENTER
+        } }
 
         val url = "http://update.${ISUS.instance.domain}/zxedu-system-images/schools/schoolcdn-$schoolId-$passCode.p12"
         APIService.downloadAsync(url, filesDir.absolutePath, callback = object : StringCallback {
