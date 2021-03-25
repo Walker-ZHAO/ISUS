@@ -34,9 +34,9 @@ class Syslog {
             InetAddress.getByName(host)
         }
 
-        private val PRI_ERROR = 155
-        private val PRI_NOTICE = 157
-        private val PRI_INFO = 158
+        private const val PRI_ERROR = 155       // 错误事件
+        private const val PRI_NOTICE = 157      // 普通但重要的事件
+        private const val PRI_INFO = 158        // 有用的信息
 
         private fun createLog(pri: Int = PRI_INFO, message: String, tag: String): String {
             val ts = SimpleDateFormat("MMM dd HH:mm:ss", Locale.ENGLISH).format(Date())
@@ -53,22 +53,40 @@ class Syslog {
             }
         }
 
+        /**
+         * 输出报警信息，如系统崩溃，异常捕获，API调用异常等
+         */
         @JvmOverloads
         @JvmStatic fun logE(message: String, tag: String = "") {
             doAsync {
                 val log = createLog(PRI_ERROR, message, tag).toByteArray()
-                socket.send(DatagramPacket(log, log.size, server, UDP_PORT))
+                try {
+                    socket.send(DatagramPacket(log, log.size, server, UDP_PORT))
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+
             }
         }
 
+        /**
+         * 输出注意信息，如业务逻辑不合规，接口数据无效，接口的业务逻辑错误等
+         */
         @JvmOverloads
         @JvmStatic fun logN(message: String, tag: String = "") {
             doAsync {
                 val log = createLog(PRI_NOTICE, message, tag).toByteArray()
-                socket.send(DatagramPacket(log, log.size, server, UDP_PORT))
+                try {
+                    socket.send(DatagramPacket(log, log.size, server, UDP_PORT))
+                }  catch (e: IOException) {
+                    e.printStackTrace()
+                }
             }
         }
 
+        /**
+         * 输出常规日志信息，如业务逻辑埋点等
+         */
         @JvmOverloads
         @JvmStatic fun logI(message: String, tag: String = "") {
             doAsync {
