@@ -6,6 +6,7 @@ import android.content.Context
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import com.tbruyelle.rxpermissions2.RxPermissions
+import com.walker.anke.framework.toast
 import net.ischool.isus.command.CommandParser
 import net.ischool.isus.command.ICommand
 import net.ischool.isus.db.ObjectBox
@@ -15,7 +16,6 @@ import net.ischool.isus.service.ISUSService
 import net.ischool.isus.service.StatusPostService
 import net.ischool.isus.service.UDPService
 import net.ischool.isus.service.WatchDogService
-import org.jetbrains.anko.toast
 
 /**
  * 库入口类

@@ -3,6 +3,7 @@ package net.ischool.isus.activity
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Base64
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.walker.anke.framework.setBase64
 import kotlinx.android.synthetic.main.activity_config.*
 import net.ischool.isus.DeviceType
@@ -11,7 +12,6 @@ import net.ischool.isus.command.CommandParser
 import net.ischool.isus.command.ICommand
 import net.ischool.isus.preference.ExternalParameter
 import net.ischool.isus.preference.PreferenceManager
-import org.jetbrains.anko.*
 
 /**
  * 配置界面
@@ -43,10 +43,11 @@ class ConfigActivity : AppCompatActivity() {
         text_external.text = builder.toString()
 
         btn_reset.setOnClickListener {
-            alert(R.string.warning_reset) {
-                titleResource = R.string.warning
-                yesButton { CommandParser.instance.processCommand(CommandParser.instance.genCommand(ICommand.COMMAND_RESET, null)) }
-                noButton {  }
+            MaterialAlertDialogBuilder(this).apply {
+                setTitle(R.string.warning)
+                setMessage(R.string.warning_reset)
+                setNegativeButton(android.R.string.cancel) { _, _-> }
+                setPositiveButton(android.R.string.ok) { _, _ -> CommandParser.instance.processCommand(CommandParser.instance.genCommand(ICommand.COMMAND_RESET, null)) }
             }.show()
         }
     }

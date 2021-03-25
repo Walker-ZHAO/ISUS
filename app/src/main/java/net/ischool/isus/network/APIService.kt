@@ -3,6 +3,8 @@ package net.ischool.isus.network
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import com.walker.anke.framework.longToast
+import com.walker.anke.framework.runOnUiThread
 import io.reactivex.rxjava3.core.Observable
 import net.ischool.isus.*
 import net.ischool.isus.command.CommandParser
@@ -16,8 +18,6 @@ import net.ischool.isus.preference.PreferenceManager
 import net.ischool.isus.service.StatusPostService
 import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
-import org.jetbrains.anko.longToast
-import org.jetbrains.anko.runOnUiThread
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory

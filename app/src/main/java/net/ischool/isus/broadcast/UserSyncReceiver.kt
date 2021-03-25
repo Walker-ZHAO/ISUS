@@ -4,10 +4,10 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import com.walker.anke.framework.newTask
 import net.ischool.isus.ISUS
 import net.ischool.isus.activity.UserSyncActivity
 import net.ischool.isus.preference.PreferenceManager
-import org.jetbrains.anko.newTask
 
 /**
  * 用户信息全量同步的命令行广播监听

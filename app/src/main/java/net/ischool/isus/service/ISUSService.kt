@@ -8,6 +8,7 @@ import android.util.Log
 import com.google.gson.Gson
 import com.rabbitmq.client.*
 import com.rabbitmq.client.impl.DefaultExceptionHandler
+import com.walker.anke.framework.doAsync
 import com.walker.anke.gson.fromJson
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.subscribeBy
@@ -24,7 +25,6 @@ import net.ischool.isus.network.callback.StringCallback
 import net.ischool.isus.network.se.SSLSocketFactoryProvider
 import net.ischool.isus.preference.PreferenceManager
 import okhttp3.Request
-import org.jetbrains.anko.doAsync
 import java.io.IOException
 
 /**

@@ -4,11 +4,11 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
+import com.walker.anke.framework.doAsync
+import com.walker.anke.framework.startService
 import net.ischool.isus.command.CommandParser
 import net.ischool.isus.command.ICommand
 import net.ischool.isus.preference.PreferenceManager
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.startService
 import java.io.File
 import java.lang.Exception
 

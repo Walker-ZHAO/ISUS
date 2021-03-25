@@ -8,6 +8,7 @@ import android.os.Environment
 import android.os.Process
 import android.provider.Settings
 import com.orhanobut.logger.Logger
+import com.walker.anke.framework.alarmManager
 import net.ischool.isus.network.APIService
 import net.ischool.isus.network.callback.StringCallback
 import okhttp3.Request
@@ -22,7 +23,6 @@ import net.ischool.isus.log.Syslog
 import net.ischool.isus.preference.PreferenceManager
 import net.ischool.isus.service.ISUSService
 import net.ischool.isus.service.QueueState
-import org.jetbrains.anko.alarmManager
 import java.io.File
 
 /**

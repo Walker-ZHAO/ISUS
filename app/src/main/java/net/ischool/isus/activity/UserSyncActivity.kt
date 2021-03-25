@@ -2,6 +2,8 @@ package net.ischool.isus.activity
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.walker.anke.framework.longToast
+import com.walker.anke.framework.toast
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
@@ -13,8 +15,6 @@ import net.ischool.isus.log.Syslog
 import net.ischool.isus.network.APIService
 import net.ischool.isus.preference.PreferenceManager
 import net.ischool.isus.service.ISUSService
-import org.jetbrains.anko.longToast
-import org.jetbrains.anko.toast
 
 /**
  * 全量同步用户信息页面

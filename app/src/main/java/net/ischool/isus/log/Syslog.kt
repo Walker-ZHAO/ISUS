@@ -1,11 +1,11 @@
 package net.ischool.isus.log
 
 import android.os.Process
+import com.walker.anke.framework.activityManager
+import com.walker.anke.framework.doAsync
 import net.ischool.isus.ISUS
 import net.ischool.isus.UDP_PORT
 import net.ischool.isus.preference.PreferenceManager
-import org.jetbrains.anko.activityManager
-import org.jetbrains.anko.doAsync
 import java.io.IOException
 import java.net.DatagramPacket
 import java.net.DatagramSocket
