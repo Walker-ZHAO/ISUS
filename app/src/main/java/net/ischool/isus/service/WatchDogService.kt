@@ -27,6 +27,7 @@ class WatchDogService: Service() {
         private const val WATCH_DOG_ACTION = "com.zxedu.watchdog"       // 监控校园APP广播
         const val COMMAND_START = "net.ischool.isus.watchdog.start"
         const val COMMAND_STOP = "net.ischool.isus.watchdog.stop"
+        const val SYSLOG_TAG = "WatchDog"       // 向Syslog输出日志的TAG
         var isRunning = false
 
         fun start(context: Context) {
@@ -83,26 +84,25 @@ class WatchDogService: Service() {
                     if (status.errno == RESULT_OK) {
                         if (status.data.sids.contains(PreferenceManager.instance.getSchoolId())) {
                             sendBroadcast(Intent(WATCH_DOG_ACTION))
-                            Syslog.logI("Network fine", "WatchDog")
+                            Syslog.logI("Network fine", tag = SYSLOG_TAG)
                         }
                         else
-                            Syslog.logE(
+                            Syslog.logN(
                                 "Network status get wrong school id [${status.data.sids}], current school id: ${PreferenceManager.instance.getSchoolId()}",
-                                "WatchDog"
+                                tag = SYSLOG_TAG
                             )
                     } else {
-                        Syslog.logE(
+                        Syslog.logN(
                             "Network status error[${status.errno}]: ${status.error}",
-                            "WatchDog"
+                            tag = SYSLOG_TAG
                         )
                     }
-                    disposables.add(
-                        Observable.timer(1, TimeUnit.MINUTES).subscribe { updateNetwork() })
+                    disposables.add(Observable.timer(1, TimeUnit.MINUTES).subscribe { updateNetwork() })
                 },
                 onError = {
                     // 网络访问失败，不再重新尝试
                     it.printStackTrace()
-                    Syslog.logI("Network status call error: ${it.message}", "WatchDog")
+                    Syslog.logE("Network status call error: ${it.message}", tag = SYSLOG_TAG)
                 }
             )
         disposables.add(disposable)

@@ -55,3 +55,10 @@ const val MQ_ROUTING_KEY_COMET = "sync.schools.sys.comet"
 
 // 头像缓存目录
 val AVATAR_CACHE_DIR = "${ISUS.instance.context.filesDir.absolutePath}/img"
+
+// 仅供ISUS内部输出日志时，使用的TAG
+internal const val LOG_TAG = "ISUS"
+
+// Syslog日志上报分类
+// RabbitMQ
+internal const val SYSLOG_CATEGORY_RABBITMQ = "RabbitMQ"

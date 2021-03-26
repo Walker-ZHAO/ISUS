@@ -1,6 +1,7 @@
 package net.ischool.isus
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import com.orhanobut.logger.AndroidLogAdapter
@@ -35,6 +36,7 @@ class ISUS(val context: Context, val domain: String, val se: Boolean) {
         /**
          * 初始化
          */
+        @SuppressLint("CheckResult")
         @ExperimentalStdlibApi
         @JvmOverloads
         @Synchronized
@@ -46,7 +48,7 @@ class ISUS(val context: Context, val domain: String, val se: Boolean) {
             ObjectBox.init(context)
             if (context is Activity) {
                 val rxPermission = RxPermissions(context)
-                val disposable = rxPermission.request(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                rxPermission.request(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         .subscribe {
                             if (!it) {
                                 context.toast(context.getString(R.string.get_permission_fail))

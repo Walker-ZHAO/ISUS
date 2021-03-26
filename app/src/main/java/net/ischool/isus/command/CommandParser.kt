@@ -60,7 +60,7 @@ class CommandParser private constructor() {
      * 命令处理器
      */
     fun processCommand(command: Command, remoteUUID: String = "") {
-        Syslog.logI("ISUS process command: $command")
+        Syslog.logI("ISUS process command: $command", SYSLOG_CATEGORY_RABBITMQ)
         if (canProcess(command)) {
             when (command.cmd.toLowerCase(Locale.getDefault())) {
                 ICommand.COMMAND_PING -> processor?.ping(remoteUUID)

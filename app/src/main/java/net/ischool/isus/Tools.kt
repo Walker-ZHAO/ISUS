@@ -32,10 +32,10 @@ suspend fun parseHostGetIPAddress(host: String = DEFAULT_HOST): String {
             InetAddress.getAllByName(host)?.forEach {
                 ipAddressArr.add(it.hostAddress)
             }
-            ipAddressArr.forEach { Log.i("Walker", it) }
+            ipAddressArr.forEach { Log.i(LOG_TAG, it) }
             return@back if (ipAddressArr.isEmpty()) "" else ipAddressArr[0]
         } catch (e: UnknownHostException) {
-            Log.e("Walker", "解析CDN IP失败: ${e.message}")
+            Log.e(LOG_TAG, "解析CDN IP失败: ${e.message}")
         }
         return@back ""
     }

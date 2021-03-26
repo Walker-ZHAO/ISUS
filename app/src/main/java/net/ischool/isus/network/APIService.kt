@@ -168,7 +168,7 @@ interface APIService {
                     .flatMap {
                         val result = checkNotNull(it.body())
                         if (result.errno == RESULT_OK) {
-                            Log.i("ISUS", "init: ${result.data}")
+                            Log.i(LOG_TAG, "init: ${result.data}")
                             with(PreferenceManager.instance) {
                                 setCMDB(cmdbid)
                                 setSchoolId(sid)
@@ -188,7 +188,7 @@ interface APIService {
                     .flatMap {
                         val result = checkNotNull(it.body())
                         if (result.errno == RESULT_OK) {
-                            Log.i("ISUS", "config: ${result.data}")
+                            Log.i(LOG_TAG, "config: ${result.data}")
                             with(PreferenceManager.instance) {
                                 when (result.data.parameter["internalICReaderType"]?.toInt()) {
                                     CReaderType.AUTO -> {

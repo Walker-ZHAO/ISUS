@@ -23,14 +23,11 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_init.*
-import net.ischool.isus.CONFIG_RSA_PASS
-import net.ischool.isus.ISUS
-import net.ischool.isus.R
+import net.ischool.isus.*
 import net.ischool.isus.network.APIService
 import net.ischool.isus.network.callback.StringCallback
 import net.ischool.isus.preference.PreferenceManager
 import net.ischool.isus.service.CMDBService
-import net.ischool.isus.startZXBS
 import okhttp3.Request
 import java.io.File
 import java.io.IOException
@@ -155,10 +152,9 @@ class InitActivity : RxAppCompatActivity() {
                         setResult(Activity.RESULT_OK)
                         finish()
                     },
-                    onComplete = { Log.i("Walker", "onComplete") },
                     onError = {
                         dialog?.dismiss()
-                        Log.e("ISUS", "${it.message}")
+                        Log.e(LOG_TAG, "${it.message}")
                         longToast("设备初始化失败，请稍后重试!（${it.message}）")
                         setResult(Activity.RESULT_CANCELED)
                         finish()
@@ -207,7 +203,7 @@ class InitActivity : RxAppCompatActivity() {
                         onError = {
                             dialog?.dismiss()
                             longToast("设备初始化失败，请稍后重试!（${it.message}）")
-                            Log.e("ISUS", "${it.message}")
+                            Log.e(LOG_TAG, "${it.message}")
                             toast("${it.message}")
                             setResult(Activity.RESULT_CANCELED)
                             finish()

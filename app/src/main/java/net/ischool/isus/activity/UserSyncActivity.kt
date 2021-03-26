@@ -10,6 +10,7 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_user_sync.*
 import net.ischool.isus.R
+import net.ischool.isus.SYSLOG_CATEGORY_RABBITMQ
 import net.ischool.isus.db.ObjectBox
 import net.ischool.isus.log.Syslog
 import net.ischool.isus.network.APIService
@@ -53,7 +54,7 @@ class UserSyncActivity : AppCompatActivity() {
                     val result = checkNotNull(it.body())
                     if (result.errno != 0) {
                         longToast("用户信息列表获取失败, 请稍后重试")
-                        Syslog.logE("用户信息列表获取失败(${result.error})")
+                        Syslog.logN("用户信息列表获取失败(${result.error})", SYSLOG_CATEGORY_RABBITMQ)
                         finish()
                         return@subscribeBy
                     }
@@ -64,7 +65,7 @@ class UserSyncActivity : AppCompatActivity() {
                 },
                 onError = {
                     longToast("用户信息列表获取失败, 请稍后重试")
-                    Syslog.logE("用户信息列表获取失败(${it.message})")
+                    Syslog.logE("用户信息列表获取失败(${it.message})", SYSLOG_CATEGORY_RABBITMQ)
                     finish()
                 }
             )
@@ -88,7 +89,7 @@ class UserSyncActivity : AppCompatActivity() {
                         PreferenceManager.instance.apply {
                             setSyncCount(getSyncCount() + 1)
                         }
-                        Syslog.logI("用户信息全量同步成功")
+                        Syslog.logI("用户信息全量同步成功", SYSLOG_CATEGORY_RABBITMQ)
                         longToast("用户信息同步成功")
                         finish()
                     } else {

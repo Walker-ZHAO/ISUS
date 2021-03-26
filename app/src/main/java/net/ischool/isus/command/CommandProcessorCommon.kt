@@ -18,6 +18,7 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import net.ischool.isus.QueryType
 import net.ischool.isus.RESULT_OK
+import net.ischool.isus.SYSLOG_CATEGORY_RABBITMQ
 import net.ischool.isus.activity.ConfigActivity
 import net.ischool.isus.log.Syslog
 import net.ischool.isus.preference.PreferenceManager
@@ -57,7 +58,7 @@ open class CommandProcessorCommon constructor(protected val context: Context) : 
                     finish(result, remoteUUID)
                 },
                 onError = {
-                    Syslog.logE("Response ping command failure: ${it.message}")
+                    Syslog.logE("Response ping command failure: ${it.message}", SYSLOG_CATEGORY_RABBITMQ)
                     result.fail(it.message)
                     finish(result, remoteUUID)
                 }
@@ -140,7 +141,7 @@ open class CommandProcessorCommon constructor(protected val context: Context) : 
 
                 override fun onFailure(request: Request, e: IOException) {
                     Logger.w(e.message)
-                    Syslog.logE("Update file download failure")
+                    Syslog.logE("Update file download failure", SYSLOG_CATEGORY_RABBITMQ)
                     result.fail(e.message)
                     finish(result, remoteUUID)
                 }
@@ -201,7 +202,7 @@ open class CommandProcessorCommon constructor(protected val context: Context) : 
                     reboot(remoteUUID)
                 },
                 onError = {
-                    Syslog.logE("Reload config failure: ${it.message}")
+                    Syslog.logE("Reload config failure: ${it.message}", SYSLOG_CATEGORY_RABBITMQ)
                     result.fail(it.message)
                     finish(result, remoteUUID)
                 }

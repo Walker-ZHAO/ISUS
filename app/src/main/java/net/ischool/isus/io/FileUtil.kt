@@ -30,17 +30,17 @@ import java.util.*
     val context = ISUS.instance.context
     var dir: File? = null
     if (fDir == null) {
-        when (hasExternalStorage() == 2) {
-            true   ->  dir = checkNotNull(context).externalCacheDir
-            false  ->  dir = checkNotNull(context).cacheDir
+        dir = when (hasExternalStorage() == 2) {
+            true   -> context.externalCacheDir
+            false  -> context.cacheDir
         }
     }
     val prefix = SimpleDateFormat("yyMMddHH", Locale.CHINESE).format(Date())
-    try {
-        return File.createTempFile(prefix, suffix, dir)
+    return try {
+        File.createTempFile(prefix, suffix, dir)
     } catch (e: IOException) {
         e.printStackTrace()
-        return null
+        null
     }
 }
 

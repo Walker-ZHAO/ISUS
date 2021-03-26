@@ -5,6 +5,7 @@ import android.os.Environment
 import android.view.KeyEvent
 import com.orhanobut.logger.Logger
 import com.seewo.sdk.SDKSystemHelper
+import net.ischool.isus.SYSLOG_CATEGORY_RABBITMQ
 import net.ischool.isus.log.Syslog
 import net.ischool.isus.network.APIService
 import net.ischool.isus.network.callback.StringCallback
@@ -50,7 +51,7 @@ class CommandProcessorSeeWo(context: Context): CommandProcessorCommon(context){
 
                 override fun onFailure(request: Request, e: IOException) {
                     Logger.w(e.message)
-                    Syslog.logE("Update file download failure")
+                    Syslog.logE("Update file download failure", SYSLOG_CATEGORY_RABBITMQ)
                     result.fail(e.message)
                     finish(result, remoteUUID)
                 }

@@ -17,8 +17,8 @@ import java.lang.Exception
 class SSLSocketFactoryProvider {
     companion object {
 
-        const val X509 = "X.509"
-        const val P12  = "PKCS12"
+        private const val X509 = "X.509"
+        private const val P12  = "PKCS12"
 
         @JvmStatic fun getSSLContext(type: String = P12): SSLContext {
             val password = PreferenceManager.instance.getKeyPass()
