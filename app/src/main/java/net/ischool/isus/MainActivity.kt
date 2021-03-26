@@ -4,12 +4,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.speech.tts.TextToSpeech
-import androidx.core.content.FileProvider
 import android.util.Log
 import com.hikvision.dmb.system.InfoSystemApi
 import com.hikvision.dmb.time.InfoTimeApi
@@ -18,6 +14,11 @@ import com.rabbitmq.client.*
 import com.trello.rxlifecycle4.android.ActivityEvent
 import com.trello.rxlifecycle4.components.support.RxAppCompatActivity
 import com.trello.rxlifecycle4.kotlin.bindUntilEvent
+import com.walker.anke.framework.doAsync
+import com.walker.anke.framework.longToast
+import com.walker.anke.framework.startActivity
+import com.walker.anke.framework.toast
+import com.ys.rkapi.MyManager
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -34,8 +35,10 @@ import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import org.jetbrains.anko.*
-import java.io.*
+import startest.ys.com.poweronoff.PowerOnOffManager
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.InputStreamReader
 import java.text.SimpleDateFormat
 import java.util.concurrent.TimeUnit
 
@@ -69,16 +72,25 @@ class MainActivity : RxAppCompatActivity() {
                 .flatMap { APIService.pong().bindUntilEvent(this, ActivityEvent.DESTROY) }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeBy(
-                        onNext = {
-                            Log.i("Walker", "$it")
-                            Log.i("Walker", "area:${PreferenceManager.instance.getAreaId()}")
-                            Log.i("Walker", "checkpoint: ${PreferenceManager.instance.getCheckpointId()}")
-                            Log.i("Walker", "tunnel: ${PreferenceManager.instance.getTunnelId()}")
-                            Log.i("Walker", "attend: ${PreferenceManager.instance.getAttendModel()}")
-                            Log.i("Walker", "peripherals: ${PreferenceManager.instance.getPeripherals()}")
-                        },
-                        onComplete = {Log.i("Walker", "onComplete")},
-                        onError = { Log.e("Walker", "$it") }
+                    onNext = {
+                        Log.i(LOG_TAG, "$it")
+                        Log.i(LOG_TAG, "area:${PreferenceManager.instance.getAreaId()}")
+                        Log.i(
+                            LOG_TAG,
+                            "checkpoint: ${PreferenceManager.instance.getCheckpointId()}"
+                        )
+                        Log.i(LOG_TAG, "tunnel: ${PreferenceManager.instance.getTunnelId()}")
+                        Log.i(
+                            LOG_TAG,
+                            "attend: ${PreferenceManager.instance.getAttendModel()}"
+                        )
+                        Log.i(
+                            LOG_TAG,
+                            "peripherals: ${PreferenceManager.instance.getPeripherals()}"
+                        )
+                    },
+                    onComplete = { Log.i(LOG_TAG, "onComplete") },
+                    onError = { Log.e(LOG_TAG, "$it") }
                 )
 
         reset.clicks()
@@ -88,15 +100,15 @@ class MainActivity : RxAppCompatActivity() {
                 .subscribeBy {
 //                    APIService.downloadAsync("http://download.i-school.net/apk/ischool_teacher_8.8.0.apk", "/sdcard", object : StringCallback {
 //                        override fun onResponse(string: String) {
-//                            Log.i("Walker", string)
+//                            Log.i(LOG_TAG, string)
 //                        }
 //
 //                        override fun onFailure(request: Request, e: IOException) {
-//                            Log.i("Walker", e.toString())
+//                            Log.i(LOG_TAG, e.toString())
 //                        }
 //                    })
 //                    val strs = Shell.SU.run("0 echo -BOC- id")
-//                    Log.i("Walker", "$strs")
+//                    Log.i(LOG_TAG, "$strs")
 //                    if (Shell.SU.available())
 //                        Shell.SU.run("pm install -r /sdcard/app-debug.apk")
 //                    val p = execRuntimeProcess("su 0 reboot")
@@ -109,8 +121,13 @@ class MainActivity : RxAppCompatActivity() {
 //                    SSLSocketFactoryProvider.getSSLSocketFactory(assets.open("test.pem"))
 
                     APIService.getUids().subscribeBy(
-                        onError = { e -> Log.e("Walker", "getUids error: $e") },
-                        onNext = { result -> Log.i("Walker", "getUids success: ${result.body()?.data?.uids?.size}") }
+                        onError = { e -> Log.e(LOG_TAG, "getUids error: $e") },
+                        onNext = { result ->
+                            Log.i(
+                                LOG_TAG,
+                                "getUids success: ${result.body()?.data?.uids?.size}"
+                            )
+                        }
                     )
                 }
 
@@ -145,16 +162,60 @@ class MainActivity : RxAppCompatActivity() {
         find_user.setOnClickListener {
             ObjectBox.findUser("D5D69AF4A1FD")?.let {
                 longToast("$it")
-                Log.i("ISUS", "$it")
+                Log.i(LOG_TAG, "$it")
             }
         }
 
         power_off.setOnClickListener {
             if (isHikDevice()) {
+
                 val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-                val offTime = sdf.parse("2020-06-12 13:42:00")
-                val onTime = sdf.parse("2020-06-12 13:44:00")
+                val offTime = sdf.parse("2021-01-25 17:04:00")
+                val onTime = sdf.parse("2021-01-25 17:06:00")
+//                val offTime1 = sdf.parse("2020-07-20 09:34:00")
+//                val onTime1 = sdf.parse("2020-07-20 09:36:00")
+                InfoTimeApi.clearPlan()
                 InfoTimeApi.setTimeSwitch(offTime.time, onTime.time)
+//                InfoTimeApi.setTimeSwitch(offTime1.time, onTime1.time)
+            } else if (isTouchWoDevice()){
+                val manager = MyManager.getInstance(this)
+                val powerManager = PowerOnOffManager.getInstance(this)
+                Log.i(
+                    LOG_TAG,
+                    "Device info: ${manager.apiVersion}, ${manager.androidModle}, ${manager.androidVersion}, ${manager.firmwareVersion}, ${manager.kernelVersion}, ${manager.cpuType}, "
+                )
+                powerManager.clearPowerOnOffTime()
+                Log.i(LOG_TAG, "Power on mode: ${powerManager.powerOnMode}")
+                val powerOff = intArrayOf(2021, 1, 25, 17, 15)
+                val powerOn = intArrayOf(2021, 1, 25, 17, 17)
+                powerManager.setPowerOnOff(powerOn, powerOff)
+//                val powerOff = intArrayOf(11,23)
+//                val powerOn = intArrayOf(11,26)
+//                val powerOff1 = intArrayOf(11,28)
+//                val powerOn1 = intArrayOf(11,30)
+//                val weekly = intArrayOf(1,1,1,1,1,0,0)
+//                powerManager.setPowerOnOffWithWeekly(powerOn, powerOff, weekly)
+//                powerManager.setPowerOnOffWithWeekly(powerOn1, powerOff1, weekly)
+                Log.i(LOG_TAG, "Power on mode: ${powerManager.powerOnMode}")
+                Log.i(LOG_TAG, "Power on time: ${powerManager.powerOnTime}")
+                Log.i(LOG_TAG, "Power off time: ${powerManager.powerOffTime}")
+            } else {
+                val intent1 = Intent("com.hra.setAutoShutdown").apply {
+                    putExtra("key", false)
+                }
+                val intent2 = Intent("com.hra.setAutoBoot").apply {
+                    putExtra("key", false)
+                }
+                val intent3 = Intent("com.hra.setShutdownDate").apply {
+                    putExtra("key", 1613717874000)
+                }
+                val intent4 = Intent("com.hra.setBootDate").apply {
+                    putExtra("key", 1613717994000)
+                }
+                sendBroadcast(intent1)
+                sendBroadcast(intent2)
+                sendBroadcast(intent3)
+                sendBroadcast(intent4)
             }
         }
 
@@ -169,7 +230,7 @@ class MainActivity : RxAppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        Log.i("ISUS", MQ_DOMAIN)
+        Log.i(LOG_TAG, MQ_DOMAIN)
         registerReceiver(register, IntentFilter(ACTION_COMMAND))
         registerReceiver(syncReceiver, IntentFilter("net.ischool.isus.sync"))
         registerReceiver(stateRecevier, IntentFilter(ACTION_QUEUE_STATE_CHANGE))
@@ -199,7 +260,10 @@ class MainActivity : RxAppCompatActivity() {
     fun testConfig(): Response {
         val url = "https://www.i-school.net/eqptapi/getConfig"
         val formBody = FormBody.Builder()
-                .add("token", "649d88749cac57923a5f2fe3bd04d2665a5d5a58c1fab461290b02e2f64a2e7e835f930ca72763e34c883cf4f3d4a2db")
+                .add(
+                    "token",
+                    "649d88749cac57923a5f2fe3bd04d2665a5d5a58c1fab461290b02e2f64a2e7e835f930ca72763e34c883cf4f3d4a2db"
+                )
                 .build()
         val request = Request.Builder()
                 .url(url)
@@ -265,7 +329,7 @@ class MainActivity : RxAppCompatActivity() {
             val reader1 = BufferedReader(InputStreamReader(in1));
             var line1 = reader1.readLine();
             while ( line1 != null) {
-                Log.i("Walker", "返回结果=" + line1);
+                Log.i(LOG_TAG, "返回结果=" + line1);
                 line1 = reader1.readLine()
             }
             in1.close();
@@ -286,11 +350,11 @@ class MainActivity : RxAppCompatActivity() {
                 val type = args.getString("type")
                 val content = args.getString("content")
 
-                Log.i("Walker", cmd)
-                Log.i("Walker", "$version")
-                Log.i("Walker", cmdbid)
-                Log.i("Walker", type)
-                Log.i("Walker", content)
+                Log.i(LOG_TAG, cmd)
+                Log.i(LOG_TAG, "$version")
+                Log.i(LOG_TAG, cmdbid)
+                Log.i(LOG_TAG, type)
+                Log.i(LOG_TAG, content)
             }
         }
     }
@@ -313,7 +377,7 @@ class MainActivity : RxAppCompatActivity() {
             connection?.close()
             val config = factory.saslConfig
             val mechanism = config.getSaslMechanism(arrayOf("PLAIN"))
-            Log.i("Walker", "name: ${mechanism.name}")
+            Log.i(LOG_TAG, "name: ${mechanism.name}")
             // 创建新的连接
             connection = factory.newConnection()
             // 创建通道
@@ -331,10 +395,15 @@ class MainActivity : RxAppCompatActivity() {
             channel?.queueBind(queue?.queue, "equipment", "equipment.#")
             // 创建消费者获取rabbitMQ上的消息。每当获取到一条消息后，就会回调handleDelivery（）方法，该方法可以获取到消息数据并进行相应处理
             val consumer = object : DefaultConsumer(channel) {
-                override fun handleDelivery(consumerTag: String?, envelope: Envelope?, properties: AMQP.BasicProperties?, body: ByteArray?) {
+                override fun handleDelivery(
+                    consumerTag: String?,
+                    envelope: Envelope?,
+                    properties: AMQP.BasicProperties?,
+                    body: ByteArray?
+                ) {
                     super.handleDelivery(consumerTag, envelope, properties, body)
                     val msg = body?.toString(charset("UTF-8"))
-                    Log.e("Walker", "RabbitMQ message: $msg")
+                    Log.e(LOG_TAG, "RabbitMQ message: $msg")
                 }
             }
             channel?.basicConsume(queue?.queue, true, consumer)
