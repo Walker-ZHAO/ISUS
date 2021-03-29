@@ -9,11 +9,11 @@ package net.ischool.isus
  */
 class DeviceType {
     companion object {
-        @JvmField val SECURITY     = 2     /** 校园安全控制台 **/
-        @JvmField val BADGE        = 11    /** 班牌 **/
-        @JvmField val VISION_PHONE = 12    /** 可视电话 **/
-        @JvmField val SELFIE       = 13    /** 自拍机 **/
-        @JvmField val SWIPE        = 14    /** 刷卡机 **/
+        const val SECURITY     = 2     /** 校园安全控制台 **/
+        const val BADGE        = 11    /** 班牌 **/
+        const val VISION_PHONE = 12    /** 可视电话 **/
+        const val SELFIE       = 13    /** 自拍机 **/
+        const val SWIPE        = 14    /** 刷卡机 **/
 
         const val BADGE_ID = "10016"        /** 班牌标识，用于状态上报 **/
         const val SECURITY_ID = "10017"     /** 校园安全控制台标识，用于状态上报 **/

@@ -9,8 +9,8 @@ package net.ischool.isus
  */
 class LockScreenMode {
     companion object {
-        @JvmField val NONE = 0      // 不锁屏
-        @JvmField val PASSWORD = 1  // 密码解锁
-        @JvmField val CARD = 2      // 刷卡解锁
+        const val NONE = 0      // 不锁屏
+        const val PASSWORD = 1  // 密码解锁
+        const val CARD = 2      // 刷卡解锁
     }
 }
