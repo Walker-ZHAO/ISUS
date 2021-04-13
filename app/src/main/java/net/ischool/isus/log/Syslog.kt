@@ -51,7 +51,7 @@ class Syslog {
                 } else {
                     tag
                 }
-                "<$pri>$ts $tagName[${Process.myPid()}]: ${PreferenceManager.instance.getSchoolId()},${PreferenceManager.instance.getCMDB()},$category,$message"
+                "<$pri>$ts $tagName[${Process.myPid()}]:${PreferenceManager.instance.getSchoolId()},${PreferenceManager.instance.getCMDB()},$category,$message"
             }
         }
 
