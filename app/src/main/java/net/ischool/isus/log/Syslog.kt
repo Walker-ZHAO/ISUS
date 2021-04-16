@@ -60,7 +60,7 @@ class Syslog {
          * 输出报警信息，如系统崩溃，异常捕获，API调用异常等
          */
         @JvmOverloads
-        @JvmStatic fun logE(message: String, version: String = "${BuildConfig.VERSION_NAME}[${BuildConfig.VERSION_CODE}]", category: String = DEFAULT_CATEGORY, tag: String = "") {
+        @JvmStatic fun logE(message: String, version: String = "${BuildConfig.ISUS_LIB_VERSION}[${BuildConfig.ISUS_LIB_VERSION_CODE}]", category: String = DEFAULT_CATEGORY, tag: String = "") {
             doAsync {
                 val log = createLog(PRI_ERROR, "err,$message", version, category, tag).toByteArray()
                 try {
@@ -76,7 +76,7 @@ class Syslog {
          * 输出注意信息，如核心功能日志，业务逻辑不合规，接口数据无效，接口的业务逻辑错误等
          */
         @JvmOverloads
-        @JvmStatic fun logN(message: String, version: String = "${BuildConfig.VERSION_NAME}[${BuildConfig.VERSION_CODE}]", category: String = DEFAULT_CATEGORY, tag: String = "") {
+        @JvmStatic fun logN(message: String, version: String = "${BuildConfig.ISUS_LIB_VERSION}[${BuildConfig.ISUS_LIB_VERSION_CODE}]", category: String = DEFAULT_CATEGORY, tag: String = "") {
             doAsync {
                 val log = createLog(PRI_NOTICE, "notice,$message", version, category, tag).toByteArray()
                 try {
@@ -91,7 +91,7 @@ class Syslog {
          * 输出常规日志信息，如业务逻辑埋点等
          */
         @JvmOverloads
-        @JvmStatic fun logI(message: String, version: String = "${BuildConfig.VERSION_NAME}[${BuildConfig.VERSION_CODE}]", category: String = DEFAULT_CATEGORY, tag: String = "") {
+        @JvmStatic fun logI(message: String, version: String = "${BuildConfig.ISUS_LIB_VERSION}[${BuildConfig.ISUS_LIB_VERSION_CODE}]", category: String = DEFAULT_CATEGORY, tag: String = "") {
             doAsync {
                 val log = createLog(PRI_INFO, "info,$message", version, category, tag).toByteArray()
                 try {

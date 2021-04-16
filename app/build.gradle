@@ -27,6 +27,8 @@ android {
         versionName ISUS_VERSION
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexKeepFile file('multidex-config.txt')
+        buildConfigField "String", "ISUS_LIB_VERSION", "\"$ISUS_VERSION\""
+        buildConfigField "int", "ISUS_LIB_VERSION_CODE", "$ISUS_VERSION_CODE"
     }
     buildTypes {
         release {
