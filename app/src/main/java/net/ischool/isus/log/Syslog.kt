@@ -3,6 +3,7 @@ package net.ischool.isus.log
 import android.os.Process
 import com.walker.anke.framework.activityManager
 import com.walker.anke.framework.doAsync
+import net.ischool.isus.BuildConfig
 import net.ischool.isus.ISUS
 import net.ischool.isus.UDP_PORT
 import net.ischool.isus.preference.PreferenceManager
@@ -40,7 +41,7 @@ class Syslog {
 
         private const val DEFAULT_CATEGORY = "Default"  // 默认日志类别
 
-        private fun createLog(pri: Int = PRI_INFO, message: String, category: String = DEFAULT_CATEGORY, tag: String): String {
+        private fun createLog(pri: Int = PRI_INFO, message: String, version: String, category: String = DEFAULT_CATEGORY, tag: String): String {
             val ts = SimpleDateFormat("MMM dd HH:mm:ss", Locale.ENGLISH).format(Date())
             return with(ISUS.instance.context) {
                 val tagName = if (tag.isEmpty()) {
@@ -51,7 +52,7 @@ class Syslog {
                 } else {
                     tag
                 }
-                "<$pri>$ts $tagName[${Process.myPid()}]:${PreferenceManager.instance.getSchoolId()},${PreferenceManager.instance.getCMDB()},$category,$message"
+                "<$pri>$ts $tagName[${Process.myPid()}]:${PreferenceManager.instance.getSchoolId()},${PreferenceManager.instance.getCMDB()},$version,$category,$message"
             }
         }
 
@@ -59,9 +60,9 @@ class Syslog {
          * 输出报警信息，如系统崩溃，异常捕获，API调用异常等
          */
         @JvmOverloads
-        @JvmStatic fun logE(message: String, category: String = DEFAULT_CATEGORY, tag: String = "") {
+        @JvmStatic fun logE(message: String, version: String = "${BuildConfig.VERSION_NAME}[${BuildConfig.VERSION_CODE}]", category: String = DEFAULT_CATEGORY, tag: String = "") {
             doAsync {
-                val log = createLog(PRI_ERROR, message, category, tag).toByteArray()
+                val log = createLog(PRI_ERROR, "err,$message", version, category, tag).toByteArray()
                 try {
                     socket.send(DatagramPacket(log, log.size, server, UDP_PORT))
                 } catch (e: IOException) {
@@ -75,9 +76,9 @@ class Syslog {
          * 输出注意信息，如核心功能日志，业务逻辑不合规，接口数据无效，接口的业务逻辑错误等
          */
         @JvmOverloads
-        @JvmStatic fun logN(message: String, category: String = DEFAULT_CATEGORY, tag: String = "") {
+        @JvmStatic fun logN(message: String, version: String = "${BuildConfig.VERSION_NAME}[${BuildConfig.VERSION_CODE}]", category: String = DEFAULT_CATEGORY, tag: String = "") {
             doAsync {
-                val log = createLog(PRI_NOTICE, message, category, tag).toByteArray()
+                val log = createLog(PRI_NOTICE, "notice,$message", version, category, tag).toByteArray()
                 try {
                     socket.send(DatagramPacket(log, log.size, server, UDP_PORT))
                 }  catch (e: IOException) {
@@ -90,9 +91,9 @@ class Syslog {
          * 输出常规日志信息，如业务逻辑埋点等
          */
         @JvmOverloads
-        @JvmStatic fun logI(message: String, category: String = DEFAULT_CATEGORY, tag: String = "") {
+        @JvmStatic fun logI(message: String, version: String = "${BuildConfig.VERSION_NAME}[${BuildConfig.VERSION_CODE}]", category: String = DEFAULT_CATEGORY, tag: String = "") {
             doAsync {
-                val log = createLog(PRI_INFO, message, category, tag).toByteArray()
+                val log = createLog(PRI_INFO, "info,$message", version, category, tag).toByteArray()
                 try {
                     socket.send(DatagramPacket(log, log.size, server, UDP_PORT))
                 } catch (e: IOException) {
