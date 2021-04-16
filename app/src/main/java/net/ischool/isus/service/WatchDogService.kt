@@ -27,7 +27,7 @@ class WatchDogService: Service() {
         private const val WATCH_DOG_ACTION = "com.zxedu.watchdog"       // 监控校园APP广播
         const val COMMAND_START = "net.ischool.isus.watchdog.start"
         const val COMMAND_STOP = "net.ischool.isus.watchdog.stop"
-        const val SYSLOG_TAG = "WatchDog"       // 向Syslog输出日志的TAG
+        const val SYSLOG_TAG = "watchdog"       // 向Syslog输出日志的TAG
         var isRunning = false
 
         fun start(context: Context) {
