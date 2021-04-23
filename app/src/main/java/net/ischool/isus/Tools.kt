@@ -2,6 +2,7 @@ package net.ischool.isus
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.os.Build
 import android.provider.Settings
 import android.util.Log
 import com.hikvision.dmb.system.InfoSystemApi
@@ -83,3 +84,8 @@ fun getDeviceID(): String = Settings.Secure.getString(
     ISUS.instance.context.contentResolver,
     Settings.Secure.ANDROID_ID
 ).toUpperCase(Locale.getDefault())
+
+/**
+ * 获取设备信息
+ */
+fun getDeviceInfo(): String = "${Build.PRODUCT}-${Build.TYPE} ${Build.VERSION.RELEASE} ${Build.ID} ${Build.VERSION.INCREMENTAL} ${Build.TAGS}"
