@@ -38,6 +38,7 @@ class Syslog {
         private const val PRI_ERROR = 155       // 错误事件
         private const val PRI_NOTICE = 157      // 普通但重要的事件
         private const val PRI_INFO = 158        // 有用的信息
+        private const val PRI_DEBUG = 159       // 调试的信息
 
         private const val DEFAULT_CATEGORY = "Default"  // 默认日志类别
 
@@ -94,6 +95,21 @@ class Syslog {
         @JvmStatic fun logI(message: String, version: String = "${BuildConfig.ISUS_LIB_VERSION}[${BuildConfig.ISUS_LIB_VERSION_CODE}]", category: String = DEFAULT_CATEGORY, tag: String = "") {
             doAsync {
                 val log = createLog(PRI_INFO, "info,$message", version, category, tag).toByteArray()
+                try {
+                    socket.send(DatagramPacket(log, log.size, server, UDP_PORT))
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+            }
+        }
+
+        /**
+         * 输出调试日志信息，仅保存于校园服务器
+         */
+        @JvmOverloads
+        @JvmStatic fun logD(message: String, version: String = "${BuildConfig.ISUS_LIB_VERSION}[${BuildConfig.ISUS_LIB_VERSION_CODE}]", category: String = DEFAULT_CATEGORY, tag: String = "") {
+            doAsync {
+                val log = createLog(PRI_DEBUG, "info,$message", version, category, tag).toByteArray()
                 try {
                     socket.send(DatagramPacket(log, log.size, server, UDP_PORT))
                 } catch (e: IOException) {
