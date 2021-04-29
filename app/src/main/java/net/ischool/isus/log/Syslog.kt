@@ -109,7 +109,7 @@ class Syslog {
         @JvmOverloads
         @JvmStatic fun logD(message: String, version: String = "${BuildConfig.ISUS_LIB_VERSION}[${BuildConfig.ISUS_LIB_VERSION_CODE}]", category: String = DEFAULT_CATEGORY, tag: String = "") {
             doAsync {
-                val log = createLog(PRI_DEBUG, "info,$message", version, category, tag).toByteArray()
+                val log = createLog(PRI_DEBUG, "debug,$message", version, category, tag).toByteArray()
                 try {
                     socket.send(DatagramPacket(log, log.size, server, UDP_PORT))
                 } catch (e: IOException) {
