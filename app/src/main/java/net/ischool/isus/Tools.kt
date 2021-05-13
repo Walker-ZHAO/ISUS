@@ -49,7 +49,7 @@ fun isHikDevice(): Boolean {
     try {   // 通过使用海康SDK获取主板信息判断是否为海康设备
         InfoSystemApi.getMotherboardType()
         return true
-    } catch (e: Exception) { }
+    } catch (e: Throwable) { }
     return false
 }
 
@@ -61,7 +61,7 @@ fun isSeeWoDevice(): Boolean {
         if (!OpenSDK.getInstance().isConnected)
             OpenSDK.getInstance().connect(ISUS.instance.context)
         return OpenSDK.getInstance().isConnected
-    } catch (e: Exception) { }
+    } catch (e: Throwable) { }
     return false
 }
 
