@@ -61,7 +61,7 @@ fun isSeeWoDevice(): Boolean {
         if (!OpenSDK.getInstance().isConnected)
             OpenSDK.getInstance().connect(ISUS.instance.context)
         return OpenSDK.getInstance().isConnected
-    } catch (e: Throwable) { }
+    } catch (e: Exception) { }
     return false
 }
 
