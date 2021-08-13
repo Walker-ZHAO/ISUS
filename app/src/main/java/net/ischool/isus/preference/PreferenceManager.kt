@@ -237,4 +237,9 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
      * 获取设备关联的环境监测通道ID列表，用 , 分隔
      */
     fun getEnvironmentTunnels() = getParameter()["environment_tunnels"] ?: ""
+
+    /**
+     * Hybrid模式下，需要加载的Web页地址
+     */
+    fun getHybridUrl() = getParameter()["hybrid_url"] ?: ""
 }
