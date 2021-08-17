@@ -241,5 +241,9 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     /**
      * Hybrid模式下，需要加载的Web页地址
      */
-    fun getHybridUrl() = getParameter()["hybrid_url"] ?: ""
+    fun getHomePage(): String {
+        val displayModelParameter = getParameter()["displayModelParams"] ?: ""
+        val parameter = Gson().fromJson<Map<String, String>>(displayModelParameter)?:HashMap()
+        return parameter["homepage"] ?: ""
+    }
 }

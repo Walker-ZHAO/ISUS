@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.lamy.system.Magicbox
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.util.Log
@@ -87,6 +88,10 @@ class MainActivity : RxAppCompatActivity() {
                         Log.i(
                             LOG_TAG,
                             "peripherals: ${PreferenceManager.instance.getPeripherals()}"
+                        )
+                        Log.i(
+                            LOG_TAG,
+                            "homepage: ${PreferenceManager.instance.getHomePage()}"
                         )
                     },
                     onComplete = { Log.i(LOG_TAG, "onComplete") },
@@ -200,22 +205,25 @@ class MainActivity : RxAppCompatActivity() {
                 Log.i(LOG_TAG, "Power on time: ${powerManager.powerOnTime}")
                 Log.i(LOG_TAG, "Power off time: ${powerManager.powerOffTime}")
             } else {
-                val intent1 = Intent("com.hra.setAutoShutdown").apply {
-                    putExtra("key", false)
-                }
-                val intent2 = Intent("com.hra.setAutoBoot").apply {
-                    putExtra("key", false)
-                }
-                val intent3 = Intent("com.hra.setShutdownDate").apply {
-                    putExtra("key", 1613717874000)
-                }
-                val intent4 = Intent("com.hra.setBootDate").apply {
-                    putExtra("key", 1613717994000)
-                }
-                sendBroadcast(intent1)
-                sendBroadcast(intent2)
-                sendBroadcast(intent3)
-                sendBroadcast(intent4)
+//                val intent1 = Intent("com.hra.setAutoShutdown").apply {
+//                    putExtra("key", false)
+//                }
+//                val intent2 = Intent("com.hra.setAutoBoot").apply {
+//                    putExtra("key", false)
+//                }
+//                val intent3 = Intent("com.hra.setShutdownDate").apply {
+//                    putExtra("key", 1613717874000)
+//                }
+//                val intent4 = Intent("com.hra.setBootDate").apply {
+//                    putExtra("key", 1613717994000)
+//                }
+//                sendBroadcast(intent1)
+//                sendBroadcast(intent2)
+//                sendBroadcast(intent3)
+//                sendBroadcast(intent4)
+                val result = Magicbox.enableTimmingPoweron("2021-04-16 10:24:00")
+                Log.i("Walker", "set power on result: $result")
+                Magicbox.shutdown(false)
             }
         }
 
