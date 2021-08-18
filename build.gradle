@@ -4,8 +4,8 @@ buildscript {
     ext.kotlin_version = '1.4.21'
     ext.objectboxVersion = '2.6.0'
 
-    ext.ISUS_VERSION = '0.3.5'
-    ext.ISUS_VERSION_CODE = 17
+    ext.ISUS_VERSION = '0.3.7'
+    ext.ISUS_VERSION_CODE = 179
 
     ext.COMPILE_SDK_VERSION = 28
     ext.MIN_SDK_VERSION = 21
