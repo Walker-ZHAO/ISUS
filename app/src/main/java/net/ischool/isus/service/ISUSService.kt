@@ -253,6 +253,13 @@ class ISUSService : Service() {
                         when (result.errno) {
                             0 -> {  // 更新用户信息，ack
                                 val user = result.data
+                                // 头像无效，仅保存用户信息
+                                if (user.avatar.isBlank()) {
+                                    user.cacheAvatar = ""
+                                    ObjectBox.updateUser(user)
+                                    success()
+                                    return@subscribeBy
+                                }
                                 APIService.downloadAsync(
                                     user.avatar,
                                     AVATAR_CACHE_DIR,
