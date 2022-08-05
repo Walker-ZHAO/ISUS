@@ -70,7 +70,8 @@
         <service android:name=".service.CMDBService"
                  android:exported="false"/>
 
-        <receiver android:name=".broadcast.UserSyncReceiver">
+        <receiver android:name=".broadcast.UserSyncReceiver"
+                android:exported="true">
             <intent-filter android:priority="1000">
                 <action android:name="net.ischool.isus.sync"/>
             </intent-filter>
