@@ -34,7 +34,8 @@
 
         <activity
             android:name=".activity.InitActivity"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme"
+                android:exported="true"/>
 
         <activity
                 android:name=".activity.UserSyncActivity"
@@ -59,7 +60,8 @@
             </intent-filter>
         </service>
 
-        <receiver android:name=".broadcast.CMDBReceiver">
+        <receiver android:name=".broadcast.CMDBReceiver"
+                android:exported="true">
             <intent-filter android:priority="1000">
                 <action android:name="net.ischool.isus.cmdbid"/>
             </intent-filter>
