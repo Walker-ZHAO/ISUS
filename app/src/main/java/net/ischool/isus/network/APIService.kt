@@ -13,6 +13,7 @@ import net.ischool.isus.model.*
 import net.ischool.isus.network.callback.StringCallback
 import net.ischool.isus.network.interceptor.CacheInterceptor
 import net.ischool.isus.network.interceptor.URLInterceptor
+import net.ischool.isus.network.se.NullX509TrustManager
 import net.ischool.isus.network.se.SSLSocketFactoryProvider
 import net.ischool.isus.preference.PreferenceManager
 import net.ischool.isus.service.StatusPostService
@@ -150,7 +151,7 @@ interface APIService {
                     })
             if (ISUS.instance.se) {
                 builder
-                    .sslSocketFactory(SSLSocketFactoryProvider.getSSLSocketFactory())
+                    .sslSocketFactory(SSLSocketFactoryProvider.getSSLSocketFactory(), NullX509TrustManager())
                     .hostnameVerifier { hostname, session -> true }
             }
             builder.build()
