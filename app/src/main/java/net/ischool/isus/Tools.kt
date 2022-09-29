@@ -9,6 +9,7 @@ import com.hikvision.dmb.system.InfoSystemApi
 import com.seewo.sdk.OpenSDK
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.lang.reflect.Method
 import java.net.InetAddress
 import java.net.UnknownHostException
 import java.util.*
@@ -74,6 +75,25 @@ fun isTouchWoDevice(): Boolean {
         app.activityInfo.packageName.contains("adtv")
     }
     return info != null
+}
+
+/**
+ * 判断是否是鸿合设备
+ */
+fun isHongHeDevice(): Boolean {
+    return getProperty("ro.product.customer.model", "").contains("HONGHE")
+}
+
+fun getProperty(key: String, defaultValue: String): String {
+    var value = defaultValue
+    try {
+        val c = Class.forName("android.os.SystemProperties")
+        val get: Method = c.getMethod("get", String::class.java, String::class.java)
+        value = get.invoke(c, key, "0") as String
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+    return value
 }
 
 /**
