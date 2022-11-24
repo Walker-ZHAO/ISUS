@@ -393,7 +393,13 @@ class ISUSService : Service() {
                     // 声明队列（持久的、独占的、连接断开后队列会自动删除）
                     val queueSe = channel?.queueDeclare(queueNameSe, true, false, false, null)
                     // 根据路由键将队列绑定到交换机上（需要知道交换机名称和路由键名称）
-                    channel?.queueBind(queueSe?.queue, exchangeNameSe, MQ_ROUTING_KEY_SE)
+                    if (PreferenceManager.instance.getDeviceType() == DeviceType.SECURITY) {
+                        // IC刷卡考勤使用的设备类型，绑定所有消息
+                        channel?.queueBind(queueSe?.queue, exchangeNameSe, MQ_ROUTING_KEY_SE)
+                    } else {
+                        // 其他设备类型，只绑定控制消息，不绑定用户信息同步消息
+                        channel?.queueBind(queueSe?.queue, exchangeNameSe, MQ_ROUTING_KEY_COMET)
+                    }
                     // 创建消费者获取RabbitMQ上的消息。每当获取到一条消息后，就会回调handleDelivery方法，该方法可以获取到消息数据并进行相应处理
                     channel?.basicConsume(queueSe?.queue, false, SeConsumer(channel))
                     // 未抛出异常，认为连接建立成功
