@@ -243,7 +243,56 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
      */
     fun getHomePage(): String {
         val displayModelParameter = getParameter()["displayModelParams"] ?: ""
-        val parameter = Gson().fromJson<Map<String, String>>(displayModelParameter)?:HashMap()
-        return parameter["homepage"] ?: ""
+        val parameter = Gson().fromJson<Map<String, Any>>(displayModelParameter)?:HashMap()
+        return (parameter["homepage"] as? String) ?: ""
+    }
+
+    /**
+     * Hybrid模式下，刷新Web页的间隔，单位秒
+     */
+    fun getRefreshInterval(): Int {
+        val displayModelParameter = getParameter()["displayModelParams"] ?: ""
+        val parameter = Gson().fromJson<Map<String, Any>>(displayModelParameter)?:HashMap()
+        val interval = parameter["refresh_interval"] as? Double
+        return interval?.toInt() ?: -1
+    }
+
+    /**
+     * Hybrid模式下，是否可以控制Web页
+     */
+    fun canControlWebview(): Boolean {
+        val displayModelParameter = getParameter()["displayModelParams"] ?: ""
+        val parameter = Gson().fromJson<Map<String, Any>>(displayModelParameter)?:HashMap()
+        return parameter.containsKey("navigation")
+    }
+
+    /**
+     * Hybrid模式下，是否可以控制Web页前进
+     */
+    fun canForwardWebview(): Boolean {
+        val displayModelParameter = getParameter()["displayModelParams"] ?: ""
+        val parameter = Gson().fromJson<Map<String, Any>>(displayModelParameter)?:HashMap()
+        val navigation = parameter["navigation"] as? List<*>
+        return navigation?.contains("forword") ?: false
+    }
+
+    /**
+     * Hybrid模式下，是否可以控制Web页后退
+     */
+    fun canBackWebview(): Boolean {
+        val displayModelParameter = getParameter()["displayModelParams"] ?: ""
+        val parameter = Gson().fromJson<Map<String, Any>>(displayModelParameter)?:HashMap()
+        val navigation = parameter["navigation"] as? List<*>
+        return navigation?.contains("back") ?: false
+    }
+
+    /**
+     * Hybrid模式下，是否可以控制Web页刷新
+     */
+    fun canRefreshWebview(): Boolean {
+        val displayModelParameter = getParameter()["displayModelParams"] ?: ""
+        val parameter = Gson().fromJson<Map<String, Any>>(displayModelParameter)?:HashMap()
+        val navigation = parameter["navigation"] as? List<*>
+        return navigation?.contains("refresh") ?: false
     }
 }
