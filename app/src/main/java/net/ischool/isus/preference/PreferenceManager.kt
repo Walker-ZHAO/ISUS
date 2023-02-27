@@ -253,8 +253,8 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     fun getRefreshInterval(): Int {
         val displayModelParameter = getParameter()["displayModelParams"] ?: ""
         val parameter = Gson().fromJson<Map<String, Any>>(displayModelParameter)?:HashMap()
-        val interval = parameter["refresh_interval"] as? Double
-        return interval?.toInt() ?: -1
+        val interval = parameter["refresh_interval"] as? String
+        return interval?.toIntOrNull() ?: -1
     }
 
     /**
@@ -263,7 +263,8 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     fun canControlWebview(): Boolean {
         val displayModelParameter = getParameter()["displayModelParams"] ?: ""
         val parameter = Gson().fromJson<Map<String, Any>>(displayModelParameter)?:HashMap()
-        return parameter.containsKey("navigation")
+        val navigation = parameter["navigation"] as? List<*>
+        return !navigation.isNullOrEmpty()
     }
 
     /**
