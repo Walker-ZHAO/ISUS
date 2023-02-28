@@ -114,6 +114,10 @@ class ISUSService : Service() {
                         }
                     }
                     MQ_ROUTING_KEY_USER -> {    // 增量同步用户信息
+                        // 非IC刷卡考勤项目，忽略用户信息同步消息
+                        if (PreferenceManager.instance.getDeviceType() != DeviceType.SECURITY) {
+                            return@let
+                        }
                         Syslog.logI("syncUser SE Info: $msg", SYSLOG_CATEGORY_RABBITMQ)
                         Gson().fromJson<SEUserSync>(it).payload.uid.apply {
                             syncUserInfo(
