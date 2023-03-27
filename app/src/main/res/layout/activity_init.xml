@@ -1,46 +1,214 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
     <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/tool_bar"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <androidx.appcompat.widget.Toolbar
+                android:id="@+id/tool_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
     </com.google.android.material.appbar.AppBarLayout>
 
+    <RelativeLayout
+            android:id="@+id/scanBtn"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_gravity="end"
+            android:layout_marginTop="30dp"
+            android:layout_marginEnd="25dp">
+
+        <View
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_centerInParent="true"
+                android:background="@drawable/icon_bg" />
+
+        <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_centerInParent="true"
+                android:src="@mipmap/scan"
+                tools:ignore="ContentDescription" />
+    </RelativeLayout>
+
+    <ImageView
+            android:id="@+id/safety_logo"
+            android:layout_width="wrap_content"
+            android:layout_height="75dp"
+            android:layout_gravity="center_horizontal"
+            android:adjustViewBounds="true"
+            android:src="@mipmap/logo"
+            tools:ignore="ContentDescription"
+            android:visibility="gone"/>
+
+    <net.ischool.isus.widgets.CustomTextView
+            android:id="@+id/safety_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="慧校安"
+            android:textColor="#242E3E"
+            android:textSize="25sp"
+            tools:ignore="HardcodedText"
+            android:visibility="gone"/>
+
+    <TextView
+            android:id="@+id/safety_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="AI预警处置管理系统"
+            android:textColor="#878EA8"
+            android:textSize="15sp"
+            tools:ignore="HardcodedText"
+            android:visibility="gone"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="10dp"
+            android:text="@string/device_init_cmdb_id_tip"
+            android:textColor="#333333"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            tools:ignore="HardcodedText" />
+
     <EditText
-        android:id="@+id/set_cmdb_id"
-        android:inputType="number"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/device_init_cmdb_id"/>
+            android:id="@+id/set_cmdb_id"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginTop="9dp"
+            android:hint="@string/device_init_cmdb_id"
+            android:inputType="number"
+            android:textColor="#333333"
+            android:textSize="15sp"
+            android:theme="@style/EditTextStyle"
+            tools:ignore="Autofill" />
+
+    <TextView
+            android:id="@+id/set_school_id_tip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="20dp"
+            android:text="@string/device_init_school_id_tip"
+            android:textColor="#333333"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            tools:ignore="HardcodedText" />
 
     <EditText
             android:id="@+id/set_school_id"
-            android:inputType="number"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginTop="9dp"
             android:hint="@string/device_init_school_id"
-            android:visibility="gone"/>
+            android:inputType="number"
+            android:textColor="#333333"
+            android:textSize="15sp"
+            android:theme="@style/EditTextStyle"
+            android:visibility="gone"
+            tools:ignore="Autofill" />
+
+    <TextView
+            android:id="@+id/set_pass_code_tip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="20dp"
+            android:text="@string/device_init_pass_code_tip"
+            android:textColor="#333333"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            tools:ignore="HardcodedText" />
 
     <EditText
             android:id="@+id/set_pass_code"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginTop="9dp"
             android:hint="@string/device_init_pass_code"
-            android:visibility="gone"/>
+            android:textColor="#333333"
+            android:textSize="15sp"
+            android:theme="@style/EditTextStyle"
+            android:visibility="gone"
+            tools:ignore="Autofill,TextFields" />
 
-    <Button
-        android:id="@+id/ok_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/button_ok"/>
+    <TextView
+            android:id="@+id/set_domain_tip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="20dp"
+            android:text="@string/device_init_domain_tip"
+            android:textColor="#333333"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            tools:ignore="HardcodedText" />
+
+    <EditText
+            android:id="@+id/set_domain"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginTop="9dp"
+            android:hint="@string/device_init_domain"
+            android:textColor="#333333"
+            android:textSize="15sp"
+            android:theme="@style/EditTextStyle"
+            android:visibility="gone"
+            tools:ignore="Autofill,TextFields" />
+
+    <TextView
+            android:id="@+id/set_pem_tip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="20dp"
+            android:text="@string/device_init_pem_tip"
+            android:textColor="#333333"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            tools:ignore="HardcodedText" />
+
+    <EditText
+            android:id="@+id/set_pem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="30dp"
+            android:layout_marginTop="9dp"
+            android:hint="@string/device_init_pem"
+            android:textColor="#333333"
+            android:textSize="15sp"
+            android:theme="@style/EditTextStyle"
+            android:visibility="gone"
+            tools:ignore="Autofill,TextFields" />
+
+    <android.widget.Button
+            android:id="@+id/ok_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="37.5dp"
+            android:layout_marginTop="30dp"
+            android:paddingVertical="11.5dp"
+            android:text="@string/button_ok"
+            android:textSize="16sp"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/btn_bg"/>
 </LinearLayout>

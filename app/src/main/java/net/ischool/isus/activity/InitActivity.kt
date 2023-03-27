@@ -1,5 +1,6 @@
 package net.ischool.isus.activity
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.ProgressDialog
 import android.content.BroadcastReceiver
@@ -43,8 +44,13 @@ import java.util.concurrent.TimeUnit
  */
 class InitActivity : RxAppCompatActivity() {
 
+    companion object {
+        private const val SAFETY_APP = "net.zxedu.safetycampus"
+    }
+
     private val receiver = CMDBUpdateReceiver()
 
+    @SuppressLint("CheckResult")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_init)
@@ -56,14 +62,23 @@ class InitActivity : RxAppCompatActivity() {
             .bindUntilEvent(this, ActivityEvent.DESTROY)
             .subscribe { init() }
 
+        if (applicationContext.packageName == SAFETY_APP) {
+            safety_logo.visiable()
+            safety_title.visiable()
+            safety_subtitle.visiable()
+        }
         if (ISUS.instance.se) {
+            set_school_id_tip.visiable()
             set_school_id.visiable()
+            set_pass_code_tip.visiable()
             set_pass_code.visiable()
+            set_domain_tip.visiable()
+            set_domain.visiable()
+            set_pem_tip.visiable()
+            set_pem.visiable()
         }
 
         autoInit(getCMDB())
-
-        Log.i("Walker", "app package: ${applicationContext.packageName}")
     }
 
     override fun onResume() {

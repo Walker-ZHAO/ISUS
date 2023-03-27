@@ -36,9 +36,16 @@
     <string name="description_qr_image">设备ID二维码</string>
 
     <string name="device_init_title">设备初始化</string>
+    <string name="device_init_cmdb_id_tip">CMDB ID:</string>
     <string name="device_init_cmdb_id">请输入CMDB ID</string>
+    <string name="device_init_school_id_tip">学校 ID:</string>
     <string name="device_init_school_id">请输入学校 ID</string>
+    <string name="device_init_pass_code_tip">授权码:</string>
     <string name="device_init_pass_code">请输入授权码</string>
+    <string name="device_init_domain_tip">服务器地址:</string>
+    <string name="device_init_domain">请输入服务器地址</string>
+    <string name="device_init_pem_tip">证书下载地址:</string>
+    <string name="device_init_pem">请输入证书下载地址</string>
 
     <string name="button_ok">确定</string>
     <string name="user_sync_title">用户信息同步</string>
