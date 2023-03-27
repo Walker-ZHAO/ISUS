@@ -62,6 +62,8 @@ class InitActivity : RxAppCompatActivity() {
         }
 
         autoInit(getCMDB())
+
+        Log.i("Walker", "app package: ${applicationContext.packageName}")
     }
 
     override fun onResume() {
