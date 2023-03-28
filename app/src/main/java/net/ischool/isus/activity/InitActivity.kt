@@ -62,6 +62,11 @@ class InitActivity : RxAppCompatActivity() {
             .bindUntilEvent(this, ActivityEvent.DESTROY)
             .subscribe { init() }
 
+        scanBtn.clicks()
+            .debounce(1, TimeUnit.SECONDS)
+            .bindUntilEvent(this, ActivityEvent.DESTROY)
+            .subscribe { startActivity(Intent(this, ScanActivity::class.java)) }
+
         if (applicationContext.packageName == SAFETY_APP) {
             safety_logo.visiable()
             safety_title.visiable()
