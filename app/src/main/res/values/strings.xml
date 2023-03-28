@@ -47,7 +47,7 @@
     <string name="device_init_pem_tip">证书下载地址:</string>
     <string name="device_init_pem">请输入证书下载地址</string>
 
-    <string name="button_ok">确定</string>
+    <string name="isus_button_ok">确定</string>
     <string name="user_sync_title">用户信息同步</string>
     <string name="user_sync_tip">用户信息同步中...</string>
     <string name="progress_text">%d%%</string>
