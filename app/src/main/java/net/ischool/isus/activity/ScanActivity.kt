@@ -1,6 +1,7 @@
 package net.ischool.isus.activity
 
 import android.Manifest
+import android.content.Intent
 import android.graphics.ImageFormat
 import android.os.Bundle
 import android.util.DisplayMetrics
@@ -36,6 +37,7 @@ class ScanActivity: AppCompatActivity() {
     companion object {
         private const val RATIO_4_3_VALUE = 4.0 / 3.0
         private const val RATIO_16_9_VALUE = 16.0 / 9.0
+        const val SCAN_RESULT = "scan_result"
     }
 
     // CameraX 相关
@@ -104,7 +106,10 @@ class ScanActivity: AppCompatActivity() {
                 .build()
                 .apply {
                     setAnalyzer(cameraExecutor!!, ZXingCodeAnalyzer {
-                        Log.i("Walker", "result: $it")
+                        val resultIntent = Intent().apply {
+                            putExtra(SCAN_RESULT, it)
+                        }
+                        setResult(RESULT_OK, resultIntent)
                         finish()
                     })
                 }
@@ -117,7 +122,9 @@ class ScanActivity: AppCompatActivity() {
                 camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalyzer)
                 // 设置预览的View
                 preview?.setSurfaceProvider(viewFinder.surfaceProvider)
-            } catch (e: Exception) { }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }, ContextCompat.getMainExecutor(this))
     }
 

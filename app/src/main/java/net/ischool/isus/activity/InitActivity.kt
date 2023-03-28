@@ -15,10 +15,7 @@ import com.trello.rxlifecycle4.android.ActivityEvent
 import com.trello.rxlifecycle4.components.support.RxAppCompatActivity
 import com.trello.rxlifecycle4.kotlin.bindUntilEvent
 import com.walker.anke.foundation.md5
-import com.walker.anke.framework.indeterminateProgressDialog
-import com.walker.anke.framework.longToast
-import com.walker.anke.framework.toast
-import com.walker.anke.framework.visiable
+import com.walker.anke.framework.*
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.subscribeBy
@@ -46,6 +43,7 @@ class InitActivity : RxAppCompatActivity() {
 
     companion object {
         private const val SAFETY_APP = "net.zxedu.safetycampus"
+        private const val SCAN_REQUEST_CODE = 100
     }
 
     private val receiver = CMDBUpdateReceiver()
@@ -65,7 +63,10 @@ class InitActivity : RxAppCompatActivity() {
         scanBtn.clicks()
             .debounce(1, TimeUnit.SECONDS)
             .bindUntilEvent(this, ActivityEvent.DESTROY)
-            .subscribe { startActivity(Intent(this, ScanActivity::class.java)) }
+            .subscribe {
+                val intent = Intent(this, ScanActivity::class.java)
+                startActivityForResult(intent, SCAN_REQUEST_CODE)
+            }
 
         if (applicationContext.packageName == SAFETY_APP) {
             safety_logo.visiable()
@@ -94,6 +95,15 @@ class InitActivity : RxAppCompatActivity() {
     override fun onPause() {
         super.onPause()
         unregisterReceiver(receiver)
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode != SCAN_REQUEST_CODE || resultCode != RESULT_OK) return
+        val result = data?.getStringExtra(ScanActivity.SCAN_RESULT) ?: ""
+        if (result.isEmpty()) return
+        Log.i("Walker", "scan result: $result")
     }
 
     private fun init() {
