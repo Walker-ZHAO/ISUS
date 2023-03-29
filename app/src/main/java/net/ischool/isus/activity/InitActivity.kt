@@ -7,7 +7,9 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.net.Uri
 import android.os.Bundle
+import android.util.Base64
 import android.util.Log
 import android.view.Gravity
 import com.jakewharton.rxbinding4.view.clicks
@@ -22,14 +24,19 @@ import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_init.*
 import net.ischool.isus.*
+import net.ischool.isus.io.PUBLIC_KEY
+import net.ischool.isus.io.decrypt
+import net.ischool.isus.io.getPublicKey
 import net.ischool.isus.network.APIService
 import net.ischool.isus.network.callback.StringCallback
 import net.ischool.isus.preference.PreferenceManager
+import net.ischool.isus.scheme.isFunction
 import net.ischool.isus.service.CMDBService
 import okhttp3.Request
 import java.io.File
 import java.io.IOException
 import java.lang.Exception
+import java.nio.charset.Charset
 import java.util.concurrent.TimeUnit
 
 /**
@@ -103,11 +110,37 @@ class InitActivity : RxAppCompatActivity() {
         if (requestCode != SCAN_REQUEST_CODE || resultCode != RESULT_OK) return
         val result = data?.getStringExtra(ScanActivity.SCAN_RESULT) ?: ""
         if (result.isEmpty()) return
-        Log.i("Walker", "scan result: $result")
+        parseScanResult(result)
+    }
+
+    /**
+     * 对扫码结果进行解析：
+     *
+     * 处理 URL 转义
+     * Base64 Decode
+     * 对Base64 Decode之后的数据切分成 128 字节的片段
+     * 使用 RAS 公钥对 128 字节的片段进行解密，片段长 128 字节时无需 Padding， 片段长小于 128 字节时使用 PKCS1Padding
+     * 将所有片段解密出来的数据连接成一个字符串
+     * 对解密后的字符串进行 JSON Decode
+     */
+    private fun parseScanResult(result: String) {
+        if (!result.isFunction()) return
+        val uri = Uri.parse(result)
+        if (uri.path != "/cmdb-device-bind") return
+        val encodeParam = uri.getQueryParameter("s") ?: ""
+        if (encodeParam.isEmpty()) return
+        // 加密数据
+        val encryptedData = Base64.decode(encodeParam, Base64.DEFAULT)
+        // 公钥
+        val pubKey = getPublicKey(Base64.decode(PUBLIC_KEY, Base64.DEFAULT))
+        // 使用公钥对加密数据进行解密
+        val decryptData = decrypt(encryptedData, pubKey)
+        // 解密数据转编码成UTF-8字符串
+        val json = String(decryptData, Charset.defaultCharset())
+        Log.i("Walker", json)
     }
 
     private fun init() {
-
         if (ISUS.instance.se)
             initSe()
         else
