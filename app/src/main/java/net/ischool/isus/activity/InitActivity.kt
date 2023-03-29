@@ -26,6 +26,7 @@ import kotlinx.android.synthetic.main.activity_init.*
 import net.ischool.isus.*
 import net.ischool.isus.io.PUBLIC_KEY
 import net.ischool.isus.io.decrypt
+import net.ischool.isus.io.decryptSpilt
 import net.ischool.isus.io.getPublicKey
 import net.ischool.isus.network.APIService
 import net.ischool.isus.network.callback.StringCallback
@@ -133,8 +134,8 @@ class InitActivity : RxAppCompatActivity() {
         val encryptedData = Base64.decode(encodeParam, Base64.DEFAULT)
         // 公钥
         val pubKey = getPublicKey(Base64.decode(PUBLIC_KEY, Base64.DEFAULT))
-        // 使用公钥对加密数据进行解密
-        val decryptData = decrypt(encryptedData, pubKey)
+        // 使用公钥对加密数据进行分片解密
+        val decryptData = decryptSpilt(encryptedData, pubKey)
         // 解密数据转编码成UTF-8字符串
         val json = String(decryptData, Charset.defaultCharset())
         Log.i("Walker", json)

@@ -47,7 +47,7 @@ fun getPrivateKey(privateKey: ByteArray): PrivateKey{
  * @param transformation 加密模式和填充方式，默认为 RSA/ECB/PKCS1Padding
  * @return
  */
-fun decrypt(encryptedData: ByteArray, privateKey: PrivateKey, transformation: String = "RSA/ECB/PKCS1Padding"): ByteArray {
+fun decrypt(encryptedData: ByteArray, privateKey: PrivateKey, transformation: String = TRANSFORMATION_DEFAULT): ByteArray {
     val cipher = Cipher.getInstance(transformation)
     cipher.init(Cipher.DECRYPT_MODE, privateKey)
     return cipher.doFinal(encryptedData)
@@ -61,10 +61,35 @@ fun decrypt(encryptedData: ByteArray, privateKey: PrivateKey, transformation: St
  * @param transformation 加密模式和填充方式，默认为 RSA/ECB/PKCS1Padding
  * @return
  */
-fun decrypt(encryptedData: ByteArray, publicKey: PublicKey, transformation: String = "RSA/ECB/PKCS1Padding"): ByteArray {
+fun decrypt(encryptedData: ByteArray, publicKey: PublicKey, transformation: String = TRANSFORMATION_DEFAULT): ByteArray {
     val cipher = Cipher.getInstance(transformation)
     cipher.init(Cipher.DECRYPT_MODE, publicKey)
     return cipher.doFinal(encryptedData)
+}
+
+/**
+ * 用公钥对数据进行分段解密
+ *
+ * @param encryptedData 经过encrypt()加密返回的byte数据
+ * @param publicKey 公钥
+ * @param transformation 加密模式和填充方式，默认为 RSA/ECB/PKCS1Padding
+ * @return
+ */
+fun decryptSpilt(encryptedData: ByteArray, publicKey: PublicKey, transformation: String = TRANSFORMATION_DEFAULT): ByteArray {
+    val chunkedData = encryptedData.toList().chunked(128)
+    val chunkedSize = chunkedData.size
+    val decryptData = chunkedData.mapIndexed { index, it ->
+        if (index != chunkedSize - 1) // 非最后一段，使用NoPadding方式解密
+            decrypt(it.toByteArray(), publicKey, TRANSFORMATION_NO_PADDING)
+        else // 最后一段，优先使用PKCS1Padding解密，如果报错，再尝试用NoPadding方式解密
+            try {
+                decrypt(it.toByteArray(), publicKey, transformation)
+            } catch (e: Exception) {
+                decrypt(it.toByteArray(), publicKey, TRANSFORMATION_NO_PADDING)
+            }
+
+    }
+    return decryptData.reduce { first, second -> first.plus(second) }
 }
 
 /**
@@ -76,7 +101,7 @@ fun decrypt(encryptedData: ByteArray, publicKey: PublicKey, transformation: Stri
  * @param transformation 加密模式和填充方式，默认为 RSA/ECB/PKCS1Padding
  * @return 加密后的byte型数据
  */
-public fun encrypt(data: ByteArray, publicKey: PublicKey, transformation: String = "RSA/ECB/PKCS1Padding"): ByteArray {
+public fun encrypt(data: ByteArray, publicKey: PublicKey, transformation: String = TRANSFORMATION_DEFAULT): ByteArray {
     val cipher = Cipher.getInstance(transformation)
     // 编码前设定编码方式及密钥
     cipher.init(Cipher.ENCRYPT_MODE, publicKey)
@@ -93,7 +118,7 @@ public fun encrypt(data: ByteArray, publicKey: PublicKey, transformation: String
  * @param transformation 加密模式和填充方式，默认为 RSA/ECB/PKCS1Padding
  * @return 加密后的byte型数据
  */
-public fun encrypt(data: ByteArray, privateKey: PrivateKey, transformation: String = "RSA/ECB/PKCS1Padding"): ByteArray {
+public fun encrypt(data: ByteArray, privateKey: PrivateKey, transformation: String = TRANSFORMATION_DEFAULT): ByteArray {
     val cipher = Cipher.getInstance(transformation)
     // 编码前设定编码方式及密钥
     cipher.init(Cipher.ENCRYPT_MODE, privateKey)
@@ -103,3 +128,8 @@ public fun encrypt(data: ByteArray, privateKey: PrivateKey, transformation: Stri
 
 // 公钥
 const val PUBLIC_KEY = "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC4k/SHAVLm7W/vkyiqOzDwJmMd8nOw6l35bIECOUtAAcvoxbGv8JA18ZqrKoq+x6sFqZ7ztuLqop6x98MOJKgX5Q/HHHNw/rTsEBUFML+A3/tLIotExRksz85CxfyUfs/JQNpbyvtz13PQCKp/161t6/zq8WZFhiyBXL/LrcRnSwIDAQAB"
+
+// 默认解密方式，PKCS1Padding
+private const val TRANSFORMATION_DEFAULT = "RSA/ECB/PKCS1Padding"
+// 分片解密方式，NoPadding
+private const val TRANSFORMATION_NO_PADDING = "RSA/ECB/NoPadding"
