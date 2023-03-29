@@ -12,12 +12,14 @@ import android.os.Bundle
 import android.util.Base64
 import android.util.Log
 import android.view.Gravity
+import com.google.gson.Gson
 import com.jakewharton.rxbinding4.view.clicks
 import com.trello.rxlifecycle4.android.ActivityEvent
 import com.trello.rxlifecycle4.components.support.RxAppCompatActivity
 import com.trello.rxlifecycle4.kotlin.bindUntilEvent
 import com.walker.anke.foundation.md5
 import com.walker.anke.framework.*
+import com.walker.anke.gson.fromJson
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.subscribeBy
@@ -28,6 +30,7 @@ import net.ischool.isus.io.PUBLIC_KEY
 import net.ischool.isus.io.decrypt
 import net.ischool.isus.io.decryptSpilt
 import net.ischool.isus.io.getPublicKey
+import net.ischool.isus.model.QRInfo
 import net.ischool.isus.network.APIService
 import net.ischool.isus.network.callback.StringCallback
 import net.ischool.isus.preference.PreferenceManager
@@ -138,7 +141,16 @@ class InitActivity : RxAppCompatActivity() {
         val decryptData = decryptSpilt(encryptedData, pubKey)
         // 解密数据转编码成UTF-8字符串
         val json = String(decryptData, Charset.defaultCharset())
-        Log.i("Walker", json)
+        // 解析JSON实体
+        val qrInfo = Gson().fromJson<QRInfo>(json)
+        // 填充数据
+        set_school_id.setText("${qrInfo.sid}")
+        set_cmdb_id.setText("${qrInfo.cmdbid}")
+        set_pass_code.setText(qrInfo.code)
+        set_domain.setText(qrInfo.server)
+        qrInfo.certificate?.let {
+            set_pem.setText(it)
+        }
     }
 
     private fun init() {
