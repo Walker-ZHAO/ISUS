@@ -1,6 +1,7 @@
 @file:JvmName("Constants")
 package net.ischool.isus
 
+import android.net.Uri
 import net.ischool.isus.preference.PreferenceManager
 
 /**
@@ -26,8 +27,6 @@ const val DEFAULT_PEM_DOWNLOAD_HOST = "http://update.i-school.net"
 // 证书下载路径
 const val PEM_DOWNLOAD_PATH = "/zxedu-system-images/schools/"
 
-const val DEFAULT_DOMAIN = "i-school.net"
-
 // 默认的服务器地址
 val END_POINT by lazy { PreferenceManager.instance.getPlatformApi() }
 
@@ -52,20 +51,26 @@ const val ACTION_QUEUE_STATE_CHANGE = "net.ischool.isus.queue_state"
 const val UDP_PORT = 514
 
 // RabbitMQ 相关配置
-// 通用配置
-const val MQ_VHOST = "/"
+// 通用配置，根据初始化时配置的MQ地址解析得到
+val MQ_DOMAIN: String by lazy { Uri.parse(PreferenceManager.instance.getPlatformMq()).host }
+val MQ_PORT: Int by lazy { Uri.parse(PreferenceManager.instance.getPlatformMq()).port }
+val MQ_VHOST: String by lazy { Uri.parse(PreferenceManager.instance.getPlatformMq()).path }
+val MQ_NEED_PEM: Boolean by lazy { Uri.parse(PreferenceManager.instance.getPlatformMq()).scheme?.endsWith('s') ?: false }
+val MQ_USERNAME: String by lazy { Uri.parse(PreferenceManager.instance.getPlatformMq()).userInfo?.split(":")?.first() ?: MQ_DEFAULT_USERNAME }
+val MQ_PASSWORD: String by lazy { Uri.parse(PreferenceManager.instance.getPlatformMq()).userInfo?.split(":")?.get(1) ?: MQ_DEFAULT_PASSWORD }
+
 // 非安全增强模式配置
-val MQ_DOMAIN by lazy { "cdn.schools.${ISUS.instance.domain}" }
-const val MQ_PORT = 5672
-const val MQ_USERNAME = "equipment"
-const val MQ_PASSWORD = "1835ac0a6b749651efa42dd4e09e625a"
+const val MQ_DEFAULT_DOMAIN = "cdn.schools.i-school.net"
+const val MQ_DEFAULT_POST = 5672
+const val MQ_DEFAULT_USERNAME = "equipment"
+const val MQ_DEFAULT_PASSWORD = "1835ac0a6b749651efa42dd4e09e625a"
 const val MQ_EXCHANGE_NAME = "equipment"
 const val MQ_EXCHANGE_TYPE = "topic"
 const val MQ_ROUTING_KEY_PREFIX = "$MQ_EXCHANGE_NAME.cmdb"
 
 // 安全增强模式配置
-val MQ_DOMAIN_SE by lazy { "cdnmq.i-school.net" }
-const val MQ_PORT_SE = 5671
+const val MQ_DEFAULT_SE_DOMAIN = "cdnmq.i-school.net"
+const val MQ_DEFAULT_SE_POST = 5671
 const val MQ_ROUTING_KEY_SE = "sync.schools.#"
 const val MQ_ROUTING_KEY_USER = "sync.schools.user"
 const val MQ_ROUTING_KEY_COMET = "sync.schools.sys.comet"

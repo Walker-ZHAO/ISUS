@@ -177,11 +177,28 @@ interface APIService {
                                 setToken(result.data.token)
                                 setServer(result.data.APIServer)
                                 setProtocal(result.data.protocal)
-                                if (ISUS.instance.se)
-                                    PreferenceManager.instance.setPlatformApi("${result.data.platformApi}$SE_API_PATH")
-                                else
-                                    PreferenceManager.instance.setPlatformApi("${result.data.platformApi}$API_PATH")
-                                setPlatformMq(result.data.platformMq)
+                                val platformApi = result.data.platformApi
+                                val platformMq = result.data.platformMq
+                                // 如果服务端未传递自定义配置，则使用默认配置
+                                if (platformApi.isEmpty()) {
+                                    if (ISUS.instance.se)
+                                        setPlatformApi("$DEFAULT_SE_API_HOST$SE_API_PATH")
+                                    else
+                                        setPlatformApi("$DEFAULT_API_HOST$API_PATH")
+                                } else {
+                                    if (ISUS.instance.se)
+                                        setPlatformApi("${result.data.platformApi}$SE_API_PATH")
+                                    else
+                                        setPlatformApi("${result.data.platformApi}$API_PATH")
+                                }
+                                if (platformMq.isEmpty()) {
+                                    if (ISUS.instance.se)
+                                        setPlatformMq("amqps://$MQ_DEFAULT_SE_DOMAIN:$MQ_DEFAULT_SE_POST/")
+                                    else
+                                        setPlatformMq("amqp://$MQ_DEFAULT_USERNAME:$MQ_DEFAULT_PASSWORD@$MQ_DEFAULT_DOMAIN:$MQ_DEFAULT_POST/")
+                                } else {
+                                    setPlatformMq(result.data.platformMq)
+                                }
                             }
                             Observable.just(it)
                         } else {

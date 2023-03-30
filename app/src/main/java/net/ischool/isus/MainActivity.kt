@@ -230,7 +230,6 @@ class MainActivity : RxAppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        Log.i(LOG_TAG, MQ_DOMAIN)
         registerReceiver(register, IntentFilter(ACTION_COMMAND))
         registerReceiver(syncReceiver, IntentFilter("net.ischool.isus.sync"))
         registerReceiver(stateRecevier, IntentFilter(ACTION_QUEUE_STATE_CHANGE))

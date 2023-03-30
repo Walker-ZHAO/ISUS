@@ -1,5 +1,6 @@
 package net.ischool.isus.service
 
+import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -247,6 +248,7 @@ class ISUSService : Service() {
          * @param success   同步成功回调，UI线程
          * @param fail      同步失败回调，UI线程
          */
+        @SuppressLint("CheckResult")
         fun syncUserInfo(uid: Long, success: () -> Unit, fail: () -> Unit) {
             APIService.getUserInfo(uid)
                 .subscribeOn(Schedulers.io())
@@ -336,19 +338,18 @@ class ISUSService : Service() {
      * 服务器连接设置
      */
     private fun setUpConnectionFactory() {
-        if (ISUS.instance.se) {
-            factory.host = MQ_DOMAIN_SE
-            factory.port = MQ_PORT_SE
+        if (MQ_NEED_PEM) {
             factory.useSslProtocol(SSLSocketFactoryProvider.getSSLContext())
             factory.saslConfig = DefaultSaslConfig.EXTERNAL
         } else {
-            factory.host = MQ_DOMAIN
-            factory.port = MQ_PORT
             factory.username = MQ_USERNAME
             factory.password = MQ_PASSWORD
         }
         // 通用设置
+        factory.host = MQ_DOMAIN
+        factory.port = MQ_PORT
         factory.virtualHost = MQ_VHOST
+
         // 设置连接恢复（4.0+默认开启）
         factory.isAutomaticRecoveryEnabled = true
         // 设置重试间隔，默认5s

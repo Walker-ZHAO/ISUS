@@ -2,6 +2,7 @@ package net.ischool.isus
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.util.Log
@@ -9,6 +10,7 @@ import com.hikvision.dmb.system.InfoSystemApi
 import com.seewo.sdk.OpenSDK
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import net.ischool.isus.preference.PreferenceManager
 import java.lang.reflect.Method
 import java.net.InetAddress
 import java.net.UnknownHostException
@@ -22,7 +24,7 @@ import java.util.*
  * Date: 2020/5/8
  */
 
-val DEFAULT_HOST by lazy { "${if (ISUS.instance.se) "cc" else "cdn.schools"}.${ISUS.instance.domain}" }
+val DEFAULT_HOST: String by lazy { Uri.parse(PreferenceManager.instance.getPlatformApi()).host }
 
 /**
  * 解析域名对应IP

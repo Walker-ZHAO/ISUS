@@ -25,7 +25,7 @@ import net.ischool.isus.service.WatchDogService
  * Email: zhaocework@gmail.com
  * Date: 2017/9/18
  */
-class ISUS(val context: Context, val domain: String, val se: Boolean) {
+class ISUS(val context: Context, val se: Boolean) {
 
     companion object {
 
@@ -40,8 +40,8 @@ class ISUS(val context: Context, val domain: String, val se: Boolean) {
         @ExperimentalStdlibApi
         @JvmOverloads
         @Synchronized
-        @JvmStatic fun init(context: Context, deviceType: Int, domain: String = DEFAULT_DOMAIN, securityEnhance: Boolean = false, commandProcessor: ICommand? = null) {
-            instance = ISUS(context.applicationContext, domain, securityEnhance)
+        @JvmStatic fun init(context: Context, deviceType: Int, securityEnhance: Boolean = false, commandProcessor: ICommand? = null) {
+            instance = ISUS(context.applicationContext, securityEnhance)
             CommandParser.init(commandProcessor)
             Logger.addLogAdapter(AndroidLogAdapter())
             PreferenceManager.initPreference(context, deviceType)
