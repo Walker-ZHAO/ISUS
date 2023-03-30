@@ -1,6 +1,8 @@
 @file:JvmName("Constants")
 package net.ischool.isus
 
+import net.ischool.isus.preference.PreferenceManager
+
 /**
  * Description
  *
@@ -27,7 +29,7 @@ const val PEM_DOWNLOAD_PATH = "/zxedu-system-images/schools/"
 const val DEFAULT_DOMAIN = "i-school.net"
 
 // 默认的服务器地址
-val END_POINT by lazy { ISUS.instance.apiHost }
+val END_POINT by lazy { PreferenceManager.instance.getPlatformApi() }
 
 // RSA密钥部分口令
 const val CONFIG_RSA_PASS = "6f7084632667a86cbcba2ff128d46440"

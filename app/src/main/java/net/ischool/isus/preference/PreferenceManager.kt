@@ -30,6 +30,8 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     private val _token: Preference<String>           /** 加密后的CMDB ID **/
     private val _serverAddress: Preference<String>   /** 学校相关的服务器地址 **/
     private val _protocal: Preference<String>        /** 服务器支持的协议 **/
+    private val _platformApi: Preference<String>     /** 部署平台的服务器地址 **/
+    private val _platformMq: Preference<String>      /** 部署平台的MQ地址 **/
     private val _type: Preference<Int>               /** 设备类型 **/
     private val _base64QR: Preference<String>        /** Base64 编码的二维码 **/
     private val _parameter: Preference<String>       /** 额外的参数配置 **/
@@ -47,6 +49,8 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
         _token = rxPreference.getString(KEY_TOKEN)
         _serverAddress = rxPreference.getString(KEY_SERVER_ADDRESS)
         _protocal = rxPreference.getString(KEY_PROTOCAL)
+        _platformApi = rxPreference.getString(KEY_PLATFORM_API)
+        _platformMq = rxPreference.getString(KEY_PLATFORM_MQ)
         _type = rxPreference.getInteger(KEY_TYPE)
         _base64QR = rxPreference.getString(KEY_QR)
         _parameter = rxPreference.getString(KEY_PARAMETER)
@@ -54,7 +58,7 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     }
 
     override fun toString(): String {
-        return "{CMDB ID : ${getCMDB()}, School ID : ${getSchoolId()}, Token : ${getToken()}, Server Address : ${getServer()}, Protocal : ${getProtocal()}, Type : ${getDeviceType()}, Parameter : ${_parameter.get()}}"
+        return "{CMDB ID : ${getCMDB()}, School ID : ${getSchoolId()}, Token : ${getToken()}, Server Address : ${getServer()}, Protocal : ${getProtocal()}, Platform API : ${getPlatformApi()}, Platform MQ : ${getPlatformMq()}, Type : ${getDeviceType()}, Parameter : ${_parameter.get()}}"
     }
 
     companion object {
@@ -84,6 +88,8 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
         private const val  KEY_TOKEN = "TOKEN"
         private const val  KEY_SERVER_ADDRESS = "SERVER_ADDRESS"
         private const val  KEY_PROTOCAL = "PROTOCAL"
+        private const val  KEY_PLATFORM_API = "platform_api"
+        private const val  KEY_PLATFORM_MQ = "platform_mq"
         private const val  KEY_TYPE = "TYPE"
         private const val  KEY_QR = "QR"
         private const val  KEY_PARAMETER = "PARAMETER"
@@ -98,6 +104,8 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     fun getToken() = _token.get()
     fun getServer() = _serverAddress.get()
     fun getProtocal() = _protocal.get()
+    fun getPlatformApi() = _platformApi.get()
+    fun getPlatformMq() = _platformMq.get()
     fun getDeviceType() = _type.get()
     fun getQR() = _base64QR.get()
     fun getParameter() = Gson().fromJson<Map<String, String>>(_parameter.get())?:HashMap()
@@ -116,6 +124,8 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     fun setToken(t: String) = _token.set(t)
     fun setServer(server: String) = _serverAddress.set(server)
     fun setProtocal(pro: String) = _protocal.set(pro)
+    fun setPlatformApi(api: String) = _platformApi.set(api)
+    fun setPlatformMq(mq: String) = _platformMq.set(mq)
     private fun setDeviceType(deviceType: Int) = _type.set(deviceType)
     fun setQR(qr: String) = _base64QR.set(qr)
     fun setParameter(param: Map<String, String>) = _parameter.set(Gson().toJson(param))

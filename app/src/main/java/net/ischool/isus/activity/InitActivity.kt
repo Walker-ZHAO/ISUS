@@ -164,10 +164,10 @@ class InitActivity : RxAppCompatActivity() {
         if (host.last() == '/')
             host.delete(host.length - 1, host.length)
         if (ISUS.instance.se) {
-            ISUS.instance.apiHost = "$host$SE_API_PATH"
+            PreferenceManager.instance.setPlatformApi("$host$SE_API_PATH")
             initSe()
         } else {
-            ISUS.instance.apiHost = "$host$API_PATH"
+            PreferenceManager.instance.setPlatformApi("$host$API_PATH")
             initPoor()
         }
     }

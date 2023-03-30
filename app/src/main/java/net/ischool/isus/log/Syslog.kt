@@ -1,5 +1,6 @@
 package net.ischool.isus.log
 
+import android.net.Uri
 import android.os.Process
 import com.walker.anke.framework.activityManager
 import com.walker.anke.framework.doAsync
@@ -27,10 +28,7 @@ class Syslog {
         private val socket: DatagramSocket by lazy { DatagramSocket() }
         private val server: InetAddress by lazy {
             val host = with(PreferenceManager.instance) {
-                if (getSyslog().isEmpty())
-                    getServer()
-                else
-                    getSyslog()
+                getSyslog().ifEmpty { Uri.parse(getPlatformApi()).host }
             }
             InetAddress.getByName(host)
         }

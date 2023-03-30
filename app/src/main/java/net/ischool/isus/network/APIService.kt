@@ -177,6 +177,11 @@ interface APIService {
                                 setToken(result.data.token)
                                 setServer(result.data.APIServer)
                                 setProtocal(result.data.protocal)
+                                if (ISUS.instance.se)
+                                    PreferenceManager.instance.setPlatformApi("${result.data.platformApi}$SE_API_PATH")
+                                else
+                                    PreferenceManager.instance.setPlatformApi("${result.data.platformApi}$API_PATH")
+                                setPlatformMq(result.data.platformMq)
                             }
                             Observable.just(it)
                         } else {

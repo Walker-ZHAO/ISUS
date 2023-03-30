@@ -1,5 +1,8 @@
 package net.ischool.isus.network.interceptor
 
+import android.net.Uri
+import android.util.Log
+import net.ischool.isus.ISUS
 import net.ischool.isus.preference.PreferenceManager
 import okhttp3.Interceptor
 import okhttp3.Response
@@ -16,17 +19,24 @@ class URLInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain?): Response {
         val safeChain = checkNotNull(chain)
         var request = safeChain.request()
-        val host = PreferenceManager.instance.getServer()
-        val scheme = PreferenceManager.instance.getProtocal()
-        if (request.url().toString().contains("config") || request.url().toString().contains("pong")) {
-            val urlBuilder =  request.url().newBuilder()
-            if (host.isNotEmpty())
-                urlBuilder.host(host)
-            if (scheme.isNotEmpty())
-                urlBuilder.scheme(scheme)
-            val newURL = urlBuilder.build()
-            request = request.newBuilder().url(newURL).build()
-        }
+        val platformApi = PreferenceManager.instance.getPlatformApi()
+        val uri = Uri.parse(platformApi)
+        val host = uri.host
+        val scheme = uri.scheme
+        val port = uri.port
+
+        val urlBuilder =  request.url().newBuilder()
+        if (!host.isNullOrEmpty())
+            urlBuilder.host(host)
+        if (!scheme.isNullOrEmpty())
+            urlBuilder.scheme(scheme)
+        if (port > 0)
+            urlBuilder.port(port)
+        if (ISUS.instance.se)
+            urlBuilder.setPathSegment(0, "www")
+        val newURL = urlBuilder.build()
+        request = request.newBuilder().url(newURL).build()
+
         return safeChain.proceed(request)
     }
 }
