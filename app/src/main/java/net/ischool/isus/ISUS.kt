@@ -27,6 +27,9 @@ import net.ischool.isus.service.WatchDogService
  */
 class ISUS(val context: Context, val domain: String, val se: Boolean) {
 
+    // 服务器访问地址
+    var apiHost = ""
+
     companion object {
 
         @Volatile

@@ -155,10 +155,21 @@ class InitActivity : RxAppCompatActivity() {
     }
 
     private fun init() {
-        if (ISUS.instance.se)
+        val host = set_domain.text
+        if (host.isEmpty()) {
+            runOnUiThread { toast("请输入服务器地址") }
+            return
+        }
+        // 过滤最后的反斜杠
+        if (host.last() == '/')
+            host.delete(host.length - 1, host.length)
+        if (ISUS.instance.se) {
+            ISUS.instance.apiHost = "$host$SE_API_PATH"
             initSe()
-        else
+        } else {
+            ISUS.instance.apiHost = "$host$API_PATH"
             initPoor()
+        }
     }
 
     private fun getCMDB(): String {
@@ -199,6 +210,7 @@ class InitActivity : RxAppCompatActivity() {
     /**
      * 普通模式初始化
      */
+    @SuppressLint("CheckResult")
     private fun initPoor() {
         var dialog: ProgressDialog? = null
 
@@ -245,10 +257,13 @@ class InitActivity : RxAppCompatActivity() {
     /**
      * 安全增强版初始化
      */
+    @SuppressLint("CheckResult")
     private fun initSe() {
         val schoolId = set_school_id.text.toString()
         val passCode = set_pass_code.text.toString()
         val cmdbId = set_cmdb_id.text.toString()
+        val pemHost = set_pem.text.toString()
+        val pemDownloadUrl = if (pemHost.isNotEmpty()) "$pemHost${PEM_DOWNLOAD_PATH}schoolcdn-$schoolId-$passCode.p12" else ""
 
         if (schoolId.isEmpty() || passCode.isEmpty() || cmdbId.isEmpty()) {
             runOnUiThread { toast("缺少必要参数") }
@@ -261,43 +276,67 @@ class InitActivity : RxAppCompatActivity() {
             window?.attributes?.gravity = Gravity.CENTER
         } }
 
-        val url = "http://update.${ISUS.instance.domain}/zxedu-system-images/schools/schoolcdn-$schoolId-$passCode.p12"
-        APIService.downloadAsync(url, filesDir.absolutePath, callback = object : StringCallback {
-            override fun onResponse(string: String) {
-                PreferenceManager.instance.setSePemPath(string)
-                PreferenceManager.instance.setKeyPass(genPrivateKeyPass(passCode))
-                APIService.initDevice(cmdbId, schoolId)
-                    .subscribeOn(Schedulers.io())
-                    .flatMap { APIService.getConfig() }
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeBy(
-                        onNext = {
-                            dialog?.dismiss()
-                            toast("设备初始化成功")
-                            // 启动ZXBS服务
-                            startZXBS()
-                            setResult(Activity.RESULT_OK)
-                            finish()
-                        },
-                        onError = {
-                            dialog?.dismiss()
-                            longToast("设备初始化失败，请稍后重试!（${it.message}）")
-                            Log.e(LOG_TAG, "${it.message}")
-                            toast("${it.message}")
-                            setResult(Activity.RESULT_CANCELED)
-                            finish()
-                        }
-                    )
-            }
-
-            override fun onFailure(request: Request, e: IOException) {
-                runOnUiThread {
-                    dialog?.dismiss()
-                    toast("证书下载失败，请尝试重新初始化！")
-                    longToast("Error: ${e.message}")
+        if (pemDownloadUrl.isNotEmpty()) {  // 如果配置了证书下载地址，则先下载证书，再初始化
+            APIService.downloadAsync(pemDownloadUrl, filesDir.absolutePath, callback = object : StringCallback {
+                override fun onResponse(string: String) {
+                    PreferenceManager.instance.setSePemPath(string)
+                    PreferenceManager.instance.setKeyPass(genPrivateKeyPass(passCode))
+                    APIService.initDevice(cmdbId, schoolId)
+                        .subscribeOn(Schedulers.io())
+                        .flatMap { APIService.getConfig() }
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeBy(
+                            onNext = {
+                                dialog?.dismiss()
+                                toast("设备初始化成功")
+                                // 启动ZXBS服务
+                                startZXBS()
+                                setResult(Activity.RESULT_OK)
+                                finish()
+                            },
+                            onError = {
+                                dialog?.dismiss()
+                                longToast("设备初始化失败，请稍后重试!（${it.message}）")
+                                Log.e(LOG_TAG, "${it.message}")
+                                toast("${it.message}")
+                                setResult(Activity.RESULT_CANCELED)
+                                finish()
+                            }
+                        )
                 }
-            }
-        })
+
+                override fun onFailure(request: Request, e: IOException) {
+                    runOnUiThread {
+                        dialog?.dismiss()
+                        toast("证书下载失败，请尝试重新初始化！")
+                        longToast("Error: ${e.message}")
+                    }
+                }
+            })
+        } else {    // 如果未配置证书下载地址，则代表不需要证书，直接初始化
+            APIService.initDevice(cmdbId, schoolId)
+                .subscribeOn(Schedulers.io())
+                .flatMap { APIService.getConfig() }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onNext = {
+                        dialog?.dismiss()
+                        toast("设备初始化成功")
+                        // 启动ZXBS服务
+                        startZXBS()
+                        setResult(Activity.RESULT_OK)
+                        finish()
+                    },
+                    onError = {
+                        dialog?.dismiss()
+                        longToast("设备初始化失败，请稍后重试!（${it.message}）")
+                        Log.e(LOG_TAG, "${it.message}")
+                        toast("${it.message}")
+                        setResult(Activity.RESULT_CANCELED)
+                        finish()
+                    }
+                )
+        }
     }
 
     private fun genPrivateKeyPass(pass: String) = "zxedu$pass$CONFIG_RSA_PASS".md5()

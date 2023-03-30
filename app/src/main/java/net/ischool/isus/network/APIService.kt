@@ -149,7 +149,8 @@ interface APIService {
                     .addInterceptor(HttpLoggingInterceptor().apply {
                         level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
                     })
-            if (ISUS.instance.se) {
+            // 如果处于安全增强模式，并且服务端提供了证书，则需要配置双向认证
+            if (ISUS.instance.se && PreferenceManager.instance.getSePemPath().isNotEmpty()) {
                 builder
                     .sslSocketFactory(SSLSocketFactoryProvider.getSSLSocketFactory(), NullX509TrustManager())
                     .hostnameVerifier { hostname, session -> true }
