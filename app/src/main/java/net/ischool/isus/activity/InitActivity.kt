@@ -89,10 +89,12 @@ class InitActivity : RxAppCompatActivity() {
             set_school_id.visiable()
             set_pass_code_tip.visiable()
             set_pass_code.visiable()
-            set_domain_tip.visiable()
-            set_domain.visiable()
             set_pem_tip.visiable()
             set_pem.visiable()
+            set_pem.setText(DEFAULT_PEM_DOWNLOAD_HOST)
+            set_domain.setText(DEFAULT_SE_API_HOST)
+        } else {
+            set_domain.setText(DEFAULT_API_HOST)
         }
 
         autoInit(getCMDB())
@@ -148,9 +150,8 @@ class InitActivity : RxAppCompatActivity() {
         set_cmdb_id.setText("${qrInfo.cmdbid}")
         set_pass_code.setText(qrInfo.code)
         set_domain.setText(qrInfo.server)
-        qrInfo.certificate?.let {
-            set_pem.setText(it)
-        }
+        // 如果没有证书地址，代表无需要配置证书，清空输入框的默认地址
+        set_pem.setText(qrInfo.certificate ?: "")
     }
 
     private fun init() {

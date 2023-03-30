@@ -158,7 +158,6 @@
             android:textColor="#333333"
             android:textSize="15sp"
             android:textStyle="bold"
-            android:visibility="gone"
             tools:ignore="HardcodedText" />
 
     <EditText
@@ -171,7 +170,6 @@
             android:textColor="#333333"
             android:textSize="15sp"
             android:theme="@style/EditTextStyle"
-            android:visibility="gone"
             tools:ignore="Autofill,TextFields" />
 
     <TextView

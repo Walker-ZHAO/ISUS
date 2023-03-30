@@ -9,6 +9,21 @@ package net.ischool.isus
  * Date: 2017/10/23
  */
 
+// 默认的服务器地址（普通模式）
+const val DEFAULT_API_HOST = "http://cdn.schools.i-school.net"
+// 服务器访问路径（普通模式）
+const val API_PATH = "/"
+
+// 默认的服务器地址（安全增强模式）
+const val DEFAULT_SE_API_HOST = "https://cc.i-school.net"
+// 服务器访问路径（安全增强模式）
+const val SE_API_PATH = "/www/"
+
+// 默认的证书下载服务器地址
+const val DEFAULT_PEM_DOWNLOAD_HOST = "http://update.i-school.net"
+// 证书下载路径
+const val PEM_DOWNLOAD_PATH = "/zxedu-system-images/schools/"
+
 const val DEFAULT_DOMAIN = "i-school.net"
 
 // 默认的服务器地址
