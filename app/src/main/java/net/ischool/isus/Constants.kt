@@ -27,6 +27,12 @@ const val DEFAULT_PEM_DOWNLOAD_HOST = "http://update.i-school.net"
 // 证书下载路径
 const val PEM_DOWNLOAD_PATH = "/zxedu-system-images/schools/"
 
+// 默认的附件上传服务器地址
+const val  DEFAULT_ATT_HOST = "https://att.i-school.net/"
+
+// 默认的Web页服务器地址
+const val  DEFAULT_STATIC_HOST = "https://static.i-school.net/"
+
 // 默认的服务器地址
 val END_POINT by lazy { PreferenceManager.instance.getPlatformApi() }
 

@@ -14,7 +14,10 @@
     <string name="config_sid">学校ID: %s</string>
     <string name="config_server">服务器地址：%s</string>
     <string name="config_platform_api">平台服务器地址：%s</string>
+    <string name="config_platform_att">附件服务器地址：%s</string>
+    <string name="config_platform_static">静态服务器地址：%s</string>
     <string name="config_platform_mq">MQ地址：%s</string>
+    <string name="config_iam_package">IAM配置：%s</string>
     <string name="config_comet">推送地址：</string>
     <string name="config_device_type">设备类型：%s</string>
 

@@ -32,6 +32,9 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     private val _protocal: Preference<String>        /** 服务器支持的协议 **/
     private val _platformApi: Preference<String>     /** 部署平台的服务器地址 **/
     private val _platformMq: Preference<String>      /** 部署平台的MQ地址 **/
+    private val _platformAtt: Preference<String>     /** 部署平台的附件服务器地址 **/
+    private val _platformStatic: Preference<String>  /** 部署平台的Web页地址 **/
+    private val _iamPackage: Preference<String>      /** 部署平台的IAM认证配置 **/
     private val _type: Preference<Int>               /** 设备类型 **/
     private val _base64QR: Preference<String>        /** Base64 编码的二维码 **/
     private val _parameter: Preference<String>       /** 额外的参数配置 **/
@@ -51,6 +54,9 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
         _protocal = rxPreference.getString(KEY_PROTOCAL)
         _platformApi = rxPreference.getString(KEY_PLATFORM_API)
         _platformMq = rxPreference.getString(KEY_PLATFORM_MQ)
+        _platformAtt = rxPreference.getString(KEY_PLATFORM_ATT)
+        _platformStatic = rxPreference.getString(KEY_PLATFORM_STATIC)
+        _iamPackage = rxPreference.getString(KEY_IAM_PACKAGE)
         _type = rxPreference.getInteger(KEY_TYPE)
         _base64QR = rxPreference.getString(KEY_QR)
         _parameter = rxPreference.getString(KEY_PARAMETER)
@@ -90,6 +96,9 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
         private const val  KEY_PROTOCAL = "PROTOCAL"
         private const val  KEY_PLATFORM_API = "platform_api"
         private const val  KEY_PLATFORM_MQ = "platform_mq"
+        private const val  KEY_PLATFORM_ATT = "platform_att"
+        private const val  KEY_PLATFORM_STATIC = "platform_static"
+        private const val  KEY_IAM_PACKAGE = "iam_package"
         private const val  KEY_TYPE = "TYPE"
         private const val  KEY_QR = "QR"
         private const val  KEY_PARAMETER = "PARAMETER"
@@ -106,6 +115,9 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     fun getProtocal() = _protocal.get()
     fun getPlatformApi() = _platformApi.get()
     fun getPlatformMq() = _platformMq.get()
+    fun getPlatformAtt() = _platformAtt.get()
+    fun getPlatformStatic() = _platformStatic.get()
+    fun getIamPackage() = _iamPackage.get()
     fun getDeviceType() = _type.get()
     fun getQR() = _base64QR.get()
     fun getParameter() = Gson().fromJson<Map<String, String>>(_parameter.get())?:HashMap()
@@ -126,6 +138,9 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     fun setProtocal(pro: String) = _protocal.set(pro)
     fun setPlatformApi(api: String) = _platformApi.set(api)
     fun setPlatformMq(mq: String) = _platformMq.set(mq)
+    fun setPlatformAtt(att: String) = _platformAtt.set(att)
+    fun setPlatformStatic(static: String) = _platformStatic.set(static)
+    fun setIamPackage(iamPackage: String) = _iamPackage.set(iamPackage)
     private fun setDeviceType(deviceType: Int) = _type.set(deviceType)
     fun setQR(qr: String) = _base64QR.set(qr)
     fun setParameter(param: Map<String, String>) = _parameter.set(Gson().toJson(param))

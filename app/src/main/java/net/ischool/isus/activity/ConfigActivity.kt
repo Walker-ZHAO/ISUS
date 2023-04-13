@@ -33,7 +33,10 @@ class ConfigActivity : AppCompatActivity() {
         text_school_id.text = getString(R.string.config_sid, PreferenceManager.instance.getSchoolId())
         text_server.text = getString(R.string.config_server, "${PreferenceManager.instance.getProtocal()}://${PreferenceManager.instance.getServer()}")
         text_platform_api.text = getString(R.string.config_platform_api, PreferenceManager.instance.getPlatformApi())
+        text_platform_att.text = getString(R.string.config_platform_att, PreferenceManager.instance.getPlatformAtt())
+        text_platform_static.text = getString(R.string.config_platform_static, PreferenceManager.instance.getPlatformStatic())
         text_platform_mq.text = getString(R.string.config_platform_mq, PreferenceManager.instance.getPlatformMq())
+        text_iam_package.text = getString(R.string.config_iam_package, PreferenceManager.instance.getIamPackage())
         text_device.text = getString(R.string.config_device_type, DeviceType.getDeviceName(PreferenceManager.instance.getDeviceType()))
 
         val builder = StringBuilder()

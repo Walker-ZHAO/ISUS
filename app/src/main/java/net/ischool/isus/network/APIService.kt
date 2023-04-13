@@ -179,6 +179,9 @@ interface APIService {
                                 setProtocal(result.data.protocal)
                                 val platformApi = result.data.platformApi
                                 val platformMq = result.data.platformMq
+                                val platformAtt = result.data.platformAtt
+                                val platformStatic = result.data.platformStatic
+                                val iamPackage = result.data.iamPackage
                                 // 如果服务端未传递自定义配置，则使用默认配置
                                 if (platformApi.isEmpty()) {
                                     if (ISUS.instance.se)
@@ -187,9 +190,9 @@ interface APIService {
                                         setPlatformApi("$DEFAULT_API_HOST$API_PATH")
                                 } else {
                                     if (ISUS.instance.se)
-                                        setPlatformApi("${result.data.platformApi}$SE_API_PATH")
+                                        setPlatformApi("$platformApi$SE_API_PATH")
                                     else
-                                        setPlatformApi("${result.data.platformApi}$API_PATH")
+                                        setPlatformApi("$platformApi$API_PATH")
                                 }
                                 if (platformMq.isEmpty()) {
                                     if (ISUS.instance.se)
@@ -197,8 +200,19 @@ interface APIService {
                                     else
                                         setPlatformMq("amqp://$MQ_DEFAULT_USERNAME:$MQ_DEFAULT_PASSWORD@$MQ_DEFAULT_DOMAIN:$MQ_DEFAULT_POST/")
                                 } else {
-                                    setPlatformMq(result.data.platformMq)
+                                    setPlatformMq(platformMq)
                                 }
+                                if (platformAtt.isEmpty()) {
+                                    setPlatformAtt(DEFAULT_ATT_HOST)
+                                } else {
+                                    setPlatformAtt("$platformAtt/")
+                                }
+                                if (platformStatic.isEmpty()) {
+                                    setPlatformStatic(DEFAULT_STATIC_HOST)
+                                } else {
+                                    setPlatformStatic("$platformStatic/")
+                                }
+                                setIamPackage(iamPackage)
                             }
                             Observable.just(it)
                         } else {

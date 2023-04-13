@@ -17,4 +17,7 @@ data class Metadata(
     val protocal: String,
     @SerializedName(value = "PlatformAPI") val platformApi: String,
     @SerializedName(value = "PlatformMQ") val platformMq: String,
+    @SerializedName(value = "PlatformAtt") val platformAtt: String,
+    @SerializedName(value = "PlatformStatic") val platformStatic: String,
+    @SerializedName(value = "IAMPackage") val iamPackage: String,
 )
