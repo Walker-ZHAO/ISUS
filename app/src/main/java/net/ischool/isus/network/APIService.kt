@@ -58,7 +58,7 @@ interface APIService {
      */
     @FormUrlEncoded
     @POST("eqptapi/init")
-    fun _initDevice(@Field("cmdbid") cmdbid: String, @Field("sid") sid: String, @Field("se") se: Int): Observable<Response<Result<Metadata>>>
+    fun _initDevice(@Field("cmdbid") cmdbid: String, @Field("sid") sid: String, @Field("se") se: Int, @Field("iam") iam: String): Observable<Response<Result<Metadata>>>
 
     /**
      * 获取配置信息
@@ -166,7 +166,7 @@ interface APIService {
 
         fun initDevice(cmdbid: String, sid: String): Observable<Response<Result<Metadata>>> {
             val se = if (ISUS.instance.se) 1 else 0
-            return instance._initDevice(cmdbid, sid, se)
+            return instance._initDevice(cmdbid, sid, se, ISUS.instance.iam)
                     .flatMap {
                         val result = checkNotNull(it.body())
                         if (result.errno == RESULT_OK) {
