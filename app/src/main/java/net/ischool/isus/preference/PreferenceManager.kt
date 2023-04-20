@@ -113,8 +113,18 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     fun getToken() = _token.get()
     fun getServer() = _serverAddress.get()
     fun getProtocal() = _protocal.get()
-    fun getPlatformApi() = _platformApi.get()
-    fun getPlatformMq() = _platformMq.get()
+    fun getPlatformApi() = _platformApi.get().ifEmpty {
+        if (ISUS.instance.se)
+            "$DEFAULT_SE_API_HOST$SE_API_PATH"
+        else
+            "$DEFAULT_API_HOST$API_PATH"
+    }
+    fun getPlatformMq() = _platformMq.get().ifEmpty {
+        if (ISUS.instance.se)
+            "amqps://$MQ_DEFAULT_SE_DOMAIN:$MQ_DEFAULT_SE_POST/"
+        else
+            "amqp://$MQ_DEFAULT_USERNAME:$MQ_DEFAULT_PASSWORD@$MQ_DEFAULT_DOMAIN:$MQ_DEFAULT_POST/"
+    }
     fun getPlatformAtt() = _platformAtt.get()
     fun getPlatformStatic() = _platformStatic.get()
     fun getIamPackage() = _iamPackage.get()
