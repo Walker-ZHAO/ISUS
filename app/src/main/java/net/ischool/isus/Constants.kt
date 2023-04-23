@@ -60,7 +60,7 @@ const val UDP_PORT = 514
 // 通用配置，根据初始化时配置的MQ地址解析得到
 val MQ_DOMAIN: String by lazy { Uri.parse(PreferenceManager.instance.getPlatformMq()).host }
 val MQ_PORT: Int by lazy { Uri.parse(PreferenceManager.instance.getPlatformMq()).port }
-val MQ_VHOST: String by lazy { Uri.parse(PreferenceManager.instance.getPlatformMq()).path }
+val MQ_VHOST: String by lazy { Uri.parse(PreferenceManager.instance.getPlatformMq()).pathSegments.joinToString("/").ifEmpty { "/" } }
 val MQ_NEED_PEM: Boolean by lazy { Uri.parse(PreferenceManager.instance.getPlatformMq()).scheme?.endsWith('s') ?: false }
 val MQ_USERNAME: String by lazy { Uri.parse(PreferenceManager.instance.getPlatformMq()).userInfo?.split(":")?.first() ?: MQ_DEFAULT_USERNAME }
 val MQ_PASSWORD: String by lazy { Uri.parse(PreferenceManager.instance.getPlatformMq()).userInfo?.split(":")?.get(1) ?: MQ_DEFAULT_PASSWORD }
