@@ -27,7 +27,6 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_init.*
 import net.ischool.isus.*
 import net.ischool.isus.io.PUBLIC_KEY
-import net.ischool.isus.io.decrypt
 import net.ischool.isus.io.decryptSpilt
 import net.ischool.isus.io.getPublicKey
 import net.ischool.isus.model.QRInfo
@@ -227,7 +226,7 @@ class InitActivity : RxAppCompatActivity() {
                 .flatMap {
                     val result = checkNotNull(it.body())
                     if (result.errno == net.ischool.isus.RESULT_OK) {
-                        APIService.initDevice(set_cmdb_id.text.toString(), result.data.school_id.toString())
+                        APIService.initDevice(set_cmdb_id.text.toString(), result.data.schoolId.toString())
                     } else {
                         Observable.error(Throwable(result.error))
                     }

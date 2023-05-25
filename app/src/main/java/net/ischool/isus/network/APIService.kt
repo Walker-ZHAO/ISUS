@@ -162,7 +162,17 @@ interface APIService {
 
         private val delivery: Handler by lazy { Handler(Looper.getMainLooper()) }
 
-        fun getSchoolId() = instance._getSchoolId()
+        fun getSchoolId(): Observable<Response<Result<SchoolInfo>>> {
+            return instance._getSchoolId().flatMap {
+                val result = checkNotNull(it.body())
+                if (result.errno == RESULT_OK) {
+                    PreferenceManager.instance.setCdnUrl(result.data.httpsApi)
+                    Observable.just(it)
+                } else {
+                    Observable.error(Throwable("getSchool: ${result.errno} : ${result.error}"))
+                }
+            }
+        }
 
         fun initDevice(cmdbid: String, sid: String): Observable<Response<Result<Metadata>>> {
             val se = if (ISUS.instance.se) 1 else 0

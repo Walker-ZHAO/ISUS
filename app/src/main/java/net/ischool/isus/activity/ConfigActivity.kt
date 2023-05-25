@@ -31,7 +31,7 @@ class ConfigActivity : AppCompatActivity() {
         qr_image.setBase64(PreferenceManager.instance.getQR(), Base64.DEFAULT)
         text_cmdbid.text = getString(R.string.config_cmdb, PreferenceManager.instance.getCMDB())
         text_school_id.text = getString(R.string.config_sid, PreferenceManager.instance.getSchoolId())
-        text_server.text = getString(R.string.config_server, "${PreferenceManager.instance.getProtocal()}://${PreferenceManager.instance.getServer()}")
+        text_server.text = getString(R.string.config_server, PreferenceManager.instance.getCdnUrl())
         text_platform_api.text = getString(R.string.config_platform_api, PreferenceManager.instance.getPlatformApi())
         text_platform_att.text = getString(R.string.config_platform_att, PreferenceManager.instance.getPlatformAtt())
         text_platform_static.text = getString(R.string.config_platform_static, PreferenceManager.instance.getPlatformStatic())

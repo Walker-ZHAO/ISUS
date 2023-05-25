@@ -34,6 +34,7 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     private val _platformMq: Preference<String>      /** 部署平台的MQ地址 **/
     private val _platformAtt: Preference<String>     /** 部署平台的附件服务器地址 **/
     private val _platformStatic: Preference<String>  /** 部署平台的Web页地址 **/
+    private val _cdnUrl: Preference<String>          /** 边缘云服务器地址 **/
     private val _iamPackage: Preference<String>      /** 部署平台的IAM认证配置 **/
     private val _type: Preference<Int>               /** 设备类型 **/
     private val _base64QR: Preference<String>        /** Base64 编码的二维码 **/
@@ -56,6 +57,7 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
         _platformMq = rxPreference.getString(KEY_PLATFORM_MQ)
         _platformAtt = rxPreference.getString(KEY_PLATFORM_ATT)
         _platformStatic = rxPreference.getString(KEY_PLATFORM_STATIC)
+        _cdnUrl = rxPreference.getString(KEY_CDN_URL)
         _iamPackage = rxPreference.getString(KEY_IAM_PACKAGE)
         _type = rxPreference.getInteger(KEY_TYPE)
         _base64QR = rxPreference.getString(KEY_QR)
@@ -64,7 +66,7 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     }
 
     override fun toString(): String {
-        return "{CMDB ID : ${getCMDB()}, School ID : ${getSchoolId()}, Token : ${getToken()}, Server Address : ${getServer()}, Protocal : ${getProtocal()}, Platform API : ${getPlatformApi()}, Platform MQ : ${getPlatformMq()}, Type : ${getDeviceType()}, Parameter : ${_parameter.get()}}"
+        return "{CMDB ID : ${getCMDB()}, School ID : ${getSchoolId()}, Token : ${getToken()}, Server Address : ${getCdnUrl()}, Platform API : ${getPlatformApi()}, Platform MQ : ${getPlatformMq()}, Type : ${getDeviceType()}, Parameter : ${_parameter.get()}}"
     }
 
     companion object {
@@ -98,6 +100,7 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
         private const val  KEY_PLATFORM_MQ = "platform_mq"
         private const val  KEY_PLATFORM_ATT = "platform_att"
         private const val  KEY_PLATFORM_STATIC = "platform_static"
+        private const val  KEY_CDN_URL = "cdn_url"
         private const val  KEY_IAM_PACKAGE = "iam_package"
         private const val  KEY_TYPE = "TYPE"
         private const val  KEY_QR = "QR"
@@ -127,6 +130,7 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     }
     fun getPlatformAtt() = _platformAtt.get()
     fun getPlatformStatic() = _platformStatic.get()
+    fun getCdnUrl() = _cdnUrl.get()
     fun getIamPackage() = _iamPackage.get()
     fun getDeviceType() = _type.get()
     fun getQR() = _base64QR.get()
@@ -150,6 +154,7 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     fun setPlatformMq(mq: String) = _platformMq.set(mq)
     fun setPlatformAtt(att: String) = _platformAtt.set(att)
     fun setPlatformStatic(static: String) = _platformStatic.set(static)
+    fun setCdnUrl(url: String) = _cdnUrl.set(url)
     fun setIamPackage(iamPackage: String) = _iamPackage.set(iamPackage)
     private fun setDeviceType(deviceType: Int) = _type.set(deviceType)
     fun setQR(qr: String) = _base64QR.set(qr)
