@@ -129,13 +129,14 @@ interface APIService {
      * TODO 具体接口地址跟数据字段，需要跟后台确认
      *
      * @param cmdbid    设备唯一标示符
+     * @param ip        设备IP
      *
      * @return          服务器返回的数据，包括类型，报警时间，报警原因，快速诊断，联系人信息
      *
      */
     @FormUrlEncoded
-    @POST("ischoolsrv/alarm")
-    fun _getAlarm(@Field("cmdbid") cmdbid: String): Observable<Response<Result<AlarmInfo>>>
+    @POST("/sgrid/psi/consoleGetAlarmsList")
+    fun _getAlarm(@Field("cmdbid") cmdbid: String, @Field("ip") ip: String): Observable<Response<Result<AlarmInfo>>>
 
     object Factory {
         fun createService(client: OkHttpClient): APIService {
@@ -334,7 +335,7 @@ interface APIService {
          * 获取边缘云报警信息
          */
         fun getAlarmInfo(): Observable<Response<Result<AlarmInfo>>> {
-            return instance._getAlarm(PreferenceManager.instance.getCMDB())
+            return instance._getAlarm(PreferenceManager.instance.getCMDB(), getIpAddress(ISUS.instance.context))
                 .flatMap {
                     val result = checkNotNull(it.body())
                     if (result.errno == RESULT_OK) {
