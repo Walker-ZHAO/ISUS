@@ -2,6 +2,8 @@ package net.ischool.isus.service
 
 import io.reactivex.rxjava3.core.Observable
 import net.ischool.isus.RESULT_OK
+import net.ischool.isus.model.ALARM_TYPE_DISCONNECT
+import net.ischool.isus.model.ALARM_TYPE_UPGRADE
 import net.ischool.isus.model.AlarmInfo
 import net.ischool.isus.network.APIService
 import net.ischool.isus.preference.PreferenceManager
@@ -46,7 +48,7 @@ fun checkAlarm(cdnVersion: String): Observable<List<AlarmInfo>> {
         // 此处result的报警信息，可能是连接性问题，也可能是版本问题
         val result = it.toMutableList()
         // 边缘云版本过低，更新联系人信息后，进行下一步整合
-        if (it.isNotEmpty() && it.first().type == 6) {
+        if (it.isNotEmpty() && it.first().type == ALARM_TYPE_UPGRADE) {
             val upgradeAlarm =
                 it.first().copy(contact = PreferenceManager.instance.getContactUpgrade())
             // 清空之前的报警信息，重新添加更新联系人后的报警信息
@@ -65,7 +67,7 @@ fun checkAlarm(cdnVersion: String): Observable<List<AlarmInfo>> {
  */
 private fun checkCdnConnectivity(): Observable<List<AlarmInfo>> {
     val alarmInfo = AlarmInfo(
-        1, System.currentTimeMillis(), "控制台设备无法连接边缘云",
+        ALARM_TYPE_DISCONNECT, System.currentTimeMillis(), "控制台设备无法连接边缘云",
         "请检查控制台网络连接是否正常。\n 请检查边缘云设备网络/电源指示灯是否正常。",
         "",
     )
@@ -89,7 +91,7 @@ private fun checkCdnConnectivity(): Observable<List<AlarmInfo>> {
  */
 private fun checkCdnVersion(minVersion: String): Observable<List<AlarmInfo>> {
     val alarmInfo = AlarmInfo(
-        6, System.currentTimeMillis(), "边缘云系统版本较低，请更新至【$minVersion】以上。",
+        ALARM_TYPE_UPGRADE, System.currentTimeMillis(), "边缘云系统版本较低，请更新至【$minVersion】以上。",
         "请联系平台服务商进行处理。",
         "",
     )
@@ -118,14 +120,15 @@ private fun checkCdnVersion(minVersion: String): Observable<List<AlarmInfo>> {
 private fun checkCdnAlarm(otherAlarms: List<AlarmInfo>): Observable<List<AlarmInfo>> {
     return APIService.getAlarmInfo().flatMap {
         val status = checkNotNull(it.body())
+        val result = otherAlarms.toMutableList()
         if (status.errno == RESULT_OK) {
-            // 将服务器报警信息与其他报警信息整合后发布
-            val result = status.list.toMutableList()
-            result.addAll(otherAlarms)
-            Observable.just(result)
-        } else {
-            Observable.just(otherAlarms)
+            // 对服务器报警信息进行清理，过滤无效条目（不包含报警内容的）
+            // 然后与其他报警信息整合后发布
+            result.addAll(status.data.filter { info -> info.reason.isNotEmpty() })
         }
+        // 将报警按优先级排序
+        result.sortBy { alarm -> alarm.priority }
+        Observable.just(result.toList())
     }.onErrorReturn {
         otherAlarms
     }

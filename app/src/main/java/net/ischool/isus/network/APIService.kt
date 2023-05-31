@@ -136,7 +136,7 @@ interface APIService {
      */
     @FormUrlEncoded
     @POST("/sgrid/psi/consoleGetAlarmsList")
-    fun _getAlarm(@Field("cmdbid") cmdbid: String, @Field("ip") ip: String): Observable<Response<Result<AlarmInfo>>>
+    fun _getAlarm(@Field("cmdbid") cmdbid: String, @Field("ip") ip: String): Observable<Response<Result<List<AlarmInfo>>>>
 
     object Factory {
         fun createService(client: OkHttpClient): APIService {
@@ -334,19 +334,18 @@ interface APIService {
         /**
          * 获取边缘云报警信息
          */
-        fun getAlarmInfo(): Observable<Response<Result<AlarmInfo>>> {
+        fun getAlarmInfo(): Observable<Response<Result<List<AlarmInfo>>>> {
             return instance._getAlarm(PreferenceManager.instance.getCMDB(), getIpAddress(ISUS.instance.context))
                 .flatMap {
                     val result = checkNotNull(it.body())
                     if (result.errno == RESULT_OK) {
-                        result.list.forEach { info ->
+                        result.data.forEach { info ->
                             // 保存自检类型的联系人信息
                             when (info.type) {
-                                1 -> PreferenceManager.instance.setContactDisconnect(info.contact)
-                                6 -> PreferenceManager.instance.setContactUpgrade(info.contact)
+                                ALARM_TYPE_DISCONNECT -> PreferenceManager.instance.setContactDisconnect(info.contact)
+                                ALARM_TYPE_UPGRADE -> PreferenceManager.instance.setContactUpgrade(info.contact)
                             }
                         }
-                        result.list.dropWhile { info -> info.type == 1 || info.type == 6 }
                         Observable.just(it)
                     }
                     else {
