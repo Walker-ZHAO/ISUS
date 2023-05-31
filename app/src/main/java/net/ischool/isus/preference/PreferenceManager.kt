@@ -39,6 +39,8 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     private val _type: Preference<Int>               /** 设备类型 **/
     private val _base64QR: Preference<String>        /** Base64 编码的二维码 **/
     private val _parameter: Preference<String>       /** 额外的参数配置 **/
+    private val _contactDisconnect: Preference<String>  /** 边缘云无法连接时的联系人信息 **/
+    private val _contactUpgrade: Preference<String>     /** 边缘云版本过低时的联系人信息 **/
 
     init {
         preference = context.getSharedPreferences(CONFIG_PATH, Context.MODE_PRIVATE)
@@ -62,6 +64,8 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
         _type = rxPreference.getInteger(KEY_TYPE)
         _base64QR = rxPreference.getString(KEY_QR)
         _parameter = rxPreference.getString(KEY_PARAMETER)
+        _contactDisconnect = rxPreference.getString(ALARM_DISCONNECT_CONTACT)
+        _contactUpgrade = rxPreference.getString(ALARM_UPGRADE_CONTACT)
         setDeviceType(deviceType)
     }
 
@@ -105,6 +109,10 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
         private const val  KEY_TYPE = "TYPE"
         private const val  KEY_QR = "QR"
         private const val  KEY_PARAMETER = "PARAMETER"
+
+        /** 报警接口需要持久化的联系人信息 **/
+        private const val ALARM_DISCONNECT_CONTACT = "disconnect_contact"
+        private const val ALARM_UPGRADE_CONTACT = "upgrade_contact"
     }
 
     fun getSePemPath() = _sePemPath.get()
@@ -136,6 +144,8 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     fun getQR() = _base64QR.get()
     fun getParameter() = Gson().fromJson<Map<String, String>>(_parameter.get())?:HashMap()
     fun getURL() = "${_protocal.get()}://${_serverAddress.get()}/"
+    fun getContactDisconnect() = _contactDisconnect.get()
+    fun getContactUpgrade() = _contactUpgrade.get()
 
     fun setSePemPath(path: String) = _sePemPath.set(path)
     fun setKeyPass(pass: String) = _keyPass.set(pass)
@@ -159,6 +169,8 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     private fun setDeviceType(deviceType: Int) = _type.set(deviceType)
     fun setQR(qr: String) = _base64QR.set(qr)
     fun setParameter(param: Map<String, String>) = _parameter.set(Gson().toJson(param))
+    fun setContactDisconnect(contact: String) = _contactDisconnect.set(contact)
+    fun setContactUpgrade(contact: String) = _contactUpgrade.set(contact)
 
     /**
      * 语音网关

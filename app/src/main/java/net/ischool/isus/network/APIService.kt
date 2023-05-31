@@ -117,6 +117,26 @@ interface APIService {
     @GET("ischoolsrv/ping?v=2")
     fun _getNetworkStatus(): Observable<Response<Result<NetworkStatus>>>
 
+    /**
+     * 获取边缘云服务器信息
+     */
+    @GET("cdnwebui/Device/SystemPreset")
+    fun _getCdnInfo(): Observable<Response<Result<CdnServerInfo>>>
+
+    /**
+     * 获取报警信息
+     *
+     * TODO 具体接口地址跟数据字段，需要跟后台确认
+     *
+     * @param cmdbid    设备唯一标示符
+     *
+     * @return          服务器返回的数据，包括类型，报警时间，报警原因，快速诊断，联系人信息
+     *
+     */
+    @FormUrlEncoded
+    @POST("ischoolsrv/alarm")
+    fun _getAlarm(@Field("cmdbid") cmdbid: String): Observable<Response<Result<AlarmInfo>>>
+
     object Factory {
         fun createService(client: OkHttpClient): APIService {
             val retrofit = Retrofit.Builder()
@@ -300,7 +320,39 @@ interface APIService {
                 ip)
         }
 
+        /**
+         * 获取网络状态，用于判断边缘云连通性
+         */
         fun getNetworkStatus() = instance._getNetworkStatus()
+
+        /**
+         * 获取边缘云信息，用于判断边缘云是否满足最低要求版本号
+         */
+        fun getCdnInfo() = instance._getCdnInfo()
+
+        /**
+         * 获取边缘云报警信息
+         */
+        fun getAlarmInfo(): Observable<Response<Result<AlarmInfo>>> {
+            return instance._getAlarm(PreferenceManager.instance.getCMDB())
+                .flatMap {
+                    val result = checkNotNull(it.body())
+                    if (result.errno == RESULT_OK) {
+                        result.list.forEach { info ->
+                            // 保存自检类型的联系人信息
+                            when (info.type) {
+                                1 -> PreferenceManager.instance.setContactDisconnect(info.contact)
+                                6 -> PreferenceManager.instance.setContactUpgrade(info.contact)
+                            }
+                        }
+                        result.list.dropWhile { info -> info.type == 1 || info.type == 6 }
+                        Observable.just(it)
+                    }
+                    else {
+                        Observable.error(Throwable("Alarm: ${result.errno} : ${result.error}"))
+                    }
+                }
+        }
 
         /**
          * 取消所有网络请求
