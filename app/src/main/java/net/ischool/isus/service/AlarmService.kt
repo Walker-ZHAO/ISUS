@@ -67,8 +67,8 @@ fun checkAlarm(cdnVersion: String): Observable<List<AlarmInfo>> {
  */
 private fun checkCdnConnectivity(): Observable<List<AlarmInfo>> {
     val alarmInfo = AlarmInfo(
-        ALARM_TYPE_DISCONNECT, System.currentTimeMillis(), "控制台设备无法连接边缘云",
-        "请检查控制台网络连接是否正常。\n 请检查边缘云设备网络/电源指示灯是否正常。",
+        ALARM_TYPE_DISCONNECT, System.currentTimeMillis() / 1000, "控制台设备无法连接边缘云",
+        "请检查控制台网络连接是否正常。\n请检查边缘云设备网络/电源指示灯是否正常。",
         "",
     )
     return APIService.getNetworkStatus().flatMap {
@@ -76,11 +76,11 @@ private fun checkCdnConnectivity(): Observable<List<AlarmInfo>> {
         val result = if (status.errno == RESULT_OK && status.data.sids.contains(PreferenceManager.instance.getSchoolId())) {
             listOf()
         } else {
-            listOf(alarmInfo.copy(ts = System.currentTimeMillis()))
+            listOf(alarmInfo.copy(ts = System.currentTimeMillis() / 1000))
         }
         Observable.just(result)
     }.onErrorReturn {
-        listOf(alarmInfo.copy(ts = System.currentTimeMillis()))
+        listOf(alarmInfo.copy(ts = System.currentTimeMillis() / 1000))
     }
 }
 
@@ -91,7 +91,7 @@ private fun checkCdnConnectivity(): Observable<List<AlarmInfo>> {
  */
 private fun checkCdnVersion(minVersion: String): Observable<List<AlarmInfo>> {
     val alarmInfo = AlarmInfo(
-        ALARM_TYPE_UPGRADE, System.currentTimeMillis(), "边缘云系统版本较低，请更新至【$minVersion】以上。",
+        ALARM_TYPE_UPGRADE, System.currentTimeMillis() / 1000, "边缘云系统版本较低，请更新至【$minVersion】以上。",
         "请联系平台服务商进行处理。",
         "",
     )
@@ -103,14 +103,14 @@ private fun checkCdnVersion(minVersion: String): Observable<List<AlarmInfo>> {
             if (minVersionNum <= currentVersionNum) {
                 listOf()
             } else {
-                listOf(alarmInfo.copy(ts = System.currentTimeMillis()))
+                listOf(alarmInfo.copy(ts = System.currentTimeMillis() / 1000))
             }
         } else {
-            listOf(alarmInfo.copy(ts = System.currentTimeMillis()))
+            listOf(alarmInfo.copy(ts = System.currentTimeMillis() / 1000))
         }
         Observable.just(result)
     }.onErrorReturn {
-        listOf(alarmInfo.copy(ts = System.currentTimeMillis()))
+        listOf(alarmInfo.copy(ts = System.currentTimeMillis() / 1000))
     }
 }
 

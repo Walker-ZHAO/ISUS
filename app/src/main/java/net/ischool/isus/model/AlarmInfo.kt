@@ -12,7 +12,7 @@ import com.google.gson.annotations.SerializedName
 data class AlarmInfo(
     // 报警类型，参考 ALARM_TYPE_*
     @SerializedName("element_id") val type: Int,
-    // 报警时间戳
+    // 报警时间戳，单位秒
     val ts: Long,
     // 报警原因
     @SerializedName("title") val reason: String,
