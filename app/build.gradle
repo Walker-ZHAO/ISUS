@@ -1,23 +1,24 @@
-apply plugin: 'com.android.library'
-
-apply plugin: 'kotlin-android'
-
-apply plugin: 'kotlin-kapt'
-
-apply plugin: 'kotlin-android-extensions'
-
-apply plugin: 'com.github.dcendents.android-maven'
-
-group='com.github.Walker-ZHAO'
+plugins {
+//    apply plugin: 'com.android.application'
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+    id 'kotlin-android-extensions'
+    id 'maven-publish'
+    id 'io.objectbox'
+}
 
 dependencies {
     debugImplementation "io.objectbox:objectbox-android-objectbrowser:$objectboxVersion"
     releaseImplementation "io.objectbox:objectbox-android:$objectboxVersion"
 }
 
-apply plugin: 'io.objectbox'
+//apply plugin: 'io.objectbox'
 
 android {
+
+    namespace 'net.ischool.isus'
+
     compileSdkVersion COMPILE_SDK_VERSION
     defaultConfig {
 //        applicationId "net.ischool.isus"
@@ -53,6 +54,13 @@ android {
     dexOptions {
         jumboMode true
         javaMaxHeapSize "4g"
+    }
+
+    publishing {
+        singleVariant('release') {
+            withSourcesJar()
+            withJavadocJar()
+        }
     }
 }
 
@@ -117,4 +125,21 @@ dependencies {
 
 androidExtensions {
     experimental = true
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            // Creates a Maven publication called "release".
+            release(MavenPublication) {
+                // Applies the component for the release build variant.
+                from components.release
+
+                // You can then customize attributes of the publication as shown below.
+                groupId = 'com.github.Walker-ZHAO'
+                artifactId = 'ISUS'
+                version = ISUS_VERSION
+            }
+        }
+    }
 }
