@@ -4,7 +4,6 @@ plugins {
     id 'kotlin-android'
     id 'kotlin-kapt'
     id 'maven-publish'
-//    id 'io.objectbox'
 }
 
 dependencies {
@@ -98,7 +97,7 @@ dependencies {
     // Gson
     implementation 'com.google.code.gson:gson:2.8.6'
     // RxPermission
-    implementation 'com.tbruyelle.rxpermissions2:rxpermissions:0.9.4@aar'
+    implementation 'com.github.tbruyelle:rxpermissions:0.12'
     // Logger
     implementation 'com.orhanobut:logger:2.1.1'
     // Useful Extension

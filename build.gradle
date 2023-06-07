@@ -2,7 +2,7 @@
 
 buildscript {
     ext.kotlin_version = '1.8.10'
-    ext.objectboxVersion = '2.6.0'
+    ext.objectboxVersion = '3.6.0'
 
     ext.ISUS_VERSION = '0.6.1'
     ext.ISUS_VERSION_CODE = 196
@@ -12,7 +12,6 @@ buildscript {
 
     repositories {
         google()
-        jcenter()
         mavenCentral()
     }
     dependencies {
@@ -25,7 +24,6 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
         mavenCentral()
         maven { url 'https://jitpack.io' }
     }

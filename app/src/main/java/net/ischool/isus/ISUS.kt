@@ -2,11 +2,11 @@ package net.ischool.isus
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
+import androidx.fragment.app.FragmentActivity
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
-import com.tbruyelle.rxpermissions2.RxPermissions
+import com.tbruyelle.rxpermissions3.RxPermissions
 import com.walker.anke.framework.toast
 import net.ischool.isus.command.CommandParser
 import net.ischool.isus.command.ICommand
@@ -46,7 +46,7 @@ class ISUS(val context: Context, val se: Boolean, val iam: String) {
             Logger.addLogAdapter(AndroidLogAdapter())
             PreferenceManager.initPreference(context, deviceType)
             ObjectBox.init(context)
-            if (context is Activity) {
+            if (context is FragmentActivity) {
                 val rxPermission = RxPermissions(context)
                 rxPermission.request(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         .subscribe {

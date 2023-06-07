@@ -2,12 +2,14 @@ package net.ischool.isus.db
 
 import android.content.Context
 import io.objectbox.BoxStore
-import io.objectbox.android.AndroidObjectBrowser
+import io.objectbox.android.Admin
 import io.objectbox.kotlin.boxFor
 import io.objectbox.kotlin.query
+import net.ischool.isus.BuildConfig
 import net.ischool.isus.model.MyObjectBox
 import net.ischool.isus.model.User
 import net.ischool.isus.model.User_
+
 
 /**
  * DB 工具
@@ -30,7 +32,9 @@ class ObjectBox {
             // 浏览器可查看数据
             // 'adb forward tcp:[pc port] tcp:[device port]'
             // http://localhost:pc_port/index.html
-            AndroidObjectBrowser(boxStore).start(context.applicationContext)
+            if (BuildConfig.DEBUG) {
+                Admin(boxStore).start(context.applicationContext)
+            }
         }
 
         // 用户实体操作类
@@ -56,7 +60,7 @@ class ObjectBox {
          * 查找用户
          * @param cardNum   卡号
          */
-        fun findUser(cardNum: String) = userBox.query { equal(User_.cardNum, cardNum) }.findFirst()
+        fun findUser(cardNum: String) = userBox.query { User_.cardNum.equal(cardNum) }.findFirst()
 
         /**
          * 关闭数据库
