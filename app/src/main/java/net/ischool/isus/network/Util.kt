@@ -29,7 +29,7 @@ fun getIpAddress(context: Context): String {
                         while (enumIpAddr.hasMoreElements()) {
                             val inetAddress = enumIpAddr.nextElement()
                             if (!inetAddress.isLoopbackAddress && inetAddress is Inet4Address) {
-                                return inetAddress.getHostAddress()
+                                return inetAddress.getHostAddress() ?: ""
                             }
                         }
                     }
@@ -65,7 +65,7 @@ fun getLocalIP(): String {
             while (enumIpAddr.hasMoreElements()) {
                 val inetAddress = enumIpAddr.nextElement()
                 if (!inetAddress.isLoopbackAddress && inetAddress is Inet4Address) {
-                    return inetAddress.getHostAddress()
+                    return inetAddress.getHostAddress() ?: ""
                 }
             }
         }

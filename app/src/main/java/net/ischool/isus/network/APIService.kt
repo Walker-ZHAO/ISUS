@@ -395,7 +395,7 @@ interface APIService {
                     try {
                         inputStream = response.body()?.byteStream()
                         val file = File(destFileDir, if (fileName.isEmpty()) getFileName(url) else fileName)
-                        file.parentFile.mkdir()
+                        file.parentFile?.mkdir()
                         file.createNewFile()
                         fos = FileOutputStream(file)
                         len = inputStream?.read(buf)!!

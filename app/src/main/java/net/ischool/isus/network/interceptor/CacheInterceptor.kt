@@ -20,9 +20,8 @@ class CacheInterceptor : Interceptor {
         private var etag: String = ""
         private var last_modified = ""
     }
-    override fun intercept(chain: Interceptor.Chain?): Response {
-        val safeChain = checkNotNull(chain)
-        val originalRequest = safeChain.request()
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val originalRequest = chain.request()
         val builder: Request.Builder = originalRequest.newBuilder()
         if (isMsgUrl(originalRequest.url().toString())) {
             if (etag.isNotEmpty()) {
@@ -37,7 +36,7 @@ class CacheInterceptor : Interceptor {
             }
         }
 
-        val response = safeChain.proceed(builder.build())
+        val response = chain.proceed(builder.build())
 
         /**
          * 当次返回200->缓存返回的etag与modified头，作为下次访问的请求头

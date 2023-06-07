@@ -63,7 +63,7 @@ class CommandParser private constructor() {
     fun processCommand(command: Command, remoteUUID: String = "") {
         Syslog.logI("ISUS process command: $command", SYSLOG_CATEGORY_RABBITMQ)
         if (canProcess(command)) {
-            when (command.cmd.toLowerCase(Locale.getDefault())) {
+            when (command.cmd.lowercase(Locale.getDefault())) {
                 ICommand.COMMAND_PING -> processor?.ping(remoteUUID)
                 ICommand.COMMAND_CONFIG -> processor?.config(remoteUUID)
                 ICommand.COMMAND_RESET -> processor?.reset(remoteUUID)
@@ -97,7 +97,7 @@ class CommandParser private constructor() {
      */
     private fun canProcess(command: Command): Boolean {
         val cmdbid = PreferenceManager.instance.getCMDB()
-        val version = commandMap[command.cmd.toLowerCase(Locale.getDefault())] ?: -1
+        val version = commandMap[command.cmd.lowercase(Locale.getDefault())] ?: -1
         if (version >= command.cmd_version && cmdbid == command.cmdbid) {
             return true
         }
@@ -105,7 +105,7 @@ class CommandParser private constructor() {
     }
 
     fun genCommand(cmd: String, args: HashMap<String, String>?): Command {
-        val version = commandMap[cmd.toLowerCase(Locale.getDefault())] ?: 0
+        val version = commandMap[cmd.lowercase(Locale.getDefault())] ?: 0
         return Command(version, args ?: hashMapOf(), cmd, PreferenceManager.instance.getCMDB())
     }
 }

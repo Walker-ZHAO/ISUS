@@ -16,9 +16,8 @@ import okhttp3.Response
  */
 class URLInterceptor : Interceptor {
 
-    override fun intercept(chain: Interceptor.Chain?): Response {
-        val safeChain = checkNotNull(chain)
-        var request = safeChain.request()
+    override fun intercept(chain: Interceptor.Chain): Response {
+        var request = chain.request()
         val platformApi = PreferenceManager.instance.getPlatformApi()
         val uri = Uri.parse(platformApi)
         val host = uri.host
@@ -37,6 +36,6 @@ class URLInterceptor : Interceptor {
         val newURL = urlBuilder.build()
         request = request.newBuilder().url(newURL).build()
 
-        return safeChain.proceed(request)
+        return chain.proceed(request)
     }
 }

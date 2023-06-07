@@ -79,11 +79,11 @@ open class CommandProcessorCommon constructor(protected val context: Context) : 
      */
     override fun reset(remoteUUID: String) {
         val result = CommandResult(ICommand.COMMAND_RESET)
-        val appDir = File(context.cacheDir.parent)
+        val appDir = File(context.cacheDir.parent ?: "")
         if (appDir.exists()) {
             appDir.list()
-                .filter { it != "lib" }
-                .forEach {
+                ?.filter { it != "lib" }
+                ?.forEach {
                     deleteDir(File(appDir, it))
                 }
             Process.killProcess(Process.myPid())
@@ -274,7 +274,7 @@ open class CommandProcessorCommon constructor(protected val context: Context) : 
      */
     private fun deleteDir(dir: File): Boolean {
         if (dir.isDirectory) {
-            dir.list().forEach {
+            dir.list()?.forEach {
                 val success = deleteDir(File(dir, it))
                 if (!success)
                     return false

@@ -34,7 +34,7 @@ suspend fun parseHostGetIPAddress(host: String = DEFAULT_HOST): String {
         try {
             val ipAddressArr = mutableListOf<String>()
             InetAddress.getAllByName(host)?.forEach {
-                ipAddressArr.add(it.hostAddress)
+                ipAddressArr.add(it.hostAddress ?: "")
             }
             ipAddressArr.forEach { Log.i(LOG_TAG, it) }
             return@back if (ipAddressArr.isEmpty()) "" else ipAddressArr[0]
@@ -105,7 +105,7 @@ fun getProperty(key: String, defaultValue: String): String {
 fun getDeviceID(): String = Settings.Secure.getString(
     ISUS.instance.context.contentResolver,
     Settings.Secure.ANDROID_ID
-).toUpperCase(Locale.getDefault())
+).uppercase(Locale.getDefault())
 
 /**
  * 获取设备信息
