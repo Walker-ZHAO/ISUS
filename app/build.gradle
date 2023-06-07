@@ -62,7 +62,6 @@ android {
 }
 
 dependencies {
-    implementation project(path: ':seewo-sdk')
     api fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.9.0'
@@ -118,6 +117,8 @@ dependencies {
     // Activity Result API
     implementation 'androidx.activity:activity-ktx:1.7.2'
     implementation 'androidx.fragment:fragment-ktx:1.5.7'
+    // 希沃SDK
+    implementation(name:'OpenSDK-releaseBanpai-3.2.48', ext:'aar')
 }
 
 afterEvaluate {

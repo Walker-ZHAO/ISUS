@@ -1,2 +1,0 @@
-configurations.maybeCreate("default")
-artifacts.add("default", file('OpenSDK-releaseBanpai-3.2.48.aar'))
