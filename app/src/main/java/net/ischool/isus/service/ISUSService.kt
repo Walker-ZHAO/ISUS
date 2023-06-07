@@ -144,13 +144,6 @@ class ISUSService : Service() {
     }
 
     private val exceptionHandler = object : DefaultExceptionHandler() {
-        override fun handleFlowListenerException(channel: Channel?, exception: Throwable?) {
-            super.handleFlowListenerException(channel, exception)
-            val msg = "RabbitMQ Flow Exception: ${exception?.cause}"
-            Log.e(LOG_TAG, msg)
-            Syslog.logE(msg, SYSLOG_CATEGORY_RABBITMQ)
-        }
-
         override fun handleBlockedListenerException(connection: Connection?, exception: Throwable?) {
             super.handleBlockedListenerException(connection, exception)
             val msg = "RabbitMQ Blocked Exception: ${exception?.cause}"
