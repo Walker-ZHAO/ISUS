@@ -50,7 +50,7 @@ class CommandProcessorSeeWo(context: Context): CommandProcessorCommon(context){
                 }
 
                 override fun onFailure(request: Request, e: IOException) {
-                    Logger.w(e.message)
+                    Logger.w(e.message ?: "")
                     Syslog.logE("Update file download failure", SYSLOG_CATEGORY_RABBITMQ)
                     result.fail(e.message)
                     finish(result, remoteUUID)
