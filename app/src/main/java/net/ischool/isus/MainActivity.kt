@@ -1,5 +1,6 @@
 package net.ischool.isus
 
+import android.annotation.SuppressLint
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -22,10 +23,10 @@ import com.ys.rkapi.MyManager
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_main.*
 import net.ischool.isus.activity.ConfigActivity
 import net.ischool.isus.activity.InitActivity
 import net.ischool.isus.broadcast.UserSyncReceiver
+import net.ischool.isus.databinding.ActivityMainBinding
 import net.ischool.isus.db.ObjectBox
 import net.ischool.isus.network.APIService
 import net.ischool.isus.preference.PreferenceManager
@@ -40,6 +41,7 @@ import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
 import java.text.SimpleDateFormat
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 /**
@@ -47,25 +49,29 @@ import java.util.concurrent.TimeUnit
  */
 class MainActivity : RxAppCompatActivity() {
 
+    private lateinit var binding: ActivityMainBinding
+
     var mSpeech: TextToSpeech? = null
 
-    val factory by lazy { ConnectionFactory() }
+    private val factory by lazy { ConnectionFactory() }
 
-    var connection: Connection? = null
+    private var connection: Connection? = null
     var channel: Channel? = null
 
+    @SuppressLint("CheckResult")
     @ExperimentalStdlibApi
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         ISUS.init(this, DeviceType.BADGE)
 
-        init.setOnClickListener { startActivity<InitActivity>() }
+        binding.init.setOnClickListener { startActivity<InitActivity>() }
 
-        config.setOnClickListener { startActivity<ConfigActivity>() }
+        binding.config.setOnClickListener { startActivity<ConfigActivity>() }
 
-        ping.clicks()
+        binding.ping.clicks()
                 .debounce(500, TimeUnit.MICROSECONDS)
                 .bindUntilEvent(this, ActivityEvent.DESTROY)
                 .observeOn(Schedulers.io())
@@ -93,7 +99,7 @@ class MainActivity : RxAppCompatActivity() {
                     onError = { Log.e(LOG_TAG, "$it") }
                 )
 
-        reset.clicks()
+        binding.reset.clicks()
             .debounce(500, TimeUnit.MICROSECONDS)
             .bindUntilEvent(this, ActivityEvent.DESTROY)
             .observeOn(Schedulers.io())
@@ -131,7 +137,7 @@ class MainActivity : RxAppCompatActivity() {
                     )
                 }
 
-        btn_start.setOnClickListener {
+        binding.btnStart.setOnClickListener {
             ISUS.instance.startService()
 //            Observable.just(null)
 //                    .subscribe { "$it" }
@@ -139,7 +145,7 @@ class MainActivity : RxAppCompatActivity() {
 //            btn_start.snack("Hello Kotlin")
         }
 
-        btn_stop.setOnClickListener{
+        binding.btnStop.setOnClickListener{
 //            Syslog.logI("Hello syslog")
             ISUS.instance.stopService()
 //            btn_stop.snack("Hello Android") {
@@ -147,35 +153,35 @@ class MainActivity : RxAppCompatActivity() {
 //            }
         }
 
-        mq_test.setOnClickListener {
+        binding.mqTest.setOnClickListener {
             testMQ()
         }
 
-        sync.setOnClickListener {
+        binding.sync.setOnClickListener {
             sendBroadcast(Intent("net.ischool.isus.sync"))
         }
 
-        sync_count.setOnClickListener {
+        binding.syncCount.setOnClickListener {
             toast("sync count: ${PreferenceManager.instance.getSyncCount()}")
         }
 
-        find_user.setOnClickListener {
+        binding.findUser.setOnClickListener {
             ObjectBox.findUser("D5D69AF4A1FD")?.let {
                 longToast("$it")
                 Log.i(LOG_TAG, "$it")
             }
         }
 
-        power_off.setOnClickListener {
+        binding.powerOff.setOnClickListener {
             if (isHikDevice()) {
 
-                val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+                val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
                 val offTime = sdf.parse("2021-01-25 17:04:00")
                 val onTime = sdf.parse("2021-01-25 17:06:00")
 //                val offTime1 = sdf.parse("2020-07-20 09:34:00")
 //                val onTime1 = sdf.parse("2020-07-20 09:36:00")
                 InfoTimeApi.clearPlan()
-                InfoTimeApi.setTimeSwitch(offTime.time, onTime.time)
+                InfoTimeApi.setTimeSwitch(offTime?.time ?: 0, onTime?.time ?: 0)
 //                InfoTimeApi.setTimeSwitch(offTime1.time, onTime1.time)
             } else if (isTouchWoDevice()){
                 val manager = MyManager.getInstance(this)
@@ -219,8 +225,8 @@ class MainActivity : RxAppCompatActivity() {
             }
         }
 
-        udp_start.setOnClickListener { UDPService.start() }
-        udp_stop.setOnClickListener { UDPService.stop() }
+        binding.udpStart.setOnClickListener { UDPService.start() }
+        binding.udpStop.setOnClickListener { UDPService.stop() }
 
 //        Syslog.logI("Hello syslog")
 
@@ -232,14 +238,14 @@ class MainActivity : RxAppCompatActivity() {
         super.onResume()
         registerReceiver(register, IntentFilter(ACTION_COMMAND))
         registerReceiver(syncReceiver, IntentFilter("net.ischool.isus.sync"))
-        registerReceiver(stateRecevier, IntentFilter(ACTION_QUEUE_STATE_CHANGE))
+        registerReceiver(stateReceiver, IntentFilter(ACTION_QUEUE_STATE_CHANGE))
     }
 
     override fun onPause() {
         super.onPause()
         unregisterReceiver(register)
         unregisterReceiver(syncReceiver)
-        unregisterReceiver(stateRecevier)
+        unregisterReceiver(stateReceiver)
     }
 
     fun testInit(): Response {
@@ -297,12 +303,12 @@ class MainActivity : RxAppCompatActivity() {
 //    }
 
     fun execRuntimeProcess(cmd: String): Process? {
-        var map = mapOf("1" to 1, "2" to 2)
+        val map = mutableMapOf("1" to 1, "2" to 2)
         map.getOrElse("1") { 0 }
         map += "1" to 90
-        var p: Process? = null
+        val p: Process? = null
         try {
-            val process = Runtime.getRuntime().exec(cmd);
+            val process = Runtime.getRuntime().exec(cmd)
 //            val process = Runtime.getRuntime().exec("su 0", null)
             val in1 = process.inputStream
 //            val STDIN = DataOutputStream(process.outputStream)
@@ -325,29 +331,29 @@ class MainActivity : RxAppCompatActivity() {
 //            }
             process.waitFor()
 
-            val reader1 = BufferedReader(InputStreamReader(in1));
-            var line1 = reader1.readLine();
+            val reader1 = BufferedReader(InputStreamReader(in1))
+            var line1 = reader1.readLine()
             while ( line1 != null) {
-                Log.i(LOG_TAG, "返回结果=" + line1);
+                Log.i(LOG_TAG, "返回结果=$line1")
                 line1 = reader1.readLine()
             }
-            in1.close();
+            in1.close()
         } catch (e: IOException) {
             e.printStackTrace()
         }
-        return p;
+        return p
     }
 
-    val register = object : BroadcastReceiver() {
+    private val register = object : BroadcastReceiver() {
         override fun onReceive(p0: Context?, p1: Intent?) {
             val intent = checkNotNull(p1)
             if (intent.action == ACTION_COMMAND) {
-                val cmd = intent.getStringExtra(EXTRA_CMD)
+                val cmd = intent.getStringExtra(EXTRA_CMD) ?: ""
                 val version = intent.getLongExtra(EXTRA_VERSION, 0L)
-                val cmdbid = intent.getStringExtra(EXTRA_CMDB_ID)
+                val cmdbid = intent.getStringExtra(EXTRA_CMDB_ID) ?: ""
                 val args = intent.getBundleExtra(EXTRA_ARGS)
-                val type = args.getString("type")
-                val content = args.getString("content")
+                val type = args?.getString("type") ?: ""
+                val content = args?.getString("content") ?: ""
 
                 Log.i(LOG_TAG, cmd)
                 Log.i(LOG_TAG, "$version")
@@ -358,9 +364,9 @@ class MainActivity : RxAppCompatActivity() {
         }
     }
 
-    val syncReceiver by lazy { UserSyncReceiver() }
+    private val syncReceiver by lazy { UserSyncReceiver() }
 
-    val stateRecevier = object : BroadcastReceiver() {
+    private val stateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == ACTION_QUEUE_STATE_CHANGE) {
                 longToast("RabbitMQ State: ${ISUSService.queueState}")
@@ -385,7 +391,7 @@ class MainActivity : RxAppCompatActivity() {
             channel?.basicQos(1)
 
             // 随机命名一个队列名称
-            val queueName = "tester";
+            val queueName = "tester"
             // 声明交换机类型
             channel?.exchangeDeclare("equipment", "topic", true)
             // 声明队列（持久的、非独占的、连接断开后队列会自动删除）
@@ -436,11 +442,11 @@ class MainActivity : RxAppCompatActivity() {
         super.onDestroy()
     }
 
-    fun isHikDevice(): Boolean {
+    private fun isHikDevice(): Boolean {
         try {   // 通过使用海康SDK获取主板信息判断是否为海康设备
             InfoSystemApi.getMotherboardType()
             return true
-        } catch (e: Exception) { }
+        } catch (_: Exception) { }
         return false
     }
 }

@@ -24,8 +24,8 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_init.*
 import net.ischool.isus.*
+import net.ischool.isus.databinding.ActivityInitBinding
 import net.ischool.isus.io.PUBLIC_KEY
 import net.ischool.isus.io.decryptSpilt
 import net.ischool.isus.io.getPublicKey
@@ -56,21 +56,23 @@ class InitActivity : RxAppCompatActivity() {
         private const val SCAN_REQUEST_CODE = 100
     }
 
+    private lateinit var binding: ActivityInitBinding
     private val receiver = CMDBUpdateReceiver()
 
     @SuppressLint("CheckResult")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_init)
-        tool_bar.setTitle(R.string.device_init_title)
-        setSupportActionBar(tool_bar)
+        binding = ActivityInitBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        binding.toolBar.setTitle(R.string.device_init_title)
+        setSupportActionBar(binding.toolBar)
 
-        ok_btn.clicks()
+        binding.okBtn.clicks()
             .debounce(1, TimeUnit.SECONDS)
             .bindUntilEvent(this, ActivityEvent.DESTROY)
             .subscribe { init() }
 
-        scanBtn.clicks()
+        binding.scanBtn.clicks()
             .debounce(1, TimeUnit.SECONDS)
             .bindUntilEvent(this, ActivityEvent.DESTROY)
             .subscribe {
@@ -79,21 +81,23 @@ class InitActivity : RxAppCompatActivity() {
             }
 
         if (applicationContext.packageName == SAFETY_APP) {
-            safety_logo.visiable()
-            safety_title.visiable()
-            safety_subtitle.visiable()
+            binding.safetyLogo.visiable()
+            binding.safetyTitle.visiable()
+            binding.safetySubtitle.visiable()
         }
         if (ISUS.instance.se) {
-            set_school_id_tip.visiable()
-            set_school_id.visiable()
-            set_pass_code_tip.visiable()
-            set_pass_code.visiable()
-            set_pem_tip.visiable()
-            set_pem.visiable()
-            set_pem.setText(DEFAULT_PEM_DOWNLOAD_HOST)
-            set_domain.setText(DEFAULT_SE_API_HOST)
+            binding.apply {
+                setSchoolIdTip.visiable()
+                setSchoolId.visiable()
+                setPassCodeTip.visiable()
+                setPassCode.visiable()
+                setPemTip.visiable()
+                setPem.visiable()
+                setPem.setText(DEFAULT_PEM_DOWNLOAD_HOST)
+                setDomain.setText(DEFAULT_SE_API_HOST)
+            }
         } else {
-            set_domain.setText(DEFAULT_API_HOST)
+            binding.setDomain.setText(DEFAULT_API_HOST)
         }
 
         autoInit(getCMDB())
@@ -144,17 +148,19 @@ class InitActivity : RxAppCompatActivity() {
         val json = String(decryptData, Charset.defaultCharset())
         // 解析JSON实体
         val qrInfo = Gson().fromJson<QRInfo>(json)
-        // 填充数据
-        set_school_id.setText("${qrInfo.sid}")
-        set_cmdb_id.setText("${qrInfo.cmdbid}")
-        set_pass_code.setText(qrInfo.code)
-        set_domain.setText(qrInfo.server)
-        // 如果没有证书地址，代表无需要配置证书，清空输入框的默认地址
-        set_pem.setText(qrInfo.certificate ?: "")
+        binding.apply {
+            // 填充数据
+            setSchoolId.setText("${qrInfo.sid}")
+            setCmdbId.setText("${qrInfo.cmdbid}")
+            setPassCode.setText(qrInfo.code)
+            setDomain.setText(qrInfo.server)
+            // 如果没有证书地址，代表无需要配置证书，清空输入框的默认地址
+            setPem.setText(qrInfo.certificate ?: "")
+        }
     }
 
     private fun init() {
-        val host = set_domain.text
+        val host = binding.setDomain.text
         if (host.isEmpty()) {
             runOnUiThread { toast("请输入服务器地址") }
             return
@@ -190,13 +196,15 @@ class InitActivity : RxAppCompatActivity() {
                     longToast("命令行参数不正确！无法自动完成初始化！")
                     return
                 }
-                set_cmdb_id.setText(args[0])
-                set_school_id.setText(args[1])
-                set_pass_code.setText(args[2])
+                binding.apply {
+                    setCmdbId.setText(args[0])
+                    setSchoolId.setText(args[1])
+                    setPassCode.setText(args[2])
+                }
             } else {
-                set_cmdb_id.setText(cmdb)
+                binding.setCmdbId.setText(cmdb)
             }
-            ok_btn.performClick()
+            binding.okBtn.performClick()
         }
     }
 
@@ -213,7 +221,7 @@ class InitActivity : RxAppCompatActivity() {
     private fun initPoor() {
         var dialog: ProgressDialog? = null
 
-        if (set_cmdb_id.text.isEmpty()) {
+        if (binding.setCmdbId.text.isEmpty()) {
             runOnUiThread { toast("CMDB ID不能为空") }
         } else {
             runOnUiThread { dialog = indeterminateProgressDialog(getString(R.string.init_dialog_title)) {
@@ -226,7 +234,7 @@ class InitActivity : RxAppCompatActivity() {
                 .flatMap {
                     val result = checkNotNull(it.body())
                     if (result.errno == net.ischool.isus.RESULT_OK) {
-                        APIService.initDevice(set_cmdb_id.text.toString(), result.data.schoolId.toString())
+                        APIService.initDevice(binding.setCmdbId.text.toString(), result.data.schoolId.toString())
                     } else {
                         Observable.error(Throwable(result.error))
                     }
@@ -258,10 +266,10 @@ class InitActivity : RxAppCompatActivity() {
      */
     @SuppressLint("CheckResult")
     private fun initSe() {
-        val schoolId = set_school_id.text.toString()
-        val passCode = set_pass_code.text.toString()
-        val cmdbId = set_cmdb_id.text.toString()
-        val pemHost = set_pem.text.toString()
+        val schoolId = binding.setSchoolId.text.toString()
+        val passCode = binding.setPassCode.text.toString()
+        val cmdbId = binding.setCmdbId.text.toString()
+        val pemHost = binding.setPem.text.toString()
         val pemDownloadUrl = if (pemHost.isNotEmpty()) "$pemHost${PEM_DOWNLOAD_PATH}schoolcdn-$schoolId-$passCode.p12" else ""
 
         if (schoolId.isEmpty() || passCode.isEmpty() || cmdbId.isEmpty()) {

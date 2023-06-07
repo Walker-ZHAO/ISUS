@@ -3,9 +3,8 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id 'kotlin-kapt'
-    id 'kotlin-android-extensions'
     id 'maven-publish'
-    id 'io.objectbox'
+//    id 'io.objectbox'
 }
 
 dependencies {
@@ -13,7 +12,7 @@ dependencies {
     releaseImplementation "io.objectbox:objectbox-android:$objectboxVersion"
 }
 
-//apply plugin: 'io.objectbox'
+apply plugin: 'io.objectbox'
 
 android {
 
@@ -23,7 +22,7 @@ android {
     defaultConfig {
 //        applicationId "net.ischool.isus"
         minSdkVersion MIN_SDK_VERSION
-        targetSdkVersion TARGET_SDK_VERSION
+        targetSdkVersion COMPILE_SDK_VERSION
         versionCode ISUS_VERSION_CODE
         versionName ISUS_VERSION
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -39,21 +38,20 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
+        jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
     lintOptions {
         abortOnError false
     }
 
-    dexOptions {
-        jumboMode true
-        javaMaxHeapSize "4g"
+    buildFeatures {
+        viewBinding true
     }
 
     publishing {
@@ -74,7 +72,7 @@ dependencies {
     androidTestImplementation'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
     // Kotlin
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.4.2"
@@ -121,10 +119,6 @@ dependencies {
     // Activity Result API
     implementation 'androidx.activity:activity-ktx:1.2.0-rc01'
     implementation 'androidx.fragment:fragment-ktx:1.3.0-rc01'
-}
-
-androidExtensions {
-    experimental = true
 }
 
 afterEvaluate {

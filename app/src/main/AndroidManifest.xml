@@ -23,7 +23,8 @@
             tools:replace="android:extractNativeLibs">
         <activity
             android:name=".MainActivity"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppTheme"
+            android:exported="true">
             <!--<intent-filter>-->
                 <!--<action android:name="android.intent.action.MAIN" />-->
 
@@ -31,20 +32,23 @@
             <!--</intent-filter>-->
         </activity>
         <activity android:name=".activity.ScanActivity"
-                android:theme="@style/PreviewTheme"/>
+                android:theme="@style/PreviewTheme"
+                android:exported="true"/>
 
         <activity
             android:name=".activity.ConfigActivity"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme"
+            android:exported="true"/>
 
         <activity
             android:name=".activity.InitActivity"
             android:theme="@style/AppTheme"
-                android:exported="true"/>
+            android:exported="true"/>
 
         <activity
                 android:name=".activity.UserSyncActivity"
-                android:theme="@style/AppTheme"/>
+                android:theme="@style/AppTheme"
+                android:exported="true"/>
 
         <provider
             android:name="androidx.core.content.FileProvider"

@@ -5,11 +5,11 @@ import androidx.appcompat.app.AppCompatActivity
 import android.util.Base64
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.walker.anke.framework.setBase64
-import kotlinx.android.synthetic.main.activity_config.*
 import net.ischool.isus.DeviceType
 import net.ischool.isus.R
 import net.ischool.isus.command.CommandParser
 import net.ischool.isus.command.ICommand
+import net.ischool.isus.databinding.ActivityConfigBinding
 import net.ischool.isus.preference.ExternalParameter
 import net.ischool.isus.preference.PreferenceManager
 
@@ -22,22 +22,27 @@ import net.ischool.isus.preference.PreferenceManager
  */
 class ConfigActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityConfigBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_config)
-        tool_bar.setTitle(R.string.config_title)
-        setSupportActionBar(tool_bar)
+        binding = ActivityConfigBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        binding.toolBar.setTitle(R.string.config_title)
+        setSupportActionBar(binding.toolBar)
 
-        qr_image.setBase64(PreferenceManager.instance.getQR(), Base64.DEFAULT)
-        text_cmdbid.text = getString(R.string.config_cmdb, PreferenceManager.instance.getCMDB())
-        text_school_id.text = getString(R.string.config_sid, PreferenceManager.instance.getSchoolId())
-        text_server.text = getString(R.string.config_server, PreferenceManager.instance.getCdnUrl())
-        text_platform_api.text = getString(R.string.config_platform_api, PreferenceManager.instance.getPlatformApi())
-        text_platform_att.text = getString(R.string.config_platform_att, PreferenceManager.instance.getPlatformAtt())
-        text_platform_static.text = getString(R.string.config_platform_static, PreferenceManager.instance.getPlatformStatic())
-        text_platform_mq.text = getString(R.string.config_platform_mq, PreferenceManager.instance.getPlatformMq())
-        text_iam_package.text = getString(R.string.config_iam_package, PreferenceManager.instance.getIamPackage())
-        text_device.text = getString(R.string.config_device_type, DeviceType.getDeviceName(PreferenceManager.instance.getDeviceType()))
+        binding.apply {
+            qrImage.setBase64(PreferenceManager.instance.getQR(), Base64.DEFAULT)
+            textCmdbid.text = getString(R.string.config_cmdb, PreferenceManager.instance.getCMDB())
+            textSchoolId.text = getString(R.string.config_sid, PreferenceManager.instance.getSchoolId())
+            textServer.text = getString(R.string.config_server, PreferenceManager.instance.getCdnUrl())
+            textPlatformApi.text = getString(R.string.config_platform_api, PreferenceManager.instance.getPlatformApi())
+            textPlatformAtt.text = getString(R.string.config_platform_att, PreferenceManager.instance.getPlatformAtt())
+            textPlatformStatic.text = getString(R.string.config_platform_static, PreferenceManager.instance.getPlatformStatic())
+            textPlatformMq.text = getString(R.string.config_platform_mq, PreferenceManager.instance.getPlatformMq())
+            textIamPackage.text = getString(R.string.config_iam_package, PreferenceManager.instance.getIamPackage())
+            textDevice.text = getString(R.string.config_device_type, DeviceType.getDeviceName(PreferenceManager.instance.getDeviceType()))
+        }
 
         val builder = StringBuilder()
         val map = PreferenceManager.instance.getParameter()
@@ -45,9 +50,9 @@ class ConfigActivity : AppCompatActivity() {
             val title = ExternalParameter.getEXPName(key)?:key
             builder.append("$title：$value \n")
         }
-        text_external.text = builder.toString()
+        binding.textExternal.text = builder.toString()
 
-        btn_reset.setOnClickListener {
+        binding.btnReset.setOnClickListener {
             MaterialAlertDialogBuilder(this).apply {
                 setTitle(R.string.warning)
                 setMessage(R.string.warning_reset)

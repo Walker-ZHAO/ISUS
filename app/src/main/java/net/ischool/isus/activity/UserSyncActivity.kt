@@ -8,9 +8,9 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
-import kotlinx.android.synthetic.main.activity_user_sync.*
 import net.ischool.isus.R
 import net.ischool.isus.SYSLOG_CATEGORY_RABBITMQ
+import net.ischool.isus.databinding.ActivityUserSyncBinding
 import net.ischool.isus.db.ObjectBox
 import net.ischool.isus.log.Syslog
 import net.ischool.isus.network.APIService
@@ -26,15 +26,18 @@ import net.ischool.isus.service.ISUSService
  */
 class UserSyncActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityUserSyncBinding
+
     private val disposables = CompositeDisposable()
     private val uids = mutableListOf<Long>()
     private var syncCount = 0   // 已成功同步的联系人数目
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_user_sync)
-        tool_bar.setTitle(R.string.user_sync_title)
-        setSupportActionBar(tool_bar)
+        binding = ActivityUserSyncBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        binding.toolBar.setTitle(R.string.user_sync_title)
+        setSupportActionBar(binding.toolBar)
 
         startSync()
     }
@@ -82,8 +85,8 @@ class UserSyncActivity : AppCompatActivity() {
                 uids[index],
                 success = {
                     val progress = ((index + 1).toFloat() / uids.size) * 100
-                    progress_bar.progress = progress.toInt()
-                    progress_text.text = getString(R.string.progress_text, progress.toInt())
+                    binding.progressBar.progress = progress.toInt()
+                    binding.progressText.text = getString(R.string.progress_text, progress.toInt())
                     if (index == uids.size - 1) {
                         // 全量同步计数
                         PreferenceManager.instance.apply {

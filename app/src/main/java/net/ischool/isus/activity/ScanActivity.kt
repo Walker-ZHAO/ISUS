@@ -5,7 +5,6 @@ import android.content.Intent
 import android.graphics.ImageFormat
 import android.os.Bundle
 import android.util.DisplayMetrics
-import android.util.Log
 import android.util.Size
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -14,8 +13,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import com.google.zxing.*
 import com.google.zxing.common.HybridBinarizer
-import kotlinx.android.synthetic.main.activity_scan.*
-import net.ischool.isus.R
+import net.ischool.isus.databinding.ActivityScanBinding
 import java.lang.Exception
 import java.nio.ByteBuffer
 import java.util.*
@@ -40,6 +38,8 @@ class ScanActivity: AppCompatActivity() {
         const val SCAN_RESULT = "scan_result"
     }
 
+    private lateinit var binding: ActivityScanBinding
+
     // CameraX 相关
     private val lensFacing: Int = CameraSelector.LENS_FACING_BACK
     private var preview: Preview? = null
@@ -54,8 +54,9 @@ class ScanActivity: AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_scan)
-        back_iv.setOnClickListener { finish() }
+        binding = ActivityScanBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        binding.backIv.setOnClickListener { finish() }
         cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
     }
 
@@ -66,7 +67,7 @@ class ScanActivity: AppCompatActivity() {
 
     private fun setUpCameraX() {
         cameraExecutor = Executors.newSingleThreadExecutor()
-        viewFinder.post { bindCameraUseCases() }
+        binding.viewFinder.post { bindCameraUseCases() }
     }
 
     /**
@@ -74,11 +75,11 @@ class ScanActivity: AppCompatActivity() {
      */
     private fun bindCameraUseCases() {
         // 获取用于设置全屏分辨率相机的屏幕值
-        val metrics = DisplayMetrics().also { viewFinder.display.getRealMetrics(it) }
+        val metrics = DisplayMetrics().also { binding.viewFinder.display.getRealMetrics(it) }
 
         // 获取使用的屏幕比例分辨率属性
         val screenAspectRatio = aspectRatio(metrics.widthPixels / 2, metrics.heightPixels / 2)
-        val width = viewFinder.measuredWidth
+        val width = binding.viewFinder.measuredWidth
         val height = if (screenAspectRatio == AspectRatio.RATIO_16_9) {
             (width * RATIO_16_9_VALUE).toInt()
         } else {
@@ -87,7 +88,7 @@ class ScanActivity: AppCompatActivity() {
         val size = Size(width, height)
 
         // 获取旋转角度
-        val rotation = viewFinder.display.rotation
+        val rotation = binding.viewFinder.display.rotation
 
         val cameraSelector = CameraSelector.Builder().requireLensFacing(lensFacing).build()
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
@@ -122,7 +123,7 @@ class ScanActivity: AppCompatActivity() {
                 // 绑定Fragment生命周期
                 camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalyzer)
                 // 设置预览的View
-                preview?.setSurfaceProvider(viewFinder.surfaceProvider)
+                preview?.setSurfaceProvider(binding.viewFinder.surfaceProvider)
             } catch (e: Exception) {
                 e.printStackTrace()
             }

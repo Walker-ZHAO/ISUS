@@ -24,7 +24,7 @@ import java.util.*
  * Date: 2020/5/8
  */
 
-val DEFAULT_HOST: String by lazy { Uri.parse(PreferenceManager.instance.getPlatformApi()).host }
+val DEFAULT_HOST: String by lazy { Uri.parse(PreferenceManager.instance.getPlatformApi()).host ?: "" }
 
 /**
  * 解析域名对应IP
