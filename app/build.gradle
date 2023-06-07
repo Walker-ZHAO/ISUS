@@ -88,7 +88,7 @@ dependencies {
     // RxPreference
     implementation 'com.f2prateek.rx.preferences2:rx-preferences:2.0.1'
     // OKHttp3
-    implementation 'com.squareup.okhttp3:okhttp:3.11.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.11.0'
     implementation 'com.squareup.okhttp3:logging-interceptor:3.9.0'
     // Retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'

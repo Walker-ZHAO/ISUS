@@ -24,7 +24,7 @@ class URLInterceptor : Interceptor {
         val scheme = uri.scheme
         val port = uri.port
 
-        val urlBuilder =  request.url().newBuilder()
+        val urlBuilder =  request.url.newBuilder()
         if (!host.isNullOrEmpty())
             urlBuilder.host(host)
         if (!scheme.isNullOrEmpty())

@@ -23,7 +23,7 @@ class CacheInterceptor : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
         val builder: Request.Builder = originalRequest.newBuilder()
-        if (isMsgUrl(originalRequest.url().toString())) {
+        if (isMsgUrl(originalRequest.url.toString())) {
             if (etag.isNotEmpty()) {
                 builder.header("If-None-Match", etag)
             } else {
@@ -43,8 +43,8 @@ class CacheInterceptor : Interceptor {
          * 当次返回408->不缓存的etag与modified头，下次访问继续使用之前缓存的
          * 当次返回其他->清空之前缓存的etag与modified头
          */
-        if (isMsgUrl(originalRequest.url().toString())) {
-            when (response.code()) {
+        if (isMsgUrl(originalRequest.url.toString())) {
+            when (response.code) {
                 200 -> {
                     etag = response.header("Etag") ?: ""
                     last_modified = response.header("Last-Modified") ?: ""

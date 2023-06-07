@@ -358,8 +358,8 @@ interface APIService {
          * 取消所有网络请求
          */
         fun cancel() {
-            client.dispatcher().cancelAll()
-            downloadClient.dispatcher().cancelAll()
+            client.dispatcher.cancelAll()
+            downloadClient.dispatcher.cancelAll()
         }
 
         /**
@@ -383,7 +383,7 @@ interface APIService {
 
                 override fun onResponse(call: Call, response: okhttp3.Response) {
                     // 非200代表下载失败
-                    val code = response.code()
+                    val code = response.code
                     if (code != 200) {
                         sendFailedStringCallback(request, IOException("Http Code : $code"), callback)
                         return
@@ -393,8 +393,8 @@ interface APIService {
                     var len: Int
                     var fos: FileOutputStream? = null
                     try {
-                        inputStream = response.body()?.byteStream()
-                        val file = File(destFileDir, if (fileName.isEmpty()) getFileName(url) else fileName)
+                        inputStream = response.body?.byteStream()
+                        val file = File(destFileDir, fileName.ifEmpty { getFileName(url) })
                         file.parentFile?.mkdir()
                         file.createNewFile()
                         fos = FileOutputStream(file)
@@ -406,7 +406,7 @@ interface APIService {
                         fos.flush()
                         sendSuccessStringCallback(file.absolutePath, callback)
                     } catch (e: IOException) {
-                        sendFailedStringCallback(response.request(), e, callback)
+                        sendFailedStringCallback(response.request, e, callback)
                     } finally {
                         try {
                             inputStream?.close()
