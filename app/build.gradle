@@ -118,7 +118,7 @@ dependencies {
     implementation 'androidx.activity:activity-ktx:1.7.2'
     implementation 'androidx.fragment:fragment-ktx:1.5.7'
     // 希沃SDK
-    api(name:'OpenSDK-releaseBanpai-3.2.48', ext:'aar')
+    api project(':seewo')
 }
 
 afterEvaluate {
