@@ -100,7 +100,7 @@ dependencies {
     // Logger
     implementation 'com.orhanobut:logger:2.2.0'
     // Useful Extension
-    implementation 'com.github.Walker-ZHAO:Anke:0.3.1'
+    implementation 'com.github.Walker-ZHAO:Anke:0.3.2'
     // RabbitMQ
     implementation 'com.rabbitmq:amqp-client:5.17.0'
     // ObjectBox
