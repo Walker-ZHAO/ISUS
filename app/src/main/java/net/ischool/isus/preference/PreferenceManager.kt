@@ -348,4 +348,13 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
         val navigation = parameter["navigation"] as? List<*>
         return navigation?.contains("refresh") ?: false
     }
+
+    /**
+     * 是否启用X5内核
+     */
+    fun useX5Core(): Boolean {
+        val webConfig = getParameter()["webview"] ?: ""
+        val parameter = Gson().fromJson<Map<String, Any>>(webConfig) ?: HashMap()
+        return parameter["engine"] as? String? != "x5"
+    }
 }

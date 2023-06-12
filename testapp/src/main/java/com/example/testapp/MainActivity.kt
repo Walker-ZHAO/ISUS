@@ -136,6 +136,10 @@ class MainActivity : RxAppCompatActivity() {
                         LOG_TAG,
                         "refresh: ${PreferenceManager.instance.canRefreshWebview()}"
                     )
+                    Log.i(
+                        LOG_TAG,
+                        "use x5: ${PreferenceManager.instance.useX5Core()}"
+                    )
                 },
                 onComplete = { Log.i(LOG_TAG, "onComplete") },
                 onError = { Log.e(LOG_TAG, "$it") }
