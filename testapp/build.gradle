@@ -6,14 +6,14 @@ plugins {
 
 android {
     namespace 'com.example.testapp'
-    compileSdk 33
+    compileSdkVersion COMPILE_SDK_VERSION
 
     defaultConfig {
         applicationId "com.example.isus.testapp"
-        minSdk 21
-        targetSdk 33
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion MIN_SDK_VERSION
+        targetSdkVersion COMPILE_SDK_VERSION
+        versionCode ISUS_VERSION_CODE
+        versionName ISUS_VERSION
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
