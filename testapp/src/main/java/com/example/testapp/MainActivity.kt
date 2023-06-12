@@ -82,7 +82,7 @@ class MainActivity : RxAppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        ISUS.init(this, DeviceType.SECURITY, securityEnhance = false)
+        ISUS.init(this, DeviceType.BADGE, securityEnhance = false)
 //        ISUS.init(this, DeviceType.VISION_PHONE, true, "huixiaoan")
 
         binding.init.setOnClickListener { startActivity<InitActivity>() }
