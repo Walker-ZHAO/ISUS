@@ -1,2 +1,3 @@
 include ':seewo'
 include ':app'
+include ':testapp'
