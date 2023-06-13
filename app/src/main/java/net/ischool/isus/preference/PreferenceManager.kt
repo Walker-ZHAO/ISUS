@@ -355,6 +355,6 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     fun useX5Core(): Boolean {
         val webConfig = getParameter()["webview"] ?: ""
         val parameter = Gson().fromJson<Map<String, Any>>(webConfig) ?: HashMap()
-        return parameter["engine"] as? String? != "x5"
+        return parameter["engine"] as? String? == "x5"
     }
 }
