@@ -9,10 +9,6 @@ import android.os.Process
 import android.provider.Settings
 import com.orhanobut.logger.Logger
 import com.walker.anke.framework.alarmManager
-import net.ischool.isus.network.APIService
-import net.ischool.isus.network.callback.StringCallback
-import okhttp3.Request
-import java.io.IOException
 import com.walker.anke.framework.reboot
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
@@ -21,10 +17,14 @@ import net.ischool.isus.RESULT_OK
 import net.ischool.isus.SYSLOG_CATEGORY_RABBITMQ
 import net.ischool.isus.activity.ConfigActivity
 import net.ischool.isus.log.Syslog
+import net.ischool.isus.network.APIService
+import net.ischool.isus.network.callback.StringCallback
 import net.ischool.isus.preference.PreferenceManager
 import net.ischool.isus.service.ISUSService
 import net.ischool.isus.service.QueueState
+import okhttp3.Request
 import java.io.File
+import java.io.IOException
 
 /**
  * 通用命令执行器
@@ -253,6 +253,24 @@ open class CommandProcessorCommon constructor(protected val context: Context) : 
                 finish(result, remoteUUID)
             }
         }
+    }
+
+    /**
+     * 休眠
+     *
+     * Note：需要系统签名
+     */
+    override fun sleep(remoteUUID: String) {
+        execRuntimeProcess("input keyevent KEYCODE_SLEEP")
+    }
+
+    /**
+     * 唤醒
+     *
+     * Note：需要系统签名
+     */
+    override fun wakeup(remoteUUID: String) {
+        execRuntimeProcess("input keyevent KEYCODE_WAKEUP")
     }
 
     /**

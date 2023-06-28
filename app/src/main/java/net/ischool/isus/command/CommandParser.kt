@@ -36,6 +36,8 @@ class CommandParser private constructor() {
         commandMap[ICommand.COMMAND_RELOAD] = 201708
         commandMap[ICommand.COMMAND_LAUNCH_PAGE] = 201708
         commandMap[ICommand.COMMAND_QUERY_STATUS] = 202006
+        commandMap[ICommand.COMMAND_SLEEP] = 202306
+        commandMap[ICommand.COMMAND_WAKEUP] = 202306
     }
 
     companion object {
@@ -76,6 +78,8 @@ class CommandParser private constructor() {
                 ICommand.COMMAND_RELOAD -> processor?.reload(remoteUUID)
                 ICommand.COMMAND_LAUNCH_PAGE -> processor?.launchPage(command.args["intent"], remoteUUID)
                 ICommand.COMMAND_QUERY_STATUS -> processor?.queryStatus(command.args["type"], remoteUUID)
+                ICommand.COMMAND_SLEEP -> processor?.sleep(remoteUUID)
+                ICommand.COMMAND_WAKEUP -> processor?.wakeup(remoteUUID)
             }
         } else {
             // 广播无法处理的command

@@ -22,6 +22,8 @@ interface ICommand {
         const val COMMAND_RELOAD = "reload"
         const val COMMAND_LAUNCH_PAGE =   "amstart"
         const val COMMAND_QUERY_STATUS = "query_status"
+        const val COMMAND_SLEEP = "sleep"
+        const val COMMAND_WAKEUP = "wakeup"
         const val COMMAND_REFRESH = "refresh"   // 刷新页面，该命令不可以注册到命令列表中，需要转发给实际的宿主应用
     }
 
@@ -90,6 +92,16 @@ interface ICommand {
      * 查询状态信息
      */
     fun queryStatus(type: String?, remoteUUID: String)
+
+    /**
+     * 进入休眠状态
+     */
+    fun sleep(remoteUUID: String)
+
+    /**
+     * 退出休眠状态（唤醒）
+     */
+    fun wakeup(remoteUUID: String)
 
     /**
      * 执行cmd命令
