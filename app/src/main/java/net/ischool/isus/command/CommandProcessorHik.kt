@@ -2,6 +2,7 @@ package net.ischool.isus.command
 
 import android.content.Context
 import android.os.Environment
+import com.hikvision.dmb.display.InfoDisplayApi
 import com.hikvision.dmb.system.InfoSystemApi
 import com.hikvision.dmb.util.InfoUtilApi
 import com.orhanobut.logger.Logger
@@ -93,5 +94,24 @@ class CommandProcessorHik(context: Context): CommandProcessorCommon(context) {
     override fun openAdb(remoteUUID: String) {
         InfoSystemApi.openAdb()
         finish(CommandResult(ICommand.COMMAND_ADB), remoteUUID)
+    }
+
+    /**
+     * 休眠
+     */
+    override fun sleep(remoteUUID: String) {
+        InfoDisplayApi.disableBacklight()
+        // 需要禁用触屏，否则触摸事件会下发至应用
+        InfoSystemApi.execCommand("su & rm -rf /dev/input/event2")
+        finish(CommandResult(ICommand.COMMAND_SLEEP), remoteUUID)
+    }
+
+    /**
+     * 唤醒
+     */
+    override fun wakeup(remoteUUID: String) {
+        // 重启设备以唤醒
+        finish(CommandResult(ICommand.COMMAND_WAKEUP), remoteUUID)
+        InfoSystemApi.reboot()
     }
 }

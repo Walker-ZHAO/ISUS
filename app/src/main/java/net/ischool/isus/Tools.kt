@@ -2,6 +2,7 @@ package net.ischool.isus
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.lamy.system.Magicbox
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
@@ -77,6 +78,28 @@ fun isTouchWoDevice(): Boolean {
         app.activityInfo.packageName.contains("adtv")
     }
     return info != null
+}
+
+/**
+ * 是否是明博华瑞安设备
+ */
+@SuppressLint("QueryPermissionsNeeded")
+fun isMingboDevice(): Boolean {
+    val intent = Intent("com.hra.setAutoShutdown")
+    val info = ISUS.instance.context.packageManager.queryBroadcastReceivers(intent, 0)
+    return info != null
+}
+
+/**
+ * 是否是大华设备
+ */
+fun isDhDevice(): Boolean {
+    return try {
+        Magicbox.getApiVersion()
+        true
+    } catch (e: Throwable) {
+        false
+    }
 }
 
 /**

@@ -49,6 +49,8 @@ class CommandParser private constructor() {
             else
                 instance.processor = when {
                     isHikDevice() -> CommandProcessorHik(ISUS.instance.context)
+                    isTouchWoDevice() -> CommandProcessTouchWo(ISUS.instance.context)
+                    isDhDevice() -> CommandProcessDaHua(ISUS.instance.context)
                     isSeeWoDevice() -> CommandProcessorSeeWo(ISUS.instance.context)
                     isHongHeDevice() -> CommandProcessorHonghe(ISUS.instance.context)
                     else -> CommandProcessorCommon(ISUS.instance.context)
