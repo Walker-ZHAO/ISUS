@@ -3,7 +3,12 @@ package net.ischool.isus
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.lamy.display.screen.Screen
 import android.os.Build
+import com.hikvision.dmb.display.InfoDisplayApi
+import com.hikvision.dmb.system.InfoSystemApi
+import com.walker.anke.framework.reboot
+import com.ys.rkapi.MyManager
 import net.ischool.isus.preference.PreferenceManager
 import java.lang.Exception
 
@@ -44,4 +49,62 @@ fun Context.startZXBS() {
     } catch (e: Exception) {
         e.printStackTrace()
     }
+}
+
+/**
+ * 休眠
+ *
+ * 息屏 + 禁触屏
+ */
+fun Context.sleep() {
+    when {
+        isHikDevice() -> {
+            InfoDisplayApi.disableBacklight()
+            // 需要禁用触屏，否则触摸事件会下发至应用
+            InfoSystemApi.execCommand("su & rm -rf /dev/input/event2")
+        }
+        isTouchWoDevice() -> {
+            MyManager.getInstance(this).turnOffBackLight()
+            // 需要禁用触屏，否则触摸事件会导致背光重新开启
+            execRuntimeProcess("su & rm -rf /dev/input/event1")
+        }
+        isDhDevice() -> {
+            Screen.getScreen(0).turnOffBackLight()
+            // 需要禁用触屏，否则触摸事件会下发至应用
+            execRuntimeProcess("su & rm -rf /dev/input/event2")
+        }
+    }
+}
+
+/**
+ * 唤醒
+ *
+ * 重启
+ */
+fun Context.wakeup() {
+    when {
+        isHikDevice() -> {
+            InfoSystemApi.reboot()
+        }
+        isTouchWoDevice() -> {
+            reboot(null)
+        }
+        isDhDevice() -> {
+            reboot(null)
+        }
+    }
+}
+
+/**
+ * 执行cmd命令
+ */
+private fun execRuntimeProcess(cmd: String): Process? {
+    var p: Process? = null
+    try {
+        p = Runtime.getRuntime().exec(cmd)
+        p?.waitFor()
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+    return p
 }
