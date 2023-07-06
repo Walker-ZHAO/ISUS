@@ -1,5 +1,7 @@
 package net.ischool.isus.command
 
+import java.io.DataOutputStream
+
 /**
  * 命令接口
  *
@@ -106,10 +108,18 @@ interface ICommand {
     /**
      * 执行cmd命令
      */
-    fun execRuntimeProcess(cmd: String): Process? {
+    fun execRuntimeProcess(cmd: String, needEvn: Boolean = false): Process? {
         var p: Process? = null
         try {
-            p = Runtime.getRuntime().exec(cmd)
+            if (!needEvn) {
+                p = Runtime.getRuntime().exec(cmd)
+            } else {
+                p = Runtime.getRuntime().exec("sh")
+                DataOutputStream(p.outputStream).use {
+                    it.writeBytes("$cmd\n")
+                    it.flush()
+                }
+            }
             p?.waitFor()
         } catch (e: Exception) {
             e.printStackTrace()

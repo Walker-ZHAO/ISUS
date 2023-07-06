@@ -21,6 +21,8 @@ class CommandProcessDaHua(context: Context): CommandProcessorCommon(context) {
         Screen.getScreen(0).turnOffBackLight()
         // 需要禁用触屏，否则触摸事件会下发至应用
         execRuntimeProcess("su & rm -rf /dev/input/event2")
+        // 使CPU进入节能模式
+        execRuntimeProcess("echo powersave > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor", needEvn = true)
         finish(CommandResult(ICommand.COMMAND_SLEEP), remoteUUID)
     }
 
