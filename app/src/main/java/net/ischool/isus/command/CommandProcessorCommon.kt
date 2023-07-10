@@ -22,6 +22,8 @@ import net.ischool.isus.network.callback.StringCallback
 import net.ischool.isus.preference.PreferenceManager
 import net.ischool.isus.service.ISUSService
 import net.ischool.isus.service.QueueState
+import net.ischool.isus.sleep
+import net.ischool.isus.wakeup
 import okhttp3.Request
 import java.io.File
 import java.io.IOException
@@ -261,7 +263,8 @@ open class CommandProcessorCommon constructor(protected val context: Context) : 
      * Note：需要系统签名
      */
     override fun sleep(remoteUUID: String) {
-        execRuntimeProcess("input keyevent KEYCODE_SLEEP")
+        context.sleep()
+        finish(CommandResult(ICommand.COMMAND_SLEEP), remoteUUID)
     }
 
     /**
@@ -270,7 +273,8 @@ open class CommandProcessorCommon constructor(protected val context: Context) : 
      * Note：需要系统签名
      */
     override fun wakeup(remoteUUID: String) {
-        execRuntimeProcess("input keyevent KEYCODE_WAKEUP")
+        finish(CommandResult(ICommand.COMMAND_WAKEUP), remoteUUID)
+        context.wakeup()
     }
 
     /**

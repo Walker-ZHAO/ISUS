@@ -95,25 +95,4 @@ class CommandProcessorHik(context: Context): CommandProcessorCommon(context) {
         InfoSystemApi.openAdb()
         finish(CommandResult(ICommand.COMMAND_ADB), remoteUUID)
     }
-
-    /**
-     * 休眠
-     */
-    override fun sleep(remoteUUID: String) {
-        InfoDisplayApi.disableBacklight()
-        // 需要禁用触屏，否则触摸事件会下发至应用
-        InfoSystemApi.execCommand("su & rm -rf /dev/input/event2")
-        // 使CPU进入节能模式
-        InfoSystemApi.execCommand("su & echo powersave > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor")
-        finish(CommandResult(ICommand.COMMAND_SLEEP), remoteUUID)
-    }
-
-    /**
-     * 唤醒
-     */
-    override fun wakeup(remoteUUID: String) {
-        // 重启设备以唤醒
-        finish(CommandResult(ICommand.COMMAND_WAKEUP), remoteUUID)
-        InfoSystemApi.reboot()
-    }
 }
