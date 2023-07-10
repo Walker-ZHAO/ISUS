@@ -10,6 +10,7 @@ import com.hikvision.dmb.system.InfoSystemApi
 import com.walker.anke.framework.reboot
 import com.ys.rkapi.MyManager
 import net.ischool.isus.preference.PreferenceManager
+import java.io.DataOutputStream
 import java.lang.Exception
 
 /**
@@ -62,16 +63,22 @@ fun Context.sleep() {
             InfoDisplayApi.disableBacklight()
             // 需要禁用触屏，否则触摸事件会下发至应用
             InfoSystemApi.execCommand("su & rm -rf /dev/input/event2")
+            // 使CPU进入节能模式
+            InfoSystemApi.execCommand("su & echo powersave > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor")
         }
         isTouchWoDevice() -> {
             MyManager.getInstance(this).turnOffBackLight()
             // 需要禁用触屏，否则触摸事件会导致背光重新开启
             execRuntimeProcess("su & rm -rf /dev/input/event1")
+            // 使CPU进入节能模式
+            execRuntimeProcess("su & echo powersave > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor")
         }
         isDhDevice() -> {
             Screen.getScreen(0).turnOffBackLight()
             // 需要禁用触屏，否则触摸事件会下发至应用
             execRuntimeProcess("su & rm -rf /dev/input/event2")
+            // 使CPU进入节能模式
+            execRuntimeProcess("echo powersave > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor", needEvn = true)
         }
     }
 }
@@ -98,10 +105,18 @@ fun Context.wakeup() {
 /**
  * 执行cmd命令
  */
-private fun execRuntimeProcess(cmd: String): Process? {
+fun execRuntimeProcess(cmd: String, needEvn: Boolean = false): Process? {
     var p: Process? = null
     try {
-        p = Runtime.getRuntime().exec(cmd)
+        if (!needEvn) {
+            p = Runtime.getRuntime().exec(cmd)
+        } else {
+            p = Runtime.getRuntime().exec("sh")
+            DataOutputStream(p.outputStream).use {
+                it.writeBytes("$cmd\n")
+                it.flush()
+            }
+        }
         p?.waitFor()
     } catch (e: Exception) {
         e.printStackTrace()
