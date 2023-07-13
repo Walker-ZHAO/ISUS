@@ -8,10 +8,12 @@ import android.os.Build
 import com.hikvision.dmb.display.InfoDisplayApi
 import com.hikvision.dmb.system.InfoSystemApi
 import com.walker.anke.framework.reboot
+import com.xbh.sdk3.Picture.PictureHelper
+import com.xbh.sdk3.System.SystemHelper
 import com.ys.rkapi.MyManager
 import net.ischool.isus.preference.PreferenceManager
 import java.io.DataOutputStream
-import java.lang.Exception
+import kotlin.Exception
 
 /**
  * 扩展方法
@@ -80,6 +82,15 @@ fun Context.sleep() {
             // 使CPU进入节能模式
             execRuntimeProcess("echo powersave > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor", needEvn = true)
         }
+        isHongHeDevice() -> {
+            PictureHelper().gotoSleep()
+            SystemHelper().apply {
+                // 需要禁用触屏，否则触摸事件会下发至应用
+                executeCommand("su & rm -rf /dev/input/event2")
+                // 使CPU进入节能模式
+                executeCommand("su & echo powersave > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor")
+            }
+        }
     }
 }
 
@@ -98,6 +109,9 @@ fun Context.wakeup() {
         }
         isDhDevice() -> {
             reboot(null)
+        }
+        isHongHeDevice() -> {
+            SystemHelper().reboot()
         }
     }
 }
