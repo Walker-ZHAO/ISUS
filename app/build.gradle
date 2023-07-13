@@ -51,6 +51,10 @@ android {
         viewBinding true
     }
 
+    configurations {
+        all*.exclude group: 'com.google.code.gson'
+    }
+
     publishing {
         singleVariant('release') {
             withSourcesJar()

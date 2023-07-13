@@ -38,6 +38,9 @@ android {
     lintOptions {
         abortOnError false
     }
+    configurations {
+        all*.exclude group: 'com.google.code.gson'
+    }
 }
 
 dependencies {
