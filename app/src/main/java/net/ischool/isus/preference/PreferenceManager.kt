@@ -350,6 +350,16 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     }
 
     /**
+     * Hybrid模式下，刷新Web页时是否使用的原始地址
+     */
+    fun refreshWithOriginal(): Boolean {
+        val displayModelParameter = getParameter()["displayModelParams"] ?: ""
+        val parameter = Gson().fromJson<Map<String, Any>>(displayModelParameter)?:HashMap()
+        val refreshMode = parameter["refresh_mode"] as? String ?: "current"
+        return refreshMode == "original"
+    }
+
+    /**
      * 是否启用X5内核
      */
     fun useX5Core(): Boolean {
