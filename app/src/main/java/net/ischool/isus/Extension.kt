@@ -72,6 +72,11 @@ fun Context.sleep() {
             MyManager.getInstance(this).turnOffBackLight()
             // 需要禁用触屏，否则触摸事件会导致背光重新开启
             execRuntimeProcess("su & rm -rf /dev/input/event1")
+            // 兼容触沃5.1的3288设备
+            execRuntimeProcess("su & rm -rf /dev/input/event2")
+            execRuntimeProcess("su & rm -rf /dev/input/event4")
+            // 兼容触沃5.1的3368设备
+            execRuntimeProcess("su & rm -rf /dev/input/event3")
             // 使CPU进入节能模式
             execRuntimeProcess("su & echo powersave > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor")
         }
