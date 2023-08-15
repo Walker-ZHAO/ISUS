@@ -12,7 +12,9 @@ import com.xbh.sdk3.Picture.PictureHelper
 import com.xbh.sdk3.System.SystemHelper
 import com.ys.rkapi.MyManager
 import net.ischool.isus.preference.PreferenceManager
+import java.io.BufferedReader
 import java.io.DataOutputStream
+import java.io.InputStreamReader
 import kotlin.Exception
 
 /**
@@ -100,6 +102,27 @@ fun Context.sleep() {
 }
 
 /**
+ * 是否处于休眠模式
+ */
+fun Context.inSleep(): Boolean {
+    return when {
+        isHikDevice() -> {
+            execRuntimeProcess("cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor").contains("powersave")
+        }
+        isTouchWoDevice() -> {
+            !MyManager.getInstance(this).isBacklightOn
+        }
+        isDhDevice() -> {
+            execRuntimeProcess("cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor").contains("powersave")
+        }
+        isHongHeDevice() -> {
+            SystemHelper().executeCommand("cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor").contains("powersave")
+        }
+        else -> false
+    }
+}
+
+/**
  * 唤醒
  *
  * 重启
@@ -124,8 +147,9 @@ fun Context.wakeup() {
 /**
  * 执行cmd命令
  */
-fun execRuntimeProcess(cmd: String, needEvn: Boolean = false): Process? {
-    var p: Process? = null
+fun execRuntimeProcess(cmd: String, needEvn: Boolean = false): String {
+    val p: Process?
+    val output = StringBuilder()
     try {
         if (!needEvn) {
             p = Runtime.getRuntime().exec(cmd)
@@ -137,8 +161,15 @@ fun execRuntimeProcess(cmd: String, needEvn: Boolean = false): Process? {
             }
         }
         p?.waitFor()
+        val reader = BufferedReader(InputStreamReader(p.inputStream))
+        var line: String?
+        reader.use {
+            while (reader.readLine().also { line = it } != null) {
+                output.append(line).append("\n")
+            }
+        }
     } catch (e: Exception) {
         e.printStackTrace()
     }
-    return p
+    return output.toString()
 }
