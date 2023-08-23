@@ -105,11 +105,12 @@ interface APIService {
      * @param ts            每分钟整的时间戳(单位秒)
      * @param type          数据类型，当前固定为3
      * @param cmdb_id       扩展信息，设备cmdbid
-     * @param client_cdn_ip 设备上解析到CDN服务器的IP地址
+     * @param cdn_ip        设备上解析到CDN服务器的IP地址
+     * @param wakeState     是否处于唤醒状态：1：唤醒；2：待机
      */
     @FormUrlEncoded
     @POST("sgrid/psi/hungribles")
-    fun _postStatus(@Field("sid") sid: String, @Field("element_id") deviceTypeId: String, @Field("service_id") service_id: String, @Field("element_name_tail") name: String, @Field("label_character") labelId: Int, @Field("info") info: String, @Field("label") label: String, @Field("uptime") ts: Long, @Field("type") type: Int, @Field("ext_cmdbid") cmdb_id: String, @Field("client_cdn_ip") cdn_ip: String): Observable<ResponseBody>
+    fun _postStatus(@Field("sid") sid: String, @Field("element_id") deviceTypeId: String, @Field("service_id") service_id: String, @Field("element_name_tail") name: String, @Field("label_character") labelId: Int, @Field("info") info: String, @Field("label") label: String, @Field("uptime") ts: Long, @Field("type") type: Int, @Field("ext_cmdbid") cmdb_id: String, @Field("client_cdn_ip") cdn_ip: String, @Field("waken_status") wakeState: Int): Observable<ResponseBody>
 
     /**
      * 获取网络状态信息
@@ -303,8 +304,9 @@ interface APIService {
          *
          * @param info  当前状态描述信息
          * @param label 当前状态
+         * @param inSleep 是否处于休眠状态
          */
-        suspend fun postStatus(info: String = "Normal", label: String = "Normal"): Observable<ResponseBody> {
+        suspend fun postStatus(info: String = "Normal", label: String = "Normal", inSleep: Boolean): Observable<ResponseBody> {
             val ts = System.currentTimeMillis() / 1000
             val extra = ts % 60
             val ip = parseHostGetIPAddress()
@@ -318,7 +320,8 @@ interface APIService {
                 ts - extra,
                 3,
                 PreferenceManager.instance.getCMDB(),
-                ip)
+                ip,
+                if (inSleep) 2 else 1)
         }
 
         /**

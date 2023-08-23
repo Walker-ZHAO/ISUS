@@ -12,6 +12,7 @@ import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import net.ischool.isus.inSleep
 import net.ischool.isus.network.APIService
 import java.util.concurrent.TimeUnit
 
@@ -47,7 +48,7 @@ class StatusPostService: Service() {
     private fun postStatus() {
         CoroutineScope(Dispatchers.Main).launch {
             // 每分钟访问一次，不能使用retryWhen及repeatWhen操作符，因为每次访问的ts均不一致
-            val disposable = APIService.postStatus()
+            val disposable = APIService.postStatus(inSleep = inSleep())
                 .subscribeOn(Schedulers.io())
                 .subscribeBy(
                     onComplete = { disposables.add(Observable.timer(1, TimeUnit.MINUTES).subscribe { postStatus() }) },
