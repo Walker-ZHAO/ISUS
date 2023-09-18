@@ -23,9 +23,47 @@ class SSLSocketFactoryProvider {
         private const val P12  = "PKCS12"
 
         @JvmStatic fun getSSLContext(type: String = P12): SSLContext {
+            val protocol = "TLS"
+            val ssContext = SSLContext.getInstance(protocol)
+            ssContext.init(getKeyManagers(type), getTrustManagers(), null)
+            return ssContext
+        }
+
+        @JvmStatic fun getSSLSocketFactory(): SSLSocketFactory = getSSLContext().socketFactory
+
+        private fun emptyKeyStore(password: String)=  KeyStore.getInstance(KeyStore.getDefaultType()).apply { load(null, password.toCharArray()) }
+
+        /**
+         * 获取包含服务端CA证书的TrustManager列表
+         */
+        fun getTrustManagers(): Array<TrustManager> {
+            // 设置服务端的可信根CA证书
+            val cf: CertificateFactory = CertificateFactory.getInstance("X.509")
+            val trustRootCAStream = ISUS.instance.certificate
+            val trustRootCA = cf.generateCertificate(trustRootCAStream) as X509Certificate
+
+            // Create a KeyStore containing our trusted CAs
+            val keyStoreType = KeyStore.getDefaultType()
+            val trustKeyStore = KeyStore.getInstance(keyStoreType).apply {
+                load(null, null)
+                setCertificateEntry("ca", trustRootCA)
+            }
+
+            // Create a TrustManager that trusts the CAs inputStream our KeyStore
+            val tmfAlgorithm: String = TrustManagerFactory.getDefaultAlgorithm()
+            val tmf: TrustManagerFactory = TrustManagerFactory.getInstance(tmfAlgorithm).apply {
+                init(trustKeyStore)
+            }
+
+            return tmf.trustManagers
+        }
+
+        /**
+         * 获取包含客户端证书的KeyManager列表
+         */
+        fun getKeyManagers(type: String = P12): Array<KeyManager> {
             // 设置提供给服务端验证的客户端证书
             val clientCertPassword = PreferenceManager.instance.getKeyPass()
-            val protocol = "TLS"
             try {
                 val file = File(PreferenceManager.instance.getSePemPath())
                 val keyStore = when (type) {
@@ -59,44 +97,10 @@ class SSLSocketFactoryProvider {
                 val kmf = KeyManagerFactory.getInstance(kmfAlgorithm).apply {
                     init(keyStore, clientCertPassword.toCharArray())
                 }
-
-                val ssContext = SSLContext.getInstance(protocol)
-                ssContext.init(kmf.keyManagers, getTrustManagers(), null)
-                return ssContext
+                return kmf.keyManagers
             } catch (e: Exception) {
-                val ssContext = SSLContext.getInstance(protocol)
-                ssContext.init(arrayOf(), arrayOf(NullX509TrustManager()), null)
-                return ssContext
+                return arrayOf()
             }
-        }
-
-        @JvmStatic fun getSSLSocketFactory(): SSLSocketFactory = getSSLContext().socketFactory
-
-        private fun emptyKeyStore(password: String)=  KeyStore.getInstance(KeyStore.getDefaultType()).apply { load(null, password.toCharArray()) }
-
-        /**
-         * 获取包含服务端CA证书的TrustManager列表
-         */
-        fun getTrustManagers(): Array<TrustManager> {
-            // 设置服务端的可信根CA证书
-            val cf: CertificateFactory = CertificateFactory.getInstance("X.509")
-            val trustRootCAStream = ISUS.instance.certificate
-            val trustRootCA = cf.generateCertificate(trustRootCAStream) as X509Certificate
-
-            // Create a KeyStore containing our trusted CAs
-            val keyStoreType = KeyStore.getDefaultType()
-            val trustKeyStore = KeyStore.getInstance(keyStoreType).apply {
-                load(null, null)
-                setCertificateEntry("ca", trustRootCA)
-            }
-
-            // Create a TrustManager that trusts the CAs inputStream our KeyStore
-            val tmfAlgorithm: String = TrustManagerFactory.getDefaultAlgorithm()
-            val tmf: TrustManagerFactory = TrustManagerFactory.getInstance(tmfAlgorithm).apply {
-                init(trustKeyStore)
-            }
-
-            return tmf.trustManagers
         }
     }
 }
