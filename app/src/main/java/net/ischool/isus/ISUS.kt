@@ -17,6 +17,7 @@ import net.ischool.isus.service.ISUSService
 import net.ischool.isus.service.StatusPostService
 import net.ischool.isus.service.UDPService
 import net.ischool.isus.service.WatchDogService
+import java.io.InputStream
 
 /**
  * 库入口类
@@ -25,7 +26,12 @@ import net.ischool.isus.service.WatchDogService
  * Email: zhaocework@gmail.com
  * Date: 2017/9/18
  */
-class ISUS(val context: Context, val se: Boolean, val iam: String) {
+class ISUS(
+    val context: Context,
+    val se: Boolean,
+    val iam: String,
+    val certificate: InputStream,
+) {
 
     companion object {
 
@@ -40,8 +46,16 @@ class ISUS(val context: Context, val se: Boolean, val iam: String) {
         @ExperimentalStdlibApi
         @JvmOverloads
         @Synchronized
-        @JvmStatic fun init(context: Context, deviceType: Int, securityEnhance: Boolean = false, iam: String = "", commandProcessor: ICommand? = null) {
-            instance = ISUS(context.applicationContext, securityEnhance, iam)
+        @JvmStatic
+        fun init(
+            context: Context,
+            deviceType: Int,
+            securityEnhance: Boolean = false,
+            iam: String = "",
+            commandProcessor: ICommand? = null,
+            certificate: InputStream,
+        ) {
+            instance = ISUS(context.applicationContext, securityEnhance, iam, certificate)
             CommandParser.init(commandProcessor)
             Logger.addLogAdapter(AndroidLogAdapter())
             PreferenceManager.initPreference(context, deviceType)

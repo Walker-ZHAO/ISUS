@@ -29,6 +29,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.util.concurrent.TimeUnit
+import javax.net.ssl.X509TrustManager
 
 /**
  * 网络接口
@@ -174,7 +175,7 @@ interface APIService {
             // 如果处于安全增强模式，并且服务端提供了证书，则需要配置双向认证
             if (ISUS.instance.se && PreferenceManager.instance.getSePemPath().isNotEmpty()) {
                 builder
-                    .sslSocketFactory(SSLSocketFactoryProvider.getSSLSocketFactory(), NullX509TrustManager())
+                    .sslSocketFactory(SSLSocketFactoryProvider.getSSLSocketFactory(), SSLSocketFactoryProvider.getTrustManagers().first() as X509TrustManager)
                     .hostnameVerifier { hostname, session -> true }
             }
             builder.build()
