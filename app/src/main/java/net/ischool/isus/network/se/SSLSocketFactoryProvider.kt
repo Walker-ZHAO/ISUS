@@ -6,8 +6,9 @@ import java.security.KeyStore
 import java.security.cert.CertificateFactory
 import javax.net.ssl.*
 import java.io.*
-import java.lang.Exception
+import java.security.PrivateKey
 import java.security.cert.X509Certificate
+import kotlin.Exception
 
 /**
  * HTTPS 双向认证 提供器
@@ -39,7 +40,7 @@ class SSLSocketFactoryProvider {
         fun getTrustManagers(): Array<TrustManager> {
             // 设置服务端的可信根CA证书
             val cf: CertificateFactory = CertificateFactory.getInstance("X.509")
-            val trustRootCAStream = ISUS.instance.certificate
+            val trustRootCAStream = ISUS.instance.certificate ?: return arrayOf()
             val trustRootCA = cf.generateCertificate(trustRootCAStream) as X509Certificate
 
             // Create a KeyStore containing our trusted CAs
@@ -102,5 +103,43 @@ class SSLSocketFactoryProvider {
                 return arrayOf()
             }
         }
+    }
+
+    /**
+     * 获取客户端证书，包含私钥及对应的X509证书
+     */
+    fun getClientCert(type: String = P12): Pair<PrivateKey?, List<X509Certificate>> {
+        var privateKey: PrivateKey? = null
+        val certificates = mutableListOf<X509Certificate>()
+
+        val clientCertPassword = PreferenceManager.instance.getKeyPass()
+        try {
+            val file = File(PreferenceManager.instance.getSePemPath())
+            when (type) {
+                X509 -> {
+                    privateKey = file.inputStream().use { KeyImport.readPrivateKey(it, clientCertPassword) }
+                    file.inputStream().use {
+                        CertificateFactory.getInstance(type)?.generateCertificates(it)
+                    }?.forEach {
+                        certificates.add(it as X509Certificate)
+                    }
+                }
+                P12 -> {
+                    val keyStore = KeyStore.getInstance(type)
+                    file.inputStream().use { keyStore.load(it, clientCertPassword.toCharArray()) }
+
+                    val aliases = keyStore.aliases()
+                    val alias = aliases.nextElement()
+                    val key = keyStore.getKey(alias, clientCertPassword.toCharArray())
+                    if (key is PrivateKey) {
+                        privateKey = key
+                        val cert = keyStore.getCertificate(alias) as X509Certificate
+                        certificates.add(cert)
+                    }
+                }
+            }
+        } catch (_: Exception) {
+        }
+        return privateKey to certificates
     }
 }

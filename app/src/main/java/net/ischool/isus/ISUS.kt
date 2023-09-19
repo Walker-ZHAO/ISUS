@@ -30,7 +30,7 @@ class ISUS(
     val context: Context,
     val se: Boolean,
     val iam: String,
-    val certificate: InputStream,
+    val certificate: InputStream?,
 ) {
 
     companion object {
@@ -53,7 +53,7 @@ class ISUS(
             securityEnhance: Boolean = false,
             iam: String = "",
             commandProcessor: ICommand? = null,
-            certificate: InputStream,
+            certificate: InputStream? = null,
         ) {
             instance = ISUS(context.applicationContext, securityEnhance, iam, certificate)
             CommandParser.init(commandProcessor)
