@@ -20,8 +20,6 @@ android {
     defaultConfig {
         minSdkVersion MIN_SDK_VERSION
         targetSdkVersion COMPILE_SDK_VERSION
-        versionCode ISUS_VERSION_CODE
-        versionName ISUS_VERSION
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexKeepFile file('multidex-config.txt')
         buildConfigField "String", "ISUS_LIB_VERSION", "\"$ISUS_VERSION\""

@@ -4,8 +4,8 @@ buildscript {
     ext.kotlin_version = '1.8.20'
     ext.objectboxVersion = '3.6.0'
 
-    ext.ISUS_VERSION = '0.7.35'
-    ext.ISUS_VERSION_CODE = 214
+    ext.ISUS_VERSION = '0.7.4'
+    ext.ISUS_VERSION_CODE = 215
 
     ext.COMPILE_SDK_VERSION = 33
     ext.MIN_SDK_VERSION = 21
@@ -15,7 +15,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.0.2'
+        classpath 'com.android.tools.build:gradle:8.1.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "io.objectbox:objectbox-gradle-plugin:$objectboxVersion"
     }
