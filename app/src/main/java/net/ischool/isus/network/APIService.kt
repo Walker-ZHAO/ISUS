@@ -15,6 +15,7 @@ import net.ischool.isus.network.interceptor.CacheInterceptor
 import net.ischool.isus.network.interceptor.URLInterceptor
 import net.ischool.isus.network.se.NullX509TrustManager
 import net.ischool.isus.network.se.SSLSocketFactoryProvider
+import net.ischool.isus.network.se.setCert
 import net.ischool.isus.preference.PreferenceManager
 import net.ischool.isus.service.StatusPostService
 import okhttp3.*
@@ -174,9 +175,7 @@ interface APIService {
                     })
             // 如果处于安全增强模式，并且服务端提供了证书，则需要配置双向认证
             if (ISUS.instance.se && PreferenceManager.instance.getSePemPath().isNotEmpty()) {
-                builder
-                    .sslSocketFactory(SSLSocketFactoryProvider.getSSLSocketFactory(), SSLSocketFactoryProvider.getTrustManagers().first() as X509TrustManager)
-                    .hostnameVerifier { hostname, session -> true }
+                builder.setCert().hostnameVerifier { hostname, session -> true }
             }
             builder.build()
         }
