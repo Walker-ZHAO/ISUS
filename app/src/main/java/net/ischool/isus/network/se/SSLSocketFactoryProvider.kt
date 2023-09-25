@@ -1,6 +1,5 @@
 package net.ischool.isus.network.se
 
-import net.ischool.isus.ISUS
 import net.ischool.isus.preference.PreferenceManager
 import okhttp3.OkHttpClient
 import java.security.KeyStore
@@ -39,25 +38,7 @@ class SSLSocketFactoryProvider {
          * 获取包含服务端CA证书的TrustManager列表
          */
         fun getTrustManagers(): Array<TrustManager> {
-            // 设置服务端的可信根CA证书
-            val cf: CertificateFactory = CertificateFactory.getInstance("X.509")
-            val trustRootCAStream = ISUS.instance.certificate ?: return arrayOf(NullX509TrustManager())
-            val trustRootCA = cf.generateCertificate(trustRootCAStream) as X509Certificate
-
-            // Create a KeyStore containing our trusted CAs
-            val keyStoreType = KeyStore.getDefaultType()
-            val trustKeyStore = KeyStore.getInstance(keyStoreType).apply {
-                load(null, null)
-                setCertificateEntry("ca", trustRootCA)
-            }
-
-            // Create a TrustManager that trusts the CAs inputStream our KeyStore
-            val tmfAlgorithm: String = TrustManagerFactory.getDefaultAlgorithm()
-            val tmf: TrustManagerFactory = TrustManagerFactory.getInstance(tmfAlgorithm).apply {
-                init(trustKeyStore)
-            }
-
-            return tmf.trustManagers
+            return arrayOf(CustomTrustManager)
         }
 
         /**
