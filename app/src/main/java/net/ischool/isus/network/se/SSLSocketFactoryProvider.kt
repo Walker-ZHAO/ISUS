@@ -114,8 +114,9 @@ class SSLSocketFactoryProvider {
                         val key = keyStore.getKey(alias, clientCertPassword.toCharArray())
                         if (key is PrivateKey) {
                             privateKey = key
-                            val cert = keyStore.getCertificate(alias) as X509Certificate
-                            certificates.add(cert)
+                            keyStore.getCertificateChain(alias).forEach {
+                                certificates.add(it as X509Certificate)
+                            }
                         }
                     }
                 }
