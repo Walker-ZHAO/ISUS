@@ -98,9 +98,8 @@ private fun checkCdnVersion(minVersion: String): Observable<List<AlarmInfo>> {
     return APIService.getCdnInfo().flatMap {
         val status = checkNotNull(it.body())
         val result = if (status.errno == RESULT_OK) {
-            val minVersionNum = minVersion.split('p').first().toInt()
-            val currentVersionNum = status.data.version?.split('p')?.first()?.toInt() ?: 0
-            if (minVersionNum <= currentVersionNum) {
+            val currentVersionNum = status.data.version ?: ""
+            if (minVersion <= currentVersionNum) {
                 listOf()
             } else {
                 listOf(alarmInfo.copy(ts = System.currentTimeMillis() / 1000))
