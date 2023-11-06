@@ -22,6 +22,7 @@ object PCMPlayer {
      * @param channelConfig: PCM音频文件的声道配置，默认单声道 [AudioFormat.CHANNEL_OUT_MONO]
      * @param audioFormat: PCM音频文件的音频格式，默认16BIT采样 [AudioFormat.ENCODING_PCM_16BIT]
      */
+    @JvmOverloads
     fun playPCM(
         filePath: String,
         sampleRate: Int = 16000,
