@@ -20,6 +20,7 @@ object PCMPlayer {
      * 播放PCM音频文件
      *
      * @param filePath: PCM音频文件路径
+     * @param useMaxVolume: 是否使用最大音量播放，默认为false
      * @param sampleRate: PCM音频文件的采样率，默认16K
      * @param channelConfig: PCM音频文件的声道配置，默认单声道 [AudioFormat.CHANNEL_OUT_MONO]
      * @param audioFormat: PCM音频文件的音频格式，默认16BIT采样 [AudioFormat.ENCODING_PCM_16BIT]
@@ -27,10 +28,10 @@ object PCMPlayer {
     @JvmOverloads
     fun playPCM(
         filePath: String,
+        useMaxVolume: Boolean = false,
         sampleRate: Int = 16000,
         channelConfig: Int = AudioFormat.CHANNEL_OUT_MONO,
         audioFormat: Int = AudioFormat.ENCODING_PCM_16BIT,
-        useMaxVolume: Boolean = false,
     ) {
         val audioManager = ISUS.instance.context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val streamType = AudioManager.STREAM_MUSIC
