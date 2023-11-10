@@ -1,6 +1,7 @@
 package net.ischool.isus
 
 import android.annotation.SuppressLint
+import android.app.smdt.SmdtManager
 import android.content.Intent
 import android.lamy.system.Magicbox
 import android.net.Uri
@@ -96,6 +97,18 @@ fun isMingboDevice(): Boolean {
 fun isDhDevice(): Boolean {
     return try {
         Magicbox.getApiVersion()
+        true
+    } catch (e: Throwable) {
+        false
+    }
+}
+
+/**
+ * 是否是大华32寸定制设备
+ */
+fun isDh32Device(): Boolean {
+    return try {
+        SmdtManager.create(ISUS.instance.context).smdtGetAPIVersion()
         true
     } catch (e: Throwable) {
         false

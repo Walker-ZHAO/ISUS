@@ -42,6 +42,7 @@ import net.ischool.isus.activity.InitActivity
 import net.ischool.isus.broadcast.UserSyncReceiver
 import net.ischool.isus.databinding.ActivityMainBinding
 import net.ischool.isus.db.ObjectBox
+import net.ischool.isus.isDh32Device
 import net.ischool.isus.isHongHeDevice
 import net.ischool.isus.isTouchWoDevice
 import net.ischool.isus.network.APIService
@@ -232,7 +233,7 @@ class MainActivity : RxAppCompatActivity() {
                 InfoTimeApi.clearPlan()
                 InfoTimeApi.setTimeSwitch(offTime?.time ?: 0, onTime?.time ?: 0)
 //                InfoTimeApi.setTimeSwitch(offTime1.time, onTime1.time)
-            } else if (isTouchWoDevice()){
+            } else if (isTouchWoDevice() || isDh32Device()){
                 val manager = MyManager.getInstance(this)
                 val powerManager = PowerOnOffManager.getInstance(this)
                 Log.i(

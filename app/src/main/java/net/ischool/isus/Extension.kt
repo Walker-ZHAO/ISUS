@@ -70,7 +70,7 @@ fun Context.sleep() {
             // 使CPU进入节能模式
             InfoSystemApi.execCommand("su & echo powersave > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor")
         }
-        isTouchWoDevice() -> {
+        isTouchWoDevice() || isDh32Device() -> {
             MyManager.getInstance(this).turnOffBackLight()
             // 需要禁用触屏，否则触摸事件会导致背光重新开启
             execRuntimeProcess("su & rm -rf /dev/input/event1")
@@ -109,7 +109,7 @@ fun Context.inSleep(): Boolean {
         isHikDevice() -> {
             execRuntimeProcess("cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor").contains("powersave")
         }
-        isTouchWoDevice() -> {
+        isTouchWoDevice() || isDh32Device() -> {
             !MyManager.getInstance(this).isBacklightOn
         }
         isDhDevice() -> {
@@ -132,7 +132,7 @@ fun Context.wakeup() {
         isHikDevice() -> {
             InfoSystemApi.reboot()
         }
-        isTouchWoDevice() -> {
+        isTouchWoDevice() || isDh32Device() -> {
             reboot(null)
         }
         isDhDevice() -> {
