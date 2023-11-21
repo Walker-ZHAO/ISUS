@@ -67,6 +67,7 @@ fun Context.sleep() {
             InfoDisplayApi.disableBacklight()
             // 需要禁用触屏，否则触摸事件会下发至应用
             InfoSystemApi.execCommand("su & rm -rf /dev/input/event2")
+            InfoSystemApi.execCommand("su & rm -rf /dev/input/event4")
             // 使CPU进入节能模式
             InfoSystemApi.execCommand("su & echo powersave > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor")
         }
