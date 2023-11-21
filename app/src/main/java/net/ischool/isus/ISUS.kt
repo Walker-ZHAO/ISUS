@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentActivity
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import com.tbruyelle.rxpermissions3.RxPermissions
+import com.walker.anke.framework.packageVersionName
 import com.walker.anke.framework.toast
 import net.ischool.isus.command.CommandParser
 import net.ischool.isus.command.ICommand
@@ -107,5 +108,20 @@ class ISUS(
         stopService()
         UDPService.stop()
         APIService.cancel()
+    }
+
+
+    /**
+     * 获取自定义UA
+     */
+    fun getUserAgent(): String {
+        val deviceFields = "device/${PreferenceManager.instance.getDeviceType()}"
+        val cardFields = "card/${PreferenceManager.instance.getCReaderType()}"
+        val versionFields = "version/${instance.context.applicationContext.packageVersionName}"
+        val seFields = "se/${instance.se}"
+        val schoolFields = "school/${PreferenceManager.instance.getSchoolId()}"
+        val cmdbFields = "cmdb/${PreferenceManager.instance.getCMDB()}"
+        val classFields = "class/${PreferenceManager.instance.getClassId()}"
+        return "iSchoolHTTP/1.0 $deviceFields $cardFields $seFields $versionFields $schoolFields $cmdbFields $classFields"
     }
 }

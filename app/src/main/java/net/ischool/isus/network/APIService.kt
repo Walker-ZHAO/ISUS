@@ -13,6 +13,7 @@ import net.ischool.isus.model.*
 import net.ischool.isus.network.callback.StringCallback
 import net.ischool.isus.network.interceptor.CacheInterceptor
 import net.ischool.isus.network.interceptor.URLInterceptor
+import net.ischool.isus.network.interceptor.UserAgentInterceptor
 import net.ischool.isus.network.se.NullX509TrustManager
 import net.ischool.isus.network.se.SSLSocketFactoryProvider
 import net.ischool.isus.network.se.setCert
@@ -170,6 +171,7 @@ interface APIService {
                     .cache(cache)
                     .addNetworkInterceptor(CacheInterceptor())
                     .addInterceptor(URLInterceptor())
+                    .addInterceptor(UserAgentInterceptor())
                     .addInterceptor(HttpLoggingInterceptor().apply {
                         level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
                     })
