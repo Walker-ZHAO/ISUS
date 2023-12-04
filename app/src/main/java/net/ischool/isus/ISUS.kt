@@ -117,11 +117,12 @@ class ISUS(
     fun getUserAgent(): String {
         val deviceFields = "device/${PreferenceManager.instance.getDeviceType()}"
         val cardFields = "card/${PreferenceManager.instance.getCReaderType()}"
+        val gateFields = "gate/${PreferenceManager.instance.getEntranceGuardType()}"
         val versionFields = "version/${instance.context.applicationContext.packageVersionName}"
         val seFields = "se/${instance.se}"
         val schoolFields = "school/${PreferenceManager.instance.getSchoolId()}"
         val cmdbFields = "cmdb/${PreferenceManager.instance.getCMDB()}"
         val classFields = "class/${PreferenceManager.instance.getClassId()}"
-        return "iSchoolHTTP/1.0 $deviceFields $cardFields $seFields $versionFields $schoolFields $cmdbFields $classFields"
+        return "iSchoolHTTP/1.0 $deviceFields $cardFields $gateFields $seFields $versionFields $schoolFields $cmdbFields $classFields"
     }
 }
