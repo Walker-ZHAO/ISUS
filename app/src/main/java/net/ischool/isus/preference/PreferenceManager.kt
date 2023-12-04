@@ -259,6 +259,13 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     fun getCReaderType() = getParameter()["internalICReaderType"]?.toInt() ?: CReaderType.NONE
 
     /**
+     * 门禁控制器类型
+     *
+     * @see net.ischool.isus.EntranceGuardType
+     */
+    fun getEntranceGuardType() = getParameter()["GateControllerType"]?.toInt() ?: EntranceGuardType.NONE
+
+    /**
      * 获取经度
      */
     fun getLongitude() = getParameter()["longitude"] ?: ""
