@@ -374,4 +374,13 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
         val parameter = Gson().fromJson<Map<String, Any>>(webConfig) ?: HashMap()
         return parameter["engine"] as? String? == "x5"
     }
+
+    /**
+     * 获取用于生成TOTP码的Base32串
+     */
+    fun totpKeyWithBase32(): String {
+        val totp = getParameter()["totp"] ?: ""
+        val parameter = Gson().fromJson<Map<String, Any>>(totp) ?: HashMap()
+        return parameter["key"] as? String? ?: ""
+    }
 }
