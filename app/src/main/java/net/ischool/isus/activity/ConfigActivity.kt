@@ -1,8 +1,11 @@
 package net.ischool.isus.activity
 
+import android.graphics.Color
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import android.util.Base64
+import android.view.View
+import android.view.WindowManager
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.walker.anke.framework.setBase64
 import net.ischool.isus.DeviceType
@@ -26,10 +29,9 @@ class ConfigActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        translucentStatusBar()
         binding = ActivityConfigBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        binding.toolBar.setTitle(R.string.config_title)
-        setSupportActionBar(binding.toolBar)
 
         binding.apply {
             qrImage.setBase64(PreferenceManager.instance.getQR(), Base64.DEFAULT)
@@ -60,5 +62,17 @@ class ConfigActivity : AppCompatActivity() {
                 setPositiveButton(android.R.string.ok) { _, _ -> CommandParser.instance.processCommand(CommandParser.instance.genCommand(ICommand.COMMAND_RESET, null)) }
             }.show()
         }
+    }
+
+    /**
+     * 将状态栏设置为全透明
+     */
+    private fun translucentStatusBar() {
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS)
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
+        window.statusBarColor = Color.TRANSPARENT
+
     }
 }
