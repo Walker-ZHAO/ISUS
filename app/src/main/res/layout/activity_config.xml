@@ -1,122 +1,238 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:paddingHorizontal="@dimen/x60"
+    android:paddingVertical="@dimen/x40">
 
-    <androidx.core.widget.NestedScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-            <ImageView
-                android:id="@+id/qr_image"
-                android:layout_width="200dp"
-                android:layout_height="200dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="30dp"
-                android:contentDescription="@string/description_qr_image"/>
+    <ImageView
+        android:id="@+id/rebindClass"
+        android:layout_width="@dimen/x270"
+        android:layout_height="@dimen/x120"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/systemSetting"
+        android:src="@mipmap/bg_rebind_class"
+        tools:ignore="ContentDescription"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"/>
+    
+    <ImageView
+        android:id="@+id/rebindClassIcon"
+        android:layout_width="@dimen/x85"
+        android:layout_height="@dimen/x85"
+        app:layout_constraintTop_toTopOf="@id/rebindClass"
+        app:layout_constraintBottom_toBottomOf="@id/rebindClass"
+        app:layout_constraintStart_toStartOf="@id/rebindClass"
+        app:layout_constraintEnd_toStartOf="@id/rebindClassTitle"
+        android:src="@mipmap/icon_rebind_class"
+        android:adjustViewBounds="true"
+        tools:ignore="ContentDescription"
+        app:layout_constraintHorizontal_chainStyle="packed"/>
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp"
-                android:text="@string/config_device_id"/>
+    <TextView
+        android:id="@+id/rebindClassTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/rebindClass"
+        app:layout_constraintBottom_toBottomOf="@id/rebindClass"
+        app:layout_constraintStart_toEndOf="@id/rebindClassIcon"
+        app:layout_constraintEnd_toEndOf="@id/rebindClass"
+        android:layout_marginStart="@dimen/x3"
+        android:text="@string/rebind_class"
+        android:textSize="@dimen/xs30"
+        android:textColor="@color/white"/>
 
-            <TextView
-                android:id="@+id/text_cmdbid"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="25dp"
-                android:textSize="20sp"/>
+    <ImageView
+        android:id="@+id/systemSetting"
+        android:layout_width="@dimen/x270"
+        android:layout_height="@dimen/x120"
+        app:layout_constraintTop_toTopOf="@id/rebindClass"
+        app:layout_constraintStart_toEndOf="@id/rebindClass"
+        app:layout_constraintEnd_toStartOf="@id/syncConfig"
+        android:src="@mipmap/bg_system_setting"
+        tools:ignore="ContentDescription" />
 
-            <TextView
-                android:id="@+id/text_school_id"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp"
-                android:textSize="20sp"/>
+    <ImageView
+        android:id="@+id/systemSettingIcon"
+        android:layout_width="@dimen/x85"
+        android:layout_height="@dimen/x85"
+        app:layout_constraintTop_toTopOf="@id/systemSetting"
+        app:layout_constraintBottom_toBottomOf="@id/systemSetting"
+        app:layout_constraintStart_toStartOf="@id/systemSetting"
+        app:layout_constraintEnd_toStartOf="@id/systemSettingTitle"
+        android:src="@mipmap/icon_system_setting"
+        android:adjustViewBounds="true"
+        tools:ignore="ContentDescription"
+        app:layout_constraintHorizontal_chainStyle="packed"/>
 
-            <TextView
-                android:id="@+id/text_server"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp"
-                android:textSize="20sp"/>
+    <TextView
+        android:id="@+id/systemSettingTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/systemSetting"
+        app:layout_constraintBottom_toBottomOf="@id/systemSetting"
+        app:layout_constraintStart_toEndOf="@id/systemSettingIcon"
+        app:layout_constraintEnd_toEndOf="@id/systemSetting"
+        android:layout_marginStart="@dimen/x3"
+        android:text="@string/system_setting"
+        android:textSize="@dimen/xs30"
+        android:textColor="@color/white"/>
 
-            <TextView
-                    android:id="@+id/text_platform_api"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="10dp"
-                    android:textSize="20sp" />
+    <ImageView
+        android:id="@+id/syncConfig"
+        android:layout_width="@dimen/x270"
+        android:layout_height="@dimen/x120"
+        app:layout_constraintTop_toTopOf="@id/rebindClass"
+        app:layout_constraintStart_toEndOf="@id/systemSetting"
+        app:layout_constraintEnd_toStartOf="@id/reset"
+        android:src="@mipmap/bg_sync_config"
+        tools:ignore="ContentDescription" />
 
-            <TextView
-                    android:id="@+id/text_platform_att"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="10dp"
-                    android:textSize="20sp" />
+    <ImageView
+        android:id="@+id/syncConfigIcon"
+        android:layout_width="@dimen/x85"
+        android:layout_height="@dimen/x85"
+        app:layout_constraintTop_toTopOf="@id/syncConfig"
+        app:layout_constraintBottom_toBottomOf="@id/syncConfig"
+        app:layout_constraintStart_toStartOf="@id/syncConfig"
+        app:layout_constraintEnd_toStartOf="@id/syncConfigTitle"
+        android:src="@mipmap/icon_sync_config"
+        android:adjustViewBounds="true"
+        tools:ignore="ContentDescription"
+        app:layout_constraintHorizontal_chainStyle="packed"/>
 
-            <TextView
-                    android:id="@+id/text_platform_static"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="10dp"
-                    android:textSize="20sp" />
+    <TextView
+        android:id="@+id/syncConfigTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/syncConfig"
+        app:layout_constraintBottom_toBottomOf="@id/syncConfig"
+        app:layout_constraintStart_toEndOf="@id/syncConfigIcon"
+        app:layout_constraintEnd_toEndOf="@id/syncConfig"
+        android:layout_marginStart="@dimen/x3"
+        android:text="@string/sync_config"
+        android:textSize="@dimen/xs30"
+        android:textColor="@color/white"/>
 
-            <TextView
-                    android:id="@+id/text_platform_mq"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="10dp"
-                    android:textSize="20sp" />
+    <ImageView
+        android:id="@+id/reset"
+        android:layout_width="@dimen/x270"
+        android:layout_height="@dimen/x120"
+        app:layout_constraintTop_toTopOf="@id/rebindClass"
+        app:layout_constraintStart_toEndOf="@id/syncConfig"
+        app:layout_constraintEnd_toStartOf="@id/reboot"
+        android:src="@mipmap/bg_reset"
+        tools:ignore="ContentDescription" />
 
-            <TextView
-                    android:id="@+id/text_iam_package"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="10dp"
-                    android:textSize="20sp" />
+    <ImageView
+        android:id="@+id/resetIcon"
+        android:layout_width="@dimen/x85"
+        android:layout_height="@dimen/x85"
+        app:layout_constraintTop_toTopOf="@id/reset"
+        app:layout_constraintBottom_toBottomOf="@id/reset"
+        app:layout_constraintStart_toStartOf="@id/reset"
+        app:layout_constraintEnd_toStartOf="@id/resetTitle"
+        android:src="@mipmap/icon_reset"
+        android:adjustViewBounds="true"
+        tools:ignore="ContentDescription"
+        app:layout_constraintHorizontal_chainStyle="packed"/>
 
-            <TextView
-                android:id="@+id/text_device"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp"
-                android:textSize="20sp"/>
+    <TextView
+        android:id="@+id/resetTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/reset"
+        app:layout_constraintBottom_toBottomOf="@id/reset"
+        app:layout_constraintStart_toEndOf="@id/resetIcon"
+        app:layout_constraintEnd_toEndOf="@id/reset"
+        android:layout_marginStart="@dimen/x3"
+        android:text="@string/reset"
+        android:textSize="@dimen/xs30"
+        android:textColor="@color/white"/>
 
-            <TextView
-                android:id="@+id/text_external"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp"
-                android:textSize="20sp"/>
+    <ImageView
+        android:id="@+id/reboot"
+        android:layout_width="@dimen/x270"
+        android:layout_height="@dimen/x120"
+        app:layout_constraintTop_toTopOf="@id/rebindClass"
+        app:layout_constraintStart_toEndOf="@id/reset"
+        app:layout_constraintEnd_toStartOf="@id/sleep"
+        android:src="@mipmap/bg_reboot"
+        tools:ignore="ContentDescription" />
 
-            <Button
-                android:id="@+id/btn_reset"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="20dp"
-                android:layout_marginBottom="15dp"
-                android:text="@string/btn_reset"
-                android:textSize="20sp"/>
-        </LinearLayout>
-    </androidx.core.widget.NestedScrollView>
-</LinearLayout>
+    <ImageView
+        android:id="@+id/rebootIcon"
+        android:layout_width="@dimen/x85"
+        android:layout_height="@dimen/x85"
+        app:layout_constraintTop_toTopOf="@id/reboot"
+        app:layout_constraintBottom_toBottomOf="@id/reboot"
+        app:layout_constraintStart_toStartOf="@id/reboot"
+        app:layout_constraintEnd_toStartOf="@id/rebootTitle"
+        android:src="@mipmap/icon_reboot"
+        android:adjustViewBounds="true"
+        tools:ignore="ContentDescription"
+        app:layout_constraintHorizontal_chainStyle="packed"/>
+
+    <TextView
+        android:id="@+id/rebootTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/reboot"
+        app:layout_constraintBottom_toBottomOf="@id/reboot"
+        app:layout_constraintStart_toEndOf="@id/rebootIcon"
+        app:layout_constraintEnd_toEndOf="@id/reboot"
+        android:layout_marginStart="@dimen/x3"
+        android:text="@string/reboot"
+        android:textSize="@dimen/xs30"
+        android:textColor="@color/white"/>
+
+    <ImageView
+        android:id="@+id/sleep"
+        android:layout_width="@dimen/x270"
+        android:layout_height="@dimen/x120"
+        app:layout_constraintTop_toTopOf="@id/rebindClass"
+        app:layout_constraintStart_toEndOf="@id/reboot"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:src="@mipmap/bg_sleep"
+        tools:ignore="ContentDescription" />
+
+    <ImageView
+        android:id="@+id/sleepIcon"
+        android:layout_width="@dimen/x85"
+        android:layout_height="@dimen/x85"
+        app:layout_constraintTop_toTopOf="@id/sleep"
+        app:layout_constraintBottom_toBottomOf="@id/sleep"
+        app:layout_constraintStart_toStartOf="@id/sleep"
+        app:layout_constraintEnd_toStartOf="@id/sleepTitle"
+        android:src="@mipmap/icon_sleep"
+        android:adjustViewBounds="true"
+        tools:ignore="ContentDescription"
+        app:layout_constraintHorizontal_chainStyle="packed"/>
+
+    <TextView
+        android:id="@+id/sleepTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/sleep"
+        app:layout_constraintBottom_toBottomOf="@id/sleep"
+        app:layout_constraintStart_toEndOf="@id/sleepIcon"
+        app:layout_constraintEnd_toEndOf="@id/sleep"
+        android:layout_marginStart="@dimen/x3"
+        android:text="@string/sleep"
+        android:textSize="@dimen/xs30"
+        android:textColor="@color/white"/>
+
+    <ImageView
+        android:id="@+id/back"
+        android:layout_width="@dimen/x80"
+        android:layout_height="@dimen/x80"
+        android:layout_marginEnd="@dimen/x50"
+        android:layout_marginBottom="@dimen/x40"
+        android:src="@mipmap/icon_back"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:ignore="ContentDescription" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

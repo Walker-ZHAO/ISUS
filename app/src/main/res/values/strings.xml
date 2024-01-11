@@ -57,4 +57,11 @@
     <string name="user_sync_tip">用户信息同步中...</string>
     <string name="progress_text">%d%%</string>
 
+    <string name="rebind_class">修改班级</string>
+    <string name="system_setting">系统设置</string>
+    <string name="sync_config">同步设置</string>
+    <string name="reset">应用重置</string>
+    <string name="reboot">系统重启</string>
+    <string name="sleep">待机</string>
+
 </resources>

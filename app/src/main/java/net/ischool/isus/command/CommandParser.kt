@@ -19,7 +19,8 @@ import kotlin.collections.HashMap
  */
 class CommandParser private constructor() {
 
-    private var processor: ICommand? = null
+    var processor: ICommand? = null
+        private set
     private val commandMap = mutableMapOf<String, Long>()
 
     init {

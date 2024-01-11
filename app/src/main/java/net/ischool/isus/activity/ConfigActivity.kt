@@ -33,35 +33,43 @@ class ConfigActivity : AppCompatActivity() {
         binding = ActivityConfigBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.apply {
-            qrImage.setBase64(PreferenceManager.instance.getQR(), Base64.DEFAULT)
-            textCmdbid.text = getString(R.string.config_cmdb, PreferenceManager.instance.getCMDB())
-            textSchoolId.text = getString(R.string.config_sid, PreferenceManager.instance.getSchoolId())
-            textServer.text = getString(R.string.config_server, PreferenceManager.instance.getCdnUrl())
-            textPlatformApi.text = getString(R.string.config_platform_api, PreferenceManager.instance.getPlatformApi())
-            textPlatformAtt.text = getString(R.string.config_platform_att, PreferenceManager.instance.getPlatformAtt())
-            textPlatformStatic.text = getString(R.string.config_platform_static, PreferenceManager.instance.getPlatformStatic())
-            textPlatformMq.text = getString(R.string.config_platform_mq, PreferenceManager.instance.getPlatformMq())
-            textIamPackage.text = getString(R.string.config_iam_package, PreferenceManager.instance.getIamPackage())
-            textDevice.text = getString(R.string.config_device_type, DeviceType.getDeviceName(PreferenceManager.instance.getDeviceType()))
-        }
+        binding.rebindClass.setOnClickListener {  }
+        binding.systemSetting.setOnClickListener { CommandParser.instance.processor?.setting() }
+        binding.syncConfig.setOnClickListener { CommandParser.instance.processor?.reload() }
+        binding.reset.setOnClickListener { CommandParser.instance.processor?.reset() }
+        binding.reboot.setOnClickListener { CommandParser.instance.processor?.reboot() }
+        binding.sleep.setOnClickListener { CommandParser.instance.processor?.sleep() }
+        binding.back.setOnClickListener { finish() }
 
-        val builder = StringBuilder()
-        val map = PreferenceManager.instance.getParameter()
-        for ( (key, value) in map ) {
-            val title = ExternalParameter.getEXPName(key)?:key
-            builder.append("$title：$value \n")
-        }
-        binding.textExternal.text = builder.toString()
+//        binding.apply {
+//            qrImage.setBase64(PreferenceManager.instance.getQR(), Base64.DEFAULT)
+//            textCmdbid.text = getString(R.string.config_cmdb, PreferenceManager.instance.getCMDB())
+//            textSchoolId.text = getString(R.string.config_sid, PreferenceManager.instance.getSchoolId())
+//            textServer.text = getString(R.string.config_server, PreferenceManager.instance.getCdnUrl())
+//            textPlatformApi.text = getString(R.string.config_platform_api, PreferenceManager.instance.getPlatformApi())
+//            textPlatformAtt.text = getString(R.string.config_platform_att, PreferenceManager.instance.getPlatformAtt())
+//            textPlatformStatic.text = getString(R.string.config_platform_static, PreferenceManager.instance.getPlatformStatic())
+//            textPlatformMq.text = getString(R.string.config_platform_mq, PreferenceManager.instance.getPlatformMq())
+//            textIamPackage.text = getString(R.string.config_iam_package, PreferenceManager.instance.getIamPackage())
+//            textDevice.text = getString(R.string.config_device_type, DeviceType.getDeviceName(PreferenceManager.instance.getDeviceType()))
+//        }
 
-        binding.btnReset.setOnClickListener {
-            MaterialAlertDialogBuilder(this).apply {
-                setTitle(R.string.warning)
-                setMessage(R.string.warning_reset)
-                setNegativeButton(android.R.string.cancel) { _, _-> }
-                setPositiveButton(android.R.string.ok) { _, _ -> CommandParser.instance.processCommand(CommandParser.instance.genCommand(ICommand.COMMAND_RESET, null)) }
-            }.show()
-        }
+//        val builder = StringBuilder()
+//        val map = PreferenceManager.instance.getParameter()
+//        for ( (key, value) in map ) {
+//            val title = ExternalParameter.getEXPName(key)?:key
+//            builder.append("$title：$value \n")
+//        }
+//        binding.textExternal.text = builder.toString()
+//
+//        binding.btnReset.setOnClickListener {
+//            MaterialAlertDialogBuilder(this).apply {
+//                setTitle(R.string.warning)
+//                setMessage(R.string.warning_reset)
+//                setNegativeButton(android.R.string.cancel) { _, _-> }
+//                setPositiveButton(android.R.string.ok) { _, _ -> CommandParser.instance.processCommand(CommandParser.instance.genCommand(ICommand.COMMAND_RESET, null)) }
+//            }.show()
+//        }
     }
 
     /**
