@@ -63,5 +63,11 @@
     <string name="reset">应用重置</string>
     <string name="reboot">系统重启</string>
     <string name="sleep">待机</string>
-
+    <string name="connection_success">连接正常</string>
+    <string name="connection_failed">连接失败</string>
+    <string name="connection_unknown">无法判断</string>
+    <string name="connection_detection">重新检测</string>
+    <string name="diag_cdn">边缘云</string>
+    <string name="diag_platform">平台</string>
+    <string name="cdn_version">版本号：%s</string>
 </resources>

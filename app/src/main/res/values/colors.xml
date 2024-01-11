@@ -6,4 +6,12 @@
     <color name="background_gray">#F2F2F2</color>
     <color name="title_text_gray">#999999</color>
     <color name="white">#FFFFFF</color>
+    <color name="blueAccent">#0FAEE0</color>
+    <color name="blue">#2A88FF</color>
+    <color name="green">#13C89D</color>
+    <color name="magenta">#F84686</color>
+    <color name="gray">#9BB5C6</color>
+    <color name="title_black">#2E333E</color>
+    <color name="subtitle_gray">#96989B</color>
+    <color name="red">#FF5959</color>
 </resources>

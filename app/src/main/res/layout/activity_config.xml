@@ -224,6 +224,234 @@
         android:textSize="@dimen/xs30"
         android:textColor="@color/white"/>
 
+    <View
+        android:id="@+id/pageStart"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/rebindClass"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/pageEnd"
+        android:layout_marginTop="@dimen/x20"
+        android:background="@mipmap/bg_page"/>
+
+    <View
+        android:id="@+id/pageEnd"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="@id/pageStart"
+        app:layout_constraintBottom_toBottomOf="@id/pageStart"
+        app:layout_constraintStart_toEndOf="@id/pageStart"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="@dimen/x20"
+        android:background="@mipmap/bg_page"/>
+
+    <View
+        android:id="@+id/cdnDiag"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/x145"
+        android:background="@drawable/white_corner_rect"
+        app:layout_constraintTop_toTopOf="@id/pageStart"
+        app:layout_constraintStart_toStartOf="@id/pageStart"
+        app:layout_constraintEnd_toStartOf="@id/platformDiag"
+        android:layout_marginTop="@dimen/x20"
+        android:layout_marginHorizontal="@dimen/x20" />
+
+    <View
+        android:layout_width="@dimen/x10"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="@id/cdnDiag"
+        app:layout_constraintBottom_toBottomOf="@id/cdnDiag"
+        app:layout_constraintStart_toStartOf="@id/cdnDiag"
+        android:background="@drawable/blue_start_corner_rect"/>
+
+    <TextView
+        android:id="@+id/cdnTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/cdnDiag"
+        app:layout_constraintStart_toStartOf="@id/cdnDiag"
+        android:layout_marginTop="@dimen/x10"
+        android:layout_marginStart="@dimen/x20"
+        android:text="@string/diag_cdn"
+        android:textSize="@dimen/xs22"
+        android:textColor="@color/title_black"/>
+
+    <TextView
+        android:id="@+id/cdnVersion"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/cdnTitle"
+        app:layout_constraintStart_toStartOf="@id/cdnTitle"
+        app:layout_constraintEnd_toEndOf="@id/cdnDiag"
+        android:layout_marginTop="@dimen/x5"
+        android:layout_marginEnd="@dimen/x10"
+        android:textSize="@dimen/xs16"
+        android:textColor="@color/subtitle_gray"
+        android:gravity="start"
+        tools:text="版本号：202311p28"/>
+
+    <TextView
+        android:id="@+id/cdnContent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/cdnVersion"
+        app:layout_constraintBottom_toBottomOf="@id/cdnDiag"
+        app:layout_constraintStart_toStartOf="@id/cdnTitle"
+        app:layout_constraintEnd_toEndOf="@id/cdnDiag"
+        android:layout_marginVertical="@dimen/x5"
+        android:layout_marginEnd="@dimen/x10"
+        android:gravity="start"
+        android:textSize="@dimen/xs16"
+        android:textColor="@color/red"
+        tools:text="版本较低,请更新至[202311p28]以上"/>
+
+    <View
+        android:id="@+id/cdnState"
+        android:layout_width="@dimen/x94"
+        android:layout_height="@dimen/x28"
+        app:layout_constraintTop_toTopOf="@id/cdnDiag"
+        app:layout_constraintEnd_toEndOf="@id/cdnDiag"
+        android:background="@drawable/gray_opposite_angles_corner_rect"/>
+    
+    <ImageView
+        android:id="@+id/cdnStateIcon"
+        android:layout_width="@dimen/x22"
+        android:layout_height="@dimen/x22"
+        app:layout_constraintTop_toTopOf="@id/cdnState"
+        app:layout_constraintBottom_toBottomOf="@id/cdnState"
+        app:layout_constraintStart_toStartOf="@id/cdnState"
+        app:layout_constraintEnd_toStartOf="@id/cdnStateTitle"
+        android:src="@mipmap/connection_unknown"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        tools:ignore="ContentDescription" />
+
+    <TextView
+        android:id="@+id/cdnStateTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/cdnState"
+        app:layout_constraintBottom_toBottomOf="@id/cdnState"
+        app:layout_constraintStart_toEndOf="@id/cdnStateIcon"
+        app:layout_constraintEnd_toEndOf="@id/cdnState"
+        android:layout_marginStart="@dimen/x2"
+        android:text="@string/connection_unknown"
+        android:textSize="@dimen/xs14"
+        android:textColor="@color/white"/>
+
+    <View
+        android:id="@+id/platformDiag"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/x94"
+        android:background="@drawable/white_corner_rect"
+        app:layout_constraintTop_toTopOf="@id/pageStart"
+        app:layout_constraintStart_toEndOf="@id/cdnDiag"
+        app:layout_constraintEnd_toEndOf="@id/pageStart"
+        android:layout_marginTop="@dimen/x20"
+        android:layout_marginEnd="@dimen/x20" />
+
+    <TextView
+        android:id="@+id/platformTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/platformDiag"
+        app:layout_constraintStart_toStartOf="@id/platformDiag"
+        android:layout_marginTop="@dimen/x10"
+        android:layout_marginStart="@dimen/x20"
+        android:text="@string/diag_platform"
+        android:textSize="@dimen/xs22"
+        android:textColor="@color/title_black"/>
+
+    <TextView
+        android:id="@+id/platformContent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/platformTitle"
+        app:layout_constraintBottom_toBottomOf="@id/platformDiag"
+        app:layout_constraintStart_toStartOf="@id/platformTitle"
+        app:layout_constraintEnd_toEndOf="@id/platformDiag"
+        android:layout_marginVertical="@dimen/x5"
+        android:layout_marginEnd="@dimen/x10"
+        android:gravity="start"
+        android:textSize="@dimen/xs16"
+        android:textColor="@color/red"
+        tools:text="边缘云到平台mq队列"/>
+
+    <View
+        android:id="@+id/platformState"
+        android:layout_width="@dimen/x94"
+        android:layout_height="@dimen/x28"
+        app:layout_constraintTop_toTopOf="@id/platformDiag"
+        app:layout_constraintEnd_toEndOf="@id/platformDiag"
+        android:background="@drawable/gray_opposite_angles_corner_rect"/>
+
+    <ImageView
+        android:id="@+id/platformStateIcon"
+        android:layout_width="@dimen/x22"
+        android:layout_height="@dimen/x22"
+        app:layout_constraintTop_toTopOf="@id/platformState"
+        app:layout_constraintBottom_toBottomOf="@id/platformState"
+        app:layout_constraintStart_toStartOf="@id/platformState"
+        app:layout_constraintEnd_toStartOf="@id/platformStateTitle"
+        android:src="@mipmap/connection_unknown"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        tools:ignore="ContentDescription" />
+
+    <TextView
+        android:id="@+id/platformStateTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/platformState"
+        app:layout_constraintBottom_toBottomOf="@id/platformState"
+        app:layout_constraintStart_toEndOf="@id/platformStateIcon"
+        app:layout_constraintEnd_toEndOf="@id/platformState"
+        android:layout_marginStart="@dimen/x2"
+        android:text="@string/connection_unknown"
+        android:textSize="@dimen/xs14"
+        android:textColor="@color/white"/>
+
+    <View
+        android:id="@+id/rediagnosis"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/x40"
+        android:background="@drawable/white_corner_rect"
+        app:layout_constraintBottom_toBottomOf="@id/cdnDiag"
+        app:layout_constraintStart_toStartOf="@id/platformDiag"
+        app:layout_constraintEnd_toEndOf="@id/platformDiag" />
+    
+    <ImageView
+        android:id="@+id/diagIcon"
+        android:layout_width="@dimen/x20"
+        android:layout_height="@dimen/x20"
+        android:src="@mipmap/icon_refresh"
+        app:layout_constraintTop_toTopOf="@id/rediagnosis"
+        app:layout_constraintBottom_toBottomOf="@id/rediagnosis"
+        app:layout_constraintStart_toStartOf="@id/rediagnosis"
+        app:layout_constraintEnd_toStartOf="@id/diagTitle"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        tools:ignore="ContentDescription" />
+
+    <TextView
+        android:id="@+id/diagTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/rediagnosis"
+        app:layout_constraintBottom_toBottomOf="@id/rediagnosis"
+        app:layout_constraintStart_toEndOf="@id/diagIcon"
+        app:layout_constraintEnd_toEndOf="@id/rediagnosis"
+        android:layout_marginStart="@dimen/x5"
+        android:text="@string/connection_detection"
+        android:textSize="@dimen/xs16"
+        android:textColor="@color/blue"/>
+
+    <View
+        android:layout_width="@dimen/x10"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="@id/platformDiag"
+        app:layout_constraintBottom_toBottomOf="@id/platformDiag"
+        app:layout_constraintStart_toStartOf="@id/platformDiag"
+        android:background="@drawable/blue_start_corner_rect"/>
+    
     <ImageView
         android:id="@+id/back"
         android:layout_width="@dimen/x80"
