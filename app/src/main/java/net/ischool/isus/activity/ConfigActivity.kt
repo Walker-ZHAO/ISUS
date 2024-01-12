@@ -5,9 +5,12 @@ import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import net.ischool.isus.DeviceType
 import net.ischool.isus.R
+import net.ischool.isus.adapter.StaticConfigurationAdapter
 import net.ischool.isus.command.CommandParser
 import net.ischool.isus.databinding.ActivityConfigBinding
 import net.ischool.isus.model.ALARM_TYPE_CAMPUSNG
@@ -18,6 +21,7 @@ import net.ischool.isus.model.ALARM_TYPE_PLATFORM
 import net.ischool.isus.model.ALARM_TYPE_UPGRADE
 import net.ischool.isus.model.AlarmInfo
 import net.ischool.isus.network.APIService
+import net.ischool.isus.preference.PreferenceManager
 import net.ischool.isus.service.checkAlarm
 
 /**
@@ -32,6 +36,8 @@ class ConfigActivity : AppCompatActivity() {
     private lateinit var binding: ActivityConfigBinding
 
     private val compositeDisposable = CompositeDisposable()
+
+    private val staticConfigAdapter by lazy { StaticConfigurationAdapter(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,23 +54,17 @@ class ConfigActivity : AppCompatActivity() {
 
         binding.rediagnosis.setOnClickListener { performDiag() }
 
+        binding.staticConfigRv.apply {
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+            adapter = staticConfigAdapter
+        }
+
         binding.back.setOnClickListener { finish() }
 
         // 执行诊断程序
         performDiag()
-
-//        binding.apply {
-//            qrImage.setBase64(PreferenceManager.instance.getQR(), Base64.DEFAULT)
-//            textCmdbid.text = getString(R.string.config_cmdb, PreferenceManager.instance.getCMDB())
-//            textSchoolId.text = getString(R.string.config_sid, PreferenceManager.instance.getSchoolId())
-//            textServer.text = getString(R.string.config_server, PreferenceManager.instance.getCdnUrl())
-//            textPlatformApi.text = getString(R.string.config_platform_api, PreferenceManager.instance.getPlatformApi())
-//            textPlatformAtt.text = getString(R.string.config_platform_att, PreferenceManager.instance.getPlatformAtt())
-//            textPlatformStatic.text = getString(R.string.config_platform_static, PreferenceManager.instance.getPlatformStatic())
-//            textPlatformMq.text = getString(R.string.config_platform_mq, PreferenceManager.instance.getPlatformMq())
-//            textIamPackage.text = getString(R.string.config_iam_package, PreferenceManager.instance.getIamPackage())
-//            textDevice.text = getString(R.string.config_device_type, DeviceType.getDeviceName(PreferenceManager.instance.getDeviceType()))
-//        }
+        // 更新静态配置信息
+        updateStaticConfig()
 
 //        val builder = StringBuilder()
 //        val map = PreferenceManager.instance.getParameter()
@@ -164,5 +164,22 @@ class ConfigActivity : AppCompatActivity() {
                 binding.platformStateTitle.text = getString(R.string.connection_success)
             }
         }
+    }
+
+    /**
+     * 更新静态配置信息
+     */
+    private fun updateStaticConfig() {
+        val staticConfigList = mutableListOf<String>()
+        staticConfigList.add(getString(R.string.config_cmdb, PreferenceManager.instance.getCMDB()))
+        staticConfigList.add(getString(R.string.config_sid, PreferenceManager.instance.getSchoolId()))
+        staticConfigList.add(getString(R.string.config_server, PreferenceManager.instance.getCdnUrl()))
+        staticConfigList.add(getString(R.string.config_platform_api, PreferenceManager.instance.getPlatformApi()))
+        staticConfigList.add(getString(R.string.config_platform_att, PreferenceManager.instance.getPlatformAtt()))
+        staticConfigList.add(getString(R.string.config_platform_static, PreferenceManager.instance.getPlatformStatic()))
+        staticConfigList.add(getString(R.string.config_platform_mq, PreferenceManager.instance.getPlatformMq()))
+        staticConfigList.add(getString(R.string.config_iam_package, PreferenceManager.instance.getIamPackage()))
+        staticConfigList.add(getString(R.string.config_device_type, DeviceType.getDeviceName(PreferenceManager.instance.getDeviceType())))
+        staticConfigAdapter.setData(staticConfigList)
     }
 }
