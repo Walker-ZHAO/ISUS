@@ -20,21 +20,18 @@ import java.util.concurrent.TimeUnit
 /**
  * 周期性检测报警信息
  *
- * @param cdnVersion 要求的最小CDN版本号
  * @param period 间隔周期，单位秒，默认60秒检测一次
  */
-fun alarmIntervalDetect(cdnVersion: String, period: Long = 60): Observable<List<AlarmInfo>> {
+fun alarmIntervalDetect(period: Long = 60): Observable<List<AlarmInfo>> {
     return Observable.interval(0, period, TimeUnit.SECONDS).flatMap {
-        checkAlarm(cdnVersion)
+        checkAlarm()
     }
 }
 
 /**
  * 整合边缘云报警信息
- *
- * @param cdnVersion 要求的最小CDN版本号
  */
-fun checkAlarm(cdnVersion: String): Observable<List<AlarmInfo>> {
+fun checkAlarm(): Observable<List<AlarmInfo>> {
     return checkCdnConnectivity().flatMap {
         // 无法连接边缘云，更新联系人信息后，发出报警
         if (it.isNotEmpty()) {
@@ -42,7 +39,7 @@ fun checkAlarm(cdnVersion: String): Observable<List<AlarmInfo>> {
             Observable.just(listOf(connectivityAlarm))
         } else {
             // 可以连接边缘云，继续版本检测
-            checkCdnVersion(cdnVersion)
+            checkCdnVersion()
         }
     }.flatMap {
         // 此处result的报警信息，可能是连接性问题，也可能是版本问题
@@ -86,10 +83,10 @@ private fun checkCdnConnectivity(): Observable<List<AlarmInfo>> {
 
 /**
  * 检查CDN服务器版本号，如果低于最低要求的版本号，返回的报警列表中包含CDN需升级的报警信息
- *
- * @param minVersion 要求的最小CDN版本号
  */
-private fun checkCdnVersion(minVersion: String): Observable<List<AlarmInfo>> {
+private fun checkCdnVersion(): Observable<List<AlarmInfo>> {
+    val minVersion = PreferenceManager.instance.getMinCdnVersion()
+
     val alarmInfo = AlarmInfo(
         ALARM_TYPE_UPGRADE, System.currentTimeMillis() / 1000, "边缘云系统版本较低，请更新至【$minVersion】以上。",
         "请联系平台服务商进行处理。",

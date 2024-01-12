@@ -41,6 +41,7 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     private val _parameter: Preference<String>       /** 额外的参数配置 **/
     private val _contactDisconnect: Preference<String>  /** 边缘云无法连接时的联系人信息 **/
     private val _contactUpgrade: Preference<String>     /** 边缘云版本过低时的联系人信息 **/
+    private val _minCdnVersion: Preference<String>     /** 要求的边缘云最低版本号 **/
 
     init {
         preference = context.getSharedPreferences(CONFIG_PATH, Context.MODE_PRIVATE)
@@ -66,6 +67,7 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
         _parameter = rxPreference.getString(KEY_PARAMETER)
         _contactDisconnect = rxPreference.getString(ALARM_DISCONNECT_CONTACT)
         _contactUpgrade = rxPreference.getString(ALARM_UPGRADE_CONTACT)
+        _minCdnVersion = rxPreference.getString(ALARM_MIN_CDN_VERSION)
         setDeviceType(deviceType)
     }
 
@@ -113,6 +115,7 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
         /** 报警接口需要持久化的联系人信息 **/
         private const val ALARM_DISCONNECT_CONTACT = "disconnect_contact"
         private const val ALARM_UPGRADE_CONTACT = "upgrade_contact"
+        private const val ALARM_MIN_CDN_VERSION = "min_cdn_version"
     }
 
     fun getSePemPath() = _sePemPath.get()
@@ -146,6 +149,7 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     fun getURL() = "${_protocal.get()}://${_serverAddress.get()}/"
     fun getContactDisconnect() = _contactDisconnect.get()
     fun getContactUpgrade() = _contactUpgrade.get()
+    fun getMinCdnVersion() = _minCdnVersion.get()
 
     fun setSePemPath(path: String) = _sePemPath.set(path)
     fun setKeyPass(pass: String) = _keyPass.set(pass)
@@ -171,6 +175,7 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     fun setParameter(param: Map<String, String>) = _parameter.set(Gson().toJson(param))
     fun setContactDisconnect(contact: String) = _contactDisconnect.set(contact)
     fun setContactUpgrade(contact: String) = _contactUpgrade.set(contact)
+    fun setMinCdnVersion(version: String) = _minCdnVersion.set(version)
 
     /**
      * 语音网关

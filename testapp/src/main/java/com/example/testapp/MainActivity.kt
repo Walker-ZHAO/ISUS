@@ -83,7 +83,7 @@ class MainActivity : RxAppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        ISUS.init(this, DeviceType.BADGE, securityEnhance = false)
+        ISUS.init(this, DeviceType.BADGE, "202401p12", securityEnhance = false)
 //        ISUS.init(this, DeviceType.VISION_PHONE, true, "huixiaoan")
 
         binding.init.setOnClickListener { startActivity<InitActivity>() }
@@ -190,7 +190,7 @@ class MainActivity : RxAppCompatActivity() {
 //                    .subscribe { "$it" }
 //            val p = execRuntimeProcess("sunew /system/xbin/system_reboot.sh")
 //            btn_start.snack("Hello Kotlin")
-            alarmIntervalDetect("202305p23").subscribeBy {
+            alarmIntervalDetect().subscribeBy {
                 Log.i("Walker", "alarm: $it")
             }
         }

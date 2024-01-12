@@ -51,6 +51,7 @@ class ISUS(
         fun init(
             context: Context,
             deviceType: Int,
+            minCdnVersion: String,
             securityEnhance: Boolean = false,
             iam: String = "",
             commandProcessor: ICommand? = null,
@@ -60,6 +61,7 @@ class ISUS(
             CommandParser.init(commandProcessor)
             Logger.addLogAdapter(AndroidLogAdapter())
             PreferenceManager.initPreference(context, deviceType)
+            PreferenceManager.instance.setMinCdnVersion(minCdnVersion)
             ObjectBox.init(context)
             if (context is FragmentActivity) {
                 val rxPermission = RxPermissions(context)

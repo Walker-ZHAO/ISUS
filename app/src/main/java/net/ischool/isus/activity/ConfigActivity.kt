@@ -112,7 +112,7 @@ class ConfigActivity : AppCompatActivity() {
                 val currentVersionNum = status.data.version ?: ""
                 binding.cdnVersion.text = getString(R.string.cdn_version, currentVersionNum)
             }
-        val diagDisposable = checkAlarm("")
+        val diagDisposable = checkAlarm()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
                 updateDiagInfo(it)
