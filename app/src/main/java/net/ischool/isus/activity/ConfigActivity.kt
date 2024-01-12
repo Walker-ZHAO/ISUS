@@ -2,19 +2,23 @@ package net.ischool.isus.activity
 
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Base64
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.walker.anke.framework.setBase64
-import net.ischool.isus.DeviceType
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import net.ischool.isus.R
 import net.ischool.isus.command.CommandParser
-import net.ischool.isus.command.ICommand
 import net.ischool.isus.databinding.ActivityConfigBinding
-import net.ischool.isus.preference.ExternalParameter
-import net.ischool.isus.preference.PreferenceManager
+import net.ischool.isus.model.ALARM_TYPE_CAMPUSNG
+import net.ischool.isus.model.ALARM_TYPE_DISCONNECT
+import net.ischool.isus.model.ALARM_TYPE_MQ
+import net.ischool.isus.model.ALARM_TYPE_NOT_MATCH
+import net.ischool.isus.model.ALARM_TYPE_PLATFORM
+import net.ischool.isus.model.ALARM_TYPE_UPGRADE
+import net.ischool.isus.model.AlarmInfo
+import net.ischool.isus.network.APIService
+import net.ischool.isus.service.checkAlarm
 
 /**
  * 配置界面
@@ -26,6 +30,8 @@ import net.ischool.isus.preference.PreferenceManager
 class ConfigActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityConfigBinding
+
+    private val compositeDisposable = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,7 +45,13 @@ class ConfigActivity : AppCompatActivity() {
         binding.reset.setOnClickListener { CommandParser.instance.processor?.reset() }
         binding.reboot.setOnClickListener { CommandParser.instance.processor?.reboot() }
         binding.sleep.setOnClickListener { CommandParser.instance.processor?.sleep() }
+
+        binding.rediagnosis.setOnClickListener { performDiag() }
+
         binding.back.setOnClickListener { finish() }
+
+        // 执行诊断程序
+        performDiag()
 
 //        binding.apply {
 //            qrImage.setBase64(PreferenceManager.instance.getQR(), Base64.DEFAULT)
@@ -72,6 +84,11 @@ class ConfigActivity : AppCompatActivity() {
 //        }
     }
 
+    override fun onDestroy() {
+        compositeDisposable.dispose()
+        super.onDestroy()
+    }
+
     /**
      * 将状态栏设置为全透明
      */
@@ -82,5 +99,70 @@ class ConfigActivity : AppCompatActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS)
         window.statusBarColor = Color.TRANSPARENT
 
+    }
+
+    /**
+     * 执行诊断程序
+     */
+    private fun performDiag() {
+        val versionDisposable = APIService.getCdnInfo()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                val status = checkNotNull(it.body())
+                val currentVersionNum = status.data.version ?: ""
+                binding.cdnVersion.text = getString(R.string.cdn_version, currentVersionNum)
+            }
+        val diagDisposable = checkAlarm("")
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                updateDiagInfo(it)
+            }
+
+        compositeDisposable.add(versionDisposable)
+        compositeDisposable.add(diagDisposable)
+    }
+
+    /**
+     * 更新诊断结果
+     */
+    private fun updateDiagInfo(infos: List<AlarmInfo>) {
+        val cdnDiagContent = StringBuilder()
+        val platformDiagContent = StringBuilder()
+        infos.forEach {
+            // 分组展示报错信息
+            when (it.type) {
+                ALARM_TYPE_DISCONNECT, ALARM_TYPE_UPGRADE, ALARM_TYPE_CAMPUSNG, ALARM_TYPE_NOT_MATCH -> {
+                    cdnDiagContent.append("${it.reason}\n")
+                }
+                ALARM_TYPE_MQ, ALARM_TYPE_PLATFORM -> {
+                    platformDiagContent.append("${it.reason}\n")
+                }
+            }
+        }
+        binding.cdnContent.text = cdnDiagContent.toString()
+        binding.platformContent.text = platformDiagContent.toString()
+
+        // 边缘云、平台的连接状态
+        if (infos.firstOrNull { it.type == ALARM_TYPE_DISCONNECT } != null) {
+            binding.cdnState.setBackgroundResource(R.drawable.magenta_opposite_angles_corner_rect)
+            binding.cdnStateIcon.setImageResource(R.mipmap.connection_failed)
+            binding.cdnStateTitle.text = getString(R.string.connection_failed)
+            binding.platformState.setBackgroundResource(R.drawable.gray_opposite_angles_corner_rect)
+            binding.platformStateIcon.setImageResource(R.mipmap.connection_unknown)
+            binding.platformStateTitle.text = getString(R.string.connection_unknown)
+        } else {
+            binding.cdnState.setBackgroundResource(R.drawable.green_opposite_angles_corner_rect)
+            binding.cdnStateIcon.setImageResource(R.mipmap.connection_success)
+            binding.cdnStateTitle.text = getString(R.string.connection_success)
+            if (infos.firstOrNull { it.type == ALARM_TYPE_MQ || it.type == ALARM_TYPE_PLATFORM } != null) {
+                binding.platformState.setBackgroundResource(R.drawable.magenta_opposite_angles_corner_rect)
+                binding.platformStateIcon.setImageResource(R.mipmap.connection_failed)
+                binding.platformStateTitle.text = getString(R.string.connection_failed)
+            } else {
+                binding.platformState.setBackgroundResource(R.drawable.green_opposite_angles_corner_rect)
+                binding.platformStateIcon.setImageResource(R.mipmap.connection_success)
+                binding.platformStateTitle.text = getString(R.string.connection_success)
+            }
+        }
     }
 }

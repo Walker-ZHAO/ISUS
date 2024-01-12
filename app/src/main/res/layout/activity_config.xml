@@ -286,10 +286,10 @@
         app:layout_constraintEnd_toEndOf="@id/cdnDiag"
         android:layout_marginTop="@dimen/x5"
         android:layout_marginEnd="@dimen/x10"
+        android:text="@string/cdn_version"
         android:textSize="@dimen/xs16"
         android:textColor="@color/subtitle_gray"
-        android:gravity="start"
-        tools:text="版本号：202311p28"/>
+        android:gravity="start" />
 
     <TextView
         android:id="@+id/cdnContent"
