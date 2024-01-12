@@ -134,13 +134,14 @@ interface APIService {
      *
      * @param cmdbid    设备唯一标示符
      * @param ip        设备IP
+     * @param type      设配类型
      *
      * @return          服务器返回的数据，包括类型，报警时间，报警原因，快速诊断，联系人信息
      *
      */
     @FormUrlEncoded
     @POST("/sgrid/psi/consoleGetAlarmsList")
-    fun _getAlarm(@Field("cmdbid") cmdbid: String, @Field("ip") ip: String): Observable<Response<Result<List<AlarmInfo>>>>
+    fun _getAlarm(@Field("cmdbid") cmdbid: String, @Field("ip") ip: String, @Field("type") type: Int): Observable<Response<Result<List<AlarmInfo>>>>
 
     object Factory {
         fun createService(client: OkHttpClient): APIService {
@@ -340,7 +341,7 @@ interface APIService {
          * 获取边缘云报警信息
          */
         fun getAlarmInfo(): Observable<Response<Result<List<AlarmInfo>>>> {
-            return instance._getAlarm(PreferenceManager.instance.getCMDB(), getIpAddress(ISUS.instance.context))
+            return instance._getAlarm(PreferenceManager.instance.getCMDB(), getIpAddress(ISUS.instance.context), PreferenceManager.instance.getDeviceType())
                 .flatMap {
                     val result = checkNotNull(it.body())
                     if (result.errno == RESULT_OK) {
