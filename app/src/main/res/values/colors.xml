@@ -13,6 +13,7 @@
     <color name="gray">#9BB5C6</color>
     <color name="grayAccent">#E5E5E5</color>
     <color name="title_black">#2E333E</color>
+    <color name="title_gray">#5A5E69</color>
     <color name="subtitle_gray">#96989B</color>
     <color name="red">#FF5959</color>
 </resources>

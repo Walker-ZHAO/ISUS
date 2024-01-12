@@ -10,6 +10,7 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import net.ischool.isus.DeviceType
 import net.ischool.isus.R
+import net.ischool.isus.adapter.DynamicConfigurationAdapter
 import net.ischool.isus.adapter.StaticConfigurationAdapter
 import net.ischool.isus.command.CommandParser
 import net.ischool.isus.databinding.ActivityConfigBinding
@@ -38,6 +39,7 @@ class ConfigActivity : AppCompatActivity() {
     private val compositeDisposable = CompositeDisposable()
 
     private val staticConfigAdapter by lazy { StaticConfigurationAdapter(this) }
+    private val dynamicConfigAdapter by lazy { DynamicConfigurationAdapter(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,6 +60,10 @@ class ConfigActivity : AppCompatActivity() {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             adapter = staticConfigAdapter
         }
+        binding.dynamicConfigRv.apply {
+            layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+            adapter = dynamicConfigAdapter
+        }
 
         binding.back.setOnClickListener { finish() }
 
@@ -65,23 +71,8 @@ class ConfigActivity : AppCompatActivity() {
         performDiag()
         // 更新静态配置信息
         updateStaticConfig()
-
-//        val builder = StringBuilder()
-//        val map = PreferenceManager.instance.getParameter()
-//        for ( (key, value) in map ) {
-//            val title = ExternalParameter.getEXPName(key)?:key
-//            builder.append("$title：$value \n")
-//        }
-//        binding.textExternal.text = builder.toString()
-//
-//        binding.btnReset.setOnClickListener {
-//            MaterialAlertDialogBuilder(this).apply {
-//                setTitle(R.string.warning)
-//                setMessage(R.string.warning_reset)
-//                setNegativeButton(android.R.string.cancel) { _, _-> }
-//                setPositiveButton(android.R.string.ok) { _, _ -> CommandParser.instance.processCommand(CommandParser.instance.genCommand(ICommand.COMMAND_RESET, null)) }
-//            }.show()
-//        }
+        // 更新动态配置信息
+        updateDynamicConfig()
     }
 
     override fun onDestroy() {
@@ -181,5 +172,13 @@ class ConfigActivity : AppCompatActivity() {
         staticConfigList.add(getString(R.string.config_iam_package, PreferenceManager.instance.getIamPackage()))
         staticConfigList.add(getString(R.string.config_device_type, DeviceType.getDeviceName(PreferenceManager.instance.getDeviceType())))
         staticConfigAdapter.setData(staticConfigList)
+    }
+
+    /**
+     * 更新动态配置信息
+     */
+    private fun updateDynamicConfig() {
+        val dynamicConfigList = PreferenceManager.instance.getParameter().map { it.toPair() }
+        dynamicConfigAdapter.setData(dynamicConfigList)
     }
 }
