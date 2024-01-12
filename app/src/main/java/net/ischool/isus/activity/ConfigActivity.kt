@@ -6,6 +6,7 @@ import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import net.ischool.isus.DeviceType
@@ -47,15 +48,25 @@ class ConfigActivity : AppCompatActivity() {
         binding = ActivityConfigBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // 指令操作
         binding.rebindClass.setOnClickListener {  }
         binding.systemSetting.setOnClickListener { CommandParser.instance.processor?.setting() }
         binding.syncConfig.setOnClickListener { CommandParser.instance.processor?.reload() }
-        binding.reset.setOnClickListener { CommandParser.instance.processor?.reset() }
+        binding.reset.setOnClickListener {
+            MaterialAlertDialogBuilder(this).apply {
+                setTitle(R.string.warning)
+                setMessage(R.string.warning_reset)
+                setNegativeButton(android.R.string.cancel) { _, _-> }
+                setPositiveButton(android.R.string.ok) { _, _ -> CommandParser.instance.processor?.reset() }
+            }.show()
+        }
         binding.reboot.setOnClickListener { CommandParser.instance.processor?.reboot() }
         binding.sleep.setOnClickListener { CommandParser.instance.processor?.sleep() }
 
+        // 诊断工具
         binding.rediagnosis.setOnClickListener { performDiag() }
 
+        // 配置信息
         binding.staticConfigRv.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             adapter = staticConfigAdapter
