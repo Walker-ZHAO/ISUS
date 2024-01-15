@@ -1,7 +1,6 @@
 package net.ischool.isus.network.interceptor
 
 import android.net.Uri
-import android.util.Log
 import net.ischool.isus.ISUS
 import net.ischool.isus.preference.PreferenceManager
 import okhttp3.Interceptor
@@ -18,7 +17,7 @@ class URLInterceptor : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
         var request = chain.request()
-        val platformApi = PreferenceManager.instance.getPlatformApi()
+        val platformApi = PreferenceManager.instance.getCdnUrl()
         val uri = Uri.parse(platformApi)
         val host = uri.host
         val scheme = uri.scheme

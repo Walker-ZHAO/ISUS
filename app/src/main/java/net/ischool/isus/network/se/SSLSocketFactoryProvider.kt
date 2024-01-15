@@ -1,5 +1,6 @@
 package net.ischool.isus.network.se
 
+import net.ischool.isus.ISUS
 import net.ischool.isus.preference.PreferenceManager
 import okhttp3.OkHttpClient
 import java.security.KeyStore
@@ -45,43 +46,60 @@ class SSLSocketFactoryProvider {
          * 获取包含客户端证书的KeyManager列表
          */
         fun getKeyManagers(type: String = P12): Array<KeyManager> {
-            // 设置提供给服务端验证的客户端证书
-            val clientCertPassword = PreferenceManager.instance.getKeyPass()
-            try {
-                val file = File(PreferenceManager.instance.getSePemPath())
-                val keyStore = when (type) {
-                    X509 -> {
-                        val keyStore = emptyKeyStore(clientCertPassword)
+            // SE 模式下，使用客户端从服务端下载的证书进行配置
+            if (ISUS.instance.se && PreferenceManager.instance.getSePemPath().isNotEmpty()) {
+                // 设置提供给服务端验证的客户端证书
+                val clientCertPassword = PreferenceManager.instance.getKeyPass()
+                try {
+                    val file = File(PreferenceManager.instance.getSePemPath())
+                    val keyStore = when (type) {
+                        X509 -> {
+                            val keyStore = emptyKeyStore(clientCertPassword)
 
-                        // 证书
-                        val certificates = file.inputStream().use { CertificateFactory.getInstance(type)?.generateCertificates(it) }
-                        certificates?.forEachIndexed { index, certificate ->
-                            keyStore.setCertificateEntry("$index", certificate)
+                            // 证书
+                            val certificates = file.inputStream().use { CertificateFactory.getInstance(type)?.generateCertificates(it) }
+                            certificates?.forEachIndexed { index, certificate ->
+                                keyStore.setCertificateEntry("$index", certificate)
+                            }
+
+                            // 私钥
+                            keyStore.setKeyEntry(
+                                "",
+                                file.inputStream().use { KeyImport.readPrivateKey(it, clientCertPassword) },
+                                clientCertPassword.toCharArray(),
+                                certificates?.toTypedArray()
+                            )
+                            keyStore
                         }
+                        P12 -> {
+                            val keyStore = KeyStore.getInstance(type)
+                            file.inputStream().use { keyStore.load(it, clientCertPassword.toCharArray()) }
+                            keyStore
+                        }
+                        else -> emptyKeyStore(clientCertPassword)
+                    }
 
-                        // 私钥
-                        keyStore.setKeyEntry(
-                            "",
-                            file.inputStream().use { KeyImport.readPrivateKey(it, clientCertPassword) },
-                            clientCertPassword.toCharArray(),
-                            certificates?.toTypedArray()
-                        )
-                        keyStore
+                    val kmfAlgorithm: String = KeyManagerFactory.getDefaultAlgorithm()
+                    val kmf = KeyManagerFactory.getInstance(kmfAlgorithm).apply {
+                        init(keyStore, clientCertPassword.toCharArray())
                     }
-                    P12 -> {
-                        val keyStore = KeyStore.getInstance(type)
-                        file.inputStream().use { keyStore.load(it, clientCertPassword.toCharArray()) }
-                        keyStore
-                    }
-                    else -> emptyKeyStore(clientCertPassword)
+                    return kmf.keyManagers
+                } catch (e: Exception) {
+                    return arrayOf()
+                }
+            } else if (ISUS.instance.clientCert != null) {
+                // 否则使用由框架外部注入的P12客户端证书
+                val certPwd = ISUS.instance.clientCertPwd ?: ""
+                val keyStore = KeyStore.getInstance("PKCS12").apply {
+                    load(ISUS.instance.clientCert, certPwd.toCharArray())
                 }
 
                 val kmfAlgorithm: String = KeyManagerFactory.getDefaultAlgorithm()
-                val kmf = KeyManagerFactory.getInstance(kmfAlgorithm).apply {
-                    init(keyStore, clientCertPassword.toCharArray())
+                val kmf: KeyManagerFactory = KeyManagerFactory.getInstance(kmfAlgorithm).apply {
+                    init(keyStore, certPwd.toCharArray())
                 }
                 return kmf.keyManagers
-            } catch (e: Exception) {
+            } else {
                 return arrayOf()
             }
         }

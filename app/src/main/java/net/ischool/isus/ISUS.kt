@@ -31,7 +31,11 @@ class ISUS(
     val context: Context,
     val se: Boolean,
     val iam: String,
+    // 服务端的自签CA证书
     val certificate: InputStream?,
+    // 客户端证书，仅支持P12格式
+    val clientCert: InputStream?,
+    val clientCertPwd: String?,
 ) {
 
     companion object {
@@ -56,8 +60,10 @@ class ISUS(
             iam: String = "",
             commandProcessor: ICommand? = null,
             certificate: InputStream? = null,
+            clientCert: InputStream? = null,
+            clientCertPwd: String? = null,
         ) {
-            instance = ISUS(context.applicationContext, securityEnhance, iam, certificate)
+            instance = ISUS(context.applicationContext, securityEnhance, iam, certificate, clientCert, clientCertPwd)
             CommandParser.init(commandProcessor)
             Logger.addLogAdapter(AndroidLogAdapter())
             PreferenceManager.initPreference(context, deviceType)

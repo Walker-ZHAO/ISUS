@@ -141,7 +141,7 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
     }
     fun getPlatformAtt() = _platformAtt.get()
     fun getPlatformStatic() = _platformStatic.get()
-    fun getCdnUrl() = _cdnUrl.get()
+    fun getCdnUrl() = _cdnUrl.get().apply { getPlatformApi() }
     fun getIamPackage() = _iamPackage.get()
     fun getDeviceType() = _type.get()
     fun getQR() = _base64QR.get()
