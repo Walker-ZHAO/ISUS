@@ -14,8 +14,6 @@ import net.ischool.isus.network.callback.StringCallback
 import net.ischool.isus.network.interceptor.CacheInterceptor
 import net.ischool.isus.network.interceptor.URLInterceptor
 import net.ischool.isus.network.interceptor.UserAgentInterceptor
-import net.ischool.isus.network.se.NullX509TrustManager
-import net.ischool.isus.network.se.SSLSocketFactoryProvider
 import net.ischool.isus.network.se.setCert
 import net.ischool.isus.preference.PreferenceManager
 import net.ischool.isus.service.StatusPostService
@@ -31,7 +29,6 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.util.concurrent.TimeUnit
-import javax.net.ssl.X509TrustManager
 
 /**
  * 网络接口
@@ -129,8 +126,7 @@ interface APIService {
 
     /**
      * 获取报警信息
-     *
-     * TODO 具体接口地址跟数据字段，需要跟后台确认
+     * https://yapi.i-school.net:60443/project/22/interface/api/12092
      *
      * @param cmdbid    设备唯一标示符
      * @param ip        设备IP
@@ -142,6 +138,13 @@ interface APIService {
     @FormUrlEncoded
     @POST("/sgrid/psi/consoleGetAlarmsList")
     fun _getAlarm(@Field("cmdbid") cmdbid: String, @Field("ip") ip: String, @Field("type") type: Int): Observable<Response<Result<List<AlarmInfo>>>>
+
+    /**
+     * 获取组织列表信息
+     * https://yapi.i-school.net:60443/project/830/interface/api/15680
+     */
+    @GET("/Cdn/equipment/getGroupList")
+    fun _getOrganizationInfo(): Observable<Response<Result<OrganizationList>>>
 
     object Factory {
         fun createService(client: OkHttpClient): APIService {
@@ -357,6 +360,11 @@ interface APIService {
                     }
                 }
         }
+
+        /**
+         * 获取组织列表信息
+         */
+        fun getOrganizationInfo() = instance._getOrganizationInfo()
 
         /**
          * 取消所有网络请求
