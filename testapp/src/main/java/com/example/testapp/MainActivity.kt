@@ -83,7 +83,8 @@ class MainActivity : RxAppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        ISUS.init(this, DeviceType.BADGE, "202401p12", securityEnhance = false)
+        val clientCert = getClientCert()
+        ISUS.init(this, DeviceType.BADGE, "202401p12", securityEnhance = false, "", null, getCertStream(), clientCert.second, clientCert.first)
 //        ISUS.init(this, DeviceType.VISION_PHONE, true, "huixiaoan")
 
         binding.init.setOnClickListener { startActivity<InitActivity>() }
