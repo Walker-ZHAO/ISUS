@@ -70,4 +70,10 @@
     <string name="diag_cdn">边缘云</string>
     <string name="diag_platform">平台</string>
     <string name="cdn_version">版本号：%s</string>
+    <string name="current_class">当前班级</string>
+    <string name="choose_education_type">选择学段</string>
+    <string name="choose_grade">选择年级</string>
+    <string name="choose_class">选择班级</string>
+    <string name="save">保存</string>
+    <string name="cancel">取消</string>
 </resources>

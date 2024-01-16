@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -15,6 +16,7 @@ import net.ischool.isus.adapter.DynamicConfigurationAdapter
 import net.ischool.isus.adapter.StaticConfigurationAdapter
 import net.ischool.isus.command.CommandParser
 import net.ischool.isus.databinding.ActivityConfigBinding
+import net.ischool.isus.dialog.RebindClassDialog
 import net.ischool.isus.model.ALARM_TYPE_CAMPUSNG
 import net.ischool.isus.model.ALARM_TYPE_DISCONNECT
 import net.ischool.isus.model.ALARM_TYPE_MQ
@@ -49,7 +51,7 @@ class ConfigActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         // 指令操作
-        binding.rebindClass.setOnClickListener {  }
+        binding.rebindClass.setOnClickListener { showRebindClassDialog() }
         binding.systemSetting.setOnClickListener { CommandParser.instance.processor?.setting() }
         binding.syncConfig.setOnClickListener { CommandParser.instance.processor?.reload() }
         binding.reset.setOnClickListener {
@@ -191,5 +193,21 @@ class ConfigActivity : AppCompatActivity() {
     private fun updateDynamicConfig() {
         val dynamicConfigList = PreferenceManager.instance.getParameter().map { it.toPair() }
         dynamicConfigAdapter.setData(dynamicConfigList)
+    }
+
+    /**
+     * 展示绑定班级对话框
+     */
+    private fun showRebindClassDialog() {
+        // 获取班级列表
+        val disposable = APIService.getOrganizationInfo()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ response ->
+                val organizations = response.body()?.data?.list?.filter { it.isClass } ?: listOf()
+                RebindClassDialog(this, organizations).show()
+            }, {
+                Toast.makeText(this, "拉取班级列表失败：${it.message}", Toast.LENGTH_LONG).show()
+            })
+        compositeDisposable.add(disposable)
     }
 }
