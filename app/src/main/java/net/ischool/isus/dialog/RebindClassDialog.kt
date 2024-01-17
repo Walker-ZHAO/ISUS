@@ -78,7 +78,7 @@ class RebindClassDialog (
         }
         // 班级信息
         binding.classRv.apply {
-            layoutManager = GridLayoutManager(context, 8, LinearLayoutManager.VERTICAL, false)
+            layoutManager = GridLayoutManager(context, 5, LinearLayoutManager.VERTICAL, false)
             adapter = classAdapter
         }
     }
