@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -55,7 +56,7 @@ class ConfigActivity : AppCompatActivity() {
         binding.systemSetting.setOnClickListener { CommandParser.instance.processor?.setting() }
         binding.syncConfig.setOnClickListener { CommandParser.instance.processor?.reload() }
         binding.reset.setOnClickListener {
-            MaterialAlertDialogBuilder(this).apply {
+            AlertDialog.Builder(this).apply {
                 setTitle(R.string.warning)
                 setMessage(R.string.warning_reset)
                 setNegativeButton(android.R.string.cancel) { _, _-> }
