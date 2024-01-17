@@ -86,17 +86,20 @@ class RebindClassDialog (
     private fun parseData() {
         val mapping: MutableList<Pair<String, List<Pair<Int, List<Organization>>>>> = mutableListOf()
         // 先按学段分组
-        organizations.groupBy { it.readebleEducationType }.toList().forEach { pair ->
+        organizations.sortedBy { it.educationType }.groupBy { it.readebleEducationType }.toList().forEach { pair ->
             // 再按年级分组
             val gradeGroup = pair.second.sortedBy { it.beginYear }.groupBy { it.beginYear }.toList()
             // 添加到映射表中
             mapping.add(Pair(pair.first, gradeGroup))
         }
+        classAdapter.setData(listOf(), currentOrganization)
+        gradeAdapter.setData(listOf(), currentOrganization)
         educationTypeAdapter.setData(mapping, currentOrganization)
     }
 
     private fun onEducationTypeChoose(grades: List<Pair<Int, List<Organization>>>, initialOrganization: Organization?) {
         currentOrganization = null
+        classAdapter.setData(listOf(), initialOrganization)
         gradeAdapter.setData(grades, initialOrganization)
     }
 
