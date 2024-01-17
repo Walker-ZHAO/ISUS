@@ -4,16 +4,18 @@ import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import net.ischool.isus.R
 import net.ischool.isus.adapter.ClassAdapter
 import net.ischool.isus.adapter.EducationTypeAdapter
 import net.ischool.isus.adapter.GradeAdapter
+import net.ischool.isus.command.CommandParser
 import net.ischool.isus.databinding.DialogRebindClassBinding
 import net.ischool.isus.model.Organization
+import net.ischool.isus.network.APIService
 import net.ischool.isus.preference.PreferenceManager
 
 /**
@@ -57,7 +59,12 @@ class RebindClassDialog (
     @SuppressLint("SetTextI18n")
     private fun initUI() {
         binding.save.setOnClickListener {
-            Log.i(TAG, "choose organization: $currentOrganization")
+            val organization = currentOrganization
+            if (organization == null) {
+                Toast.makeText(context, "请选择班级", Toast.LENGTH_LONG).show()
+            } else {
+                rebindClass(organization.id)
+            }
         }
         binding.cancel.setOnClickListener { dismiss() }
 
@@ -110,5 +117,13 @@ class RebindClassDialog (
 
     private fun onClassChoose(organization: Organization) {
         currentOrganization = organization
+    }
+
+    @SuppressLint("CheckResult")
+    private fun rebindClass(classId :Int) {
+        APIService.rebindClass(classId).subscribe {
+            CommandParser.instance.processor?.reload()
+            dismiss()
+        }
     }
 }

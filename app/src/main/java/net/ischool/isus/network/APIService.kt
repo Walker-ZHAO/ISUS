@@ -146,6 +146,16 @@ interface APIService {
     @GET("/Cdn/equipment/getGroupList")
     fun _getOrganizationInfo(): Observable<Response<Result<OrganizationList>>>
 
+    /**
+     * 设置绑定区域
+     * https://yapi.i-school.net:60443/project/830/interface/api/15672
+     *
+     * @param classId 班级ID（区域ID）
+     */
+    @FormUrlEncoded
+    @POST("/Cdn/Equipment/changeClassBind")
+    fun _rebindClass(@Field("class_id") classId: Int): Observable<ResponseBody>
+
     object Factory {
         fun createService(client: OkHttpClient): APIService {
             val retrofit = Retrofit.Builder()
@@ -365,6 +375,11 @@ interface APIService {
          * 获取组织列表信息
          */
         fun getOrganizationInfo() = instance._getOrganizationInfo()
+
+        /**
+         * 班级改绑
+         */
+        fun rebindClass(classId: Int) = instance._rebindClass(classId)
 
         /**
          * 取消所有网络请求
