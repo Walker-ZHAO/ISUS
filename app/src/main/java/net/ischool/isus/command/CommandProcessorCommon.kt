@@ -78,6 +78,8 @@ open class CommandProcessorCommon constructor(protected val context: Context) : 
 
     /**
      * 重置
+     *
+     * Note：需要系统签名
      */
     override fun reset(remoteUUID: String) {
         val result = CommandResult(ICommand.COMMAND_RESET)
@@ -88,8 +90,9 @@ open class CommandProcessorCommon constructor(protected val context: Context) : 
                 ?.forEach {
                     deleteDir(File(appDir, it))
                 }
-            Process.killProcess(Process.myPid())
             finish(result, remoteUUID)
+            reboot()
+            Process.killProcess(Process.myPid())
         } else {
             result.fail("Can't find app")
             finish(result, remoteUUID)
