@@ -47,7 +47,7 @@ import net.ischool.isus.isHongHeDevice
 import net.ischool.isus.isTouchWoDevice
 import net.ischool.isus.network.APIService
 import net.ischool.isus.preference.PreferenceManager
-import net.ischool.isus.service.ISUSService
+import net.ischool.isus.service.RabbitMQService
 import net.ischool.isus.service.UDPService
 import net.ischool.isus.service.alarmIntervalDetect
 import okhttp3.FormBody
@@ -433,7 +433,7 @@ class MainActivity : RxAppCompatActivity() {
     private val stateReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == ACTION_QUEUE_STATE_CHANGE) {
-                longToast("RabbitMQ State: ${ISUSService.queueState}")
+                longToast("RabbitMQ State: ${RabbitMQService.queueState}")
             }
         }
     }

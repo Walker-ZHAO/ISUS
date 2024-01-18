@@ -15,7 +15,7 @@ import net.ischool.isus.db.ObjectBox
 import net.ischool.isus.log.Syslog
 import net.ischool.isus.network.APIService
 import net.ischool.isus.preference.PreferenceManager
-import net.ischool.isus.service.ISUSService
+import net.ischool.isus.service.RabbitMQService
 
 /**
  * 全量同步用户信息页面
@@ -81,7 +81,7 @@ class UserSyncActivity : AppCompatActivity() {
     private fun syncSingle() {
         val index = syncCount++
         if (index < uids.size) {
-            ISUSService.syncUserInfo(
+            RabbitMQService.syncUserInfo(
                 uids[index],
                 success = {
                     val progress = ((index + 1).toFloat() / uids.size) * 100

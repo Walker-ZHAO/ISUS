@@ -14,7 +14,8 @@ import net.ischool.isus.command.ICommand
 import net.ischool.isus.db.ObjectBox
 import net.ischool.isus.network.APIService
 import net.ischool.isus.preference.PreferenceManager
-import net.ischool.isus.service.ISUSService
+import net.ischool.isus.service.RabbitMQService
+import net.ischool.isus.service.SSEService
 import net.ischool.isus.service.StatusPostService
 import net.ischool.isus.service.UDPService
 import net.ischool.isus.service.WatchDogService
@@ -94,7 +95,13 @@ class ISUS(
      * 开启统一推送服务
      */
     fun startService() {
-        ISUSService.start(context)
+        // 安全增强模式下直连公网，依然使用RabbitMQ做消息推送
+        if (instance.se) {
+            RabbitMQService.start(context)
+        } else {
+            // 与边缘云链接模式下，使用EventSource(SSE)做消息推送
+            SSEService.start(context)
+        }
         // 启动网络监控服务
         WatchDogService.start(context)
     }
@@ -105,7 +112,11 @@ class ISUS(
     fun stopService() {
         // 关闭网络监控服务
         WatchDogService.stop(context)
-        ISUSService.stop(context)
+        if (instance.se) {
+            RabbitMQService.stop(context)
+        } else {
+            SSEService.stop(context)
+        }
     }
 
     /**

@@ -90,3 +90,5 @@ internal const val LOG_TAG = "ISUS"
 // Syslog日志上报分类
 // RabbitMQ
 internal const val SYSLOG_CATEGORY_RABBITMQ = "RabbitMQ"
+// EventSource
+internal const val SYSLOG_CATEGORY_SSE = "SSE"

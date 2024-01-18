@@ -20,7 +20,7 @@ import net.ischool.isus.log.Syslog
 import net.ischool.isus.network.APIService
 import net.ischool.isus.network.callback.StringCallback
 import net.ischool.isus.preference.PreferenceManager
-import net.ischool.isus.service.ISUSService
+import net.ischool.isus.service.RabbitMQService
 import net.ischool.isus.service.QueueState
 import net.ischool.isus.sleep
 import net.ischool.isus.wakeup
@@ -247,7 +247,7 @@ open class CommandProcessorCommon constructor(protected val context: Context) : 
                     )
             }
             QueryType.QUERY_RABBITMQ -> {
-                when (ISUSService.queueState) {
+                when (RabbitMQService.queueState) {
                     QueueState.STATE_BLOCK -> result.fail("RabbitMQ Status: Offline")
                     QueueState.STATE_STANDBY -> result.success("RabbitMQ Status: Online")
                 }

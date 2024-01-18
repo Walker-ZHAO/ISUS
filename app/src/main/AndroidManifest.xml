@@ -51,11 +51,20 @@
         </provider>
 
         <service
-            android:name=".service.ISUSService"
+            android:name=".service.RabbitMQService"
             android:exported="false">
             <intent-filter android:priority="1000">
-                <action android:name="net.ischool.isus.start"/>
-                <action android:name="net.ischool.isus.stop"/>
+                <action android:name="net.ischool.isus.rabbitmq.start"/>
+                <action android:name="net.ischool.isus.rabbitmq.stop"/>
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".service.SSEService"
+            android:exported="false">
+            <intent-filter android:priority="1000">
+                <action android:name="net.ischool.isus.sse.start"/>
+                <action android:name="net.ischool.isus.sse.stop"/>
             </intent-filter>
         </service>
 

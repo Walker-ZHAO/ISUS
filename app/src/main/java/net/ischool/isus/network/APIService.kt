@@ -173,24 +173,21 @@ interface APIService {
 
         private val instance: APIService by lazy { Factory.createService(client) }
 
-        private val client: OkHttpClient by lazy {
+        val client: OkHttpClient by lazy {
             val cacheFile = File(ISUS.instance.context.externalCacheDir?.toString()?:"", "cache")
             val cacheSize = 5 * 10 * 1024 * 1024
             val cache = Cache(cacheFile, cacheSize.toLong())
 
             val builder = OkHttpClient.Builder()
-                    .connectTimeout(10, TimeUnit.SECONDS)
-                    .writeTimeout(10, TimeUnit.SECONDS)
-                    .readTimeout(30, TimeUnit.SECONDS)
-                    .cache(cache)
-                    .addNetworkInterceptor(CacheInterceptor())
-                    .addInterceptor(URLInterceptor())
-                    .addInterceptor(UserAgentInterceptor())
-                    .addInterceptor(HttpLoggingInterceptor().apply {
-                        level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
-                    })
-                    .setCert()
-                    .hostnameVerifier { hostname, session -> true }
+                .connectTimeout(10, TimeUnit.SECONDS)
+                .writeTimeout(10, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .cache(cache)
+                .addNetworkInterceptor(CacheInterceptor())
+                .addInterceptor(URLInterceptor())
+                .addInterceptor(UserAgentInterceptor())
+                .setCert()
+                .hostnameVerifier { hostname, session -> true }
             builder.build()
         }
 

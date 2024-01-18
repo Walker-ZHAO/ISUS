@@ -29,13 +29,13 @@ import okhttp3.Request
 import java.io.IOException
 
 /**
- * 统一推送服务
+ * 基于RabbitMQ的统一推送服务
  *
  * Author: Walker
  * Email: zhaocework@gmail.com
  * Date: 2017/9/19
  */
-class ISUSService : Service() {
+class RabbitMQService : Service() {
 
     /** RabbitMQ Start **/
     private val factory by lazy { ConnectionFactory() }
@@ -217,19 +217,19 @@ class ISUSService : Service() {
     /** RabbitMQ End **/
 
     companion object {
-        const val COMMAND_START = "net.ischool.isus.start"
-        const val COMMAND_STOP = "net.ischool.isus.stop"
+        const val COMMAND_START = "net.ischool.isus.rabbitmq.start"
+        const val COMMAND_STOP = "net.ischool.isus.rabbitmq.stop"
         var isRunning = false
         @JvmField var queueState = QueueState.STATE_BLOCK
 
         fun start(context: Context) {
-            val intent = Intent(context, ISUSService::class.java)
+            val intent = Intent(context, RabbitMQService::class.java)
             intent.action = COMMAND_START
             context.startService(intent)
         }
 
         fun stop(context: Context) {
-            val intent = Intent(context, ISUSService::class.java)
+            val intent = Intent(context, RabbitMQService::class.java)
             intent.action = COMMAND_STOP
             context.startService(intent)
         }
