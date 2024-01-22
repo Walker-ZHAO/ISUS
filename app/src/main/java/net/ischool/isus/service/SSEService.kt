@@ -86,7 +86,6 @@ class SSEService : Service() {
             val msg = "SSE onError: ${t.message}"
             Log.e(LOG_TAG, msg)
             Syslog.logE(msg, SYSLOG_CATEGORY_SSE)
-            reCreate()
         }
 
         override fun onComment(comment: String) {
@@ -116,9 +115,7 @@ class SSEService : Service() {
             if (isRunning) {
                 setup()
             } else {
-                doAsync {
-                    disconnect()
-                }
+                disconnect()
             }
         }
         return START_STICKY
@@ -146,13 +143,7 @@ class SSEService : Service() {
     }
 
     private fun disconnect() {
-        CoroutineScope(Dispatchers.IO).launch {
-            try {
-                eventSourceSse?.closeQuietly()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
+        eventSourceSse?.closeQuietly()
     }
 
     private fun reCreate() {
