@@ -431,7 +431,7 @@
         android:id="@+id/diagIcon"
         android:layout_width="@dimen/x20"
         android:layout_height="@dimen/x20"
-        android:src="@mipmap/icon_refresh"
+        android:src="@mipmap/icon_diag"
         app:layout_constraintTop_toTopOf="@id/rediagnosis"
         app:layout_constraintBottom_toBottomOf="@id/rediagnosis"
         app:layout_constraintStart_toStartOf="@id/rediagnosis"

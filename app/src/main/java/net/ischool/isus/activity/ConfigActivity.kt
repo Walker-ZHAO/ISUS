@@ -8,9 +8,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.kotlin.subscribeBy
 import net.ischool.isus.DeviceType
 import net.ischool.isus.R
 import net.ischool.isus.adapter.DynamicConfigurationAdapter
@@ -112,11 +112,13 @@ class ConfigActivity : AppCompatActivity() {
     private fun performDiag() {
         val versionDisposable = APIService.getCdnInfo()
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
+            .subscribeBy(onNext= {
                 val status = checkNotNull(it.body())
                 val currentVersionNum = status.data.version ?: ""
                 binding.cdnVersion.text = getString(R.string.cdn_version, currentVersionNum)
-            }
+            }, onError = {
+                binding.cdnVersion.text = getString(R.string.cdn_version, "NA")
+            })
         val diagDisposable = checkAlarm()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe {
