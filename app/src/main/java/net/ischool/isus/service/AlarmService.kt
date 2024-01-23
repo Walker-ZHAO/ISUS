@@ -68,9 +68,9 @@ private fun checkCdnConnectivity(): Observable<List<AlarmInfo>> {
         "请检查控制台网络连接是否正常。\n请检查边缘云设备网络/电源指示灯是否正常。",
         "",
     )
-    return APIService.getNetworkStatus().flatMap {
+    return APIService.getSchoolId().flatMap {
         val status = checkNotNull(it.body())
-        val result = if (status.errno == RESULT_OK && status.data.sids.contains(PreferenceManager.instance.getSchoolId())) {
+        val result = if (status.errno == RESULT_OK && status.data.schoolId.toString() == PreferenceManager.instance.getSchoolId()) {
             listOf()
         } else {
             listOf(alarmInfo.copy(ts = System.currentTimeMillis() / 1000))
