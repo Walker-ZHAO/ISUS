@@ -64,7 +64,7 @@ fun checkAlarm(): Observable<List<AlarmInfo>> {
  */
 private fun checkCdnConnectivity(): Observable<List<AlarmInfo>> {
     val alarmInfo = AlarmInfo(
-        ALARM_TYPE_DISCONNECT, System.currentTimeMillis() / 1000, "控制台设备无法连接边缘云",
+        ALARM_TYPE_DISCONNECT, System.currentTimeMillis() / 1000, "设备无法连接边缘云",
         "请检查控制台网络连接是否正常。\n请检查边缘云设备网络/电源指示灯是否正常。",
         "",
     )
