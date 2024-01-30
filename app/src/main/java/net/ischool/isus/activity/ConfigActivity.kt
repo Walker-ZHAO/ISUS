@@ -7,10 +7,13 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.kotlin.subscribeBy
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.ischool.isus.DeviceType
 import net.ischool.isus.R
 import net.ischool.isus.adapter.DynamicConfigurationAdapter
@@ -28,6 +31,7 @@ import net.ischool.isus.model.AlarmInfo
 import net.ischool.isus.network.APIService
 import net.ischool.isus.preference.PreferenceManager
 import net.ischool.isus.service.checkAlarm
+import kotlin.time.Duration.Companion.minutes
 
 /**
  * 配置界面
@@ -87,6 +91,12 @@ class ConfigActivity : AppCompatActivity() {
         updateStaticConfig()
         // 更新动态配置信息
         updateDynamicConfig()
+
+        // 页面停留两分钟后自动退出
+        lifecycleScope.launch {
+            delay(2.minutes)
+            finish()
+        }
     }
 
     override fun onDestroy() {
