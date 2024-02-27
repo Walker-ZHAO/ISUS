@@ -3,12 +3,15 @@ package net.ischool.isus
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import androidx.fragment.app.FragmentActivity
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
 import com.tbruyelle.rxpermissions3.RxPermissions
 import com.walker.anke.framework.packageVersionName
 import com.walker.anke.framework.toast
+import net.ischool.isus.broadcast.USBReceiver
 import net.ischool.isus.command.CommandParser
 import net.ischool.isus.command.ICommand
 import net.ischool.isus.db.ObjectBox
@@ -44,6 +47,8 @@ class ISUS(
         @Volatile
         lateinit var instance: ISUS
             private set
+
+        private val usbReceiver = USBReceiver()
 
         /**
          * 初始化
@@ -104,6 +109,13 @@ class ISUS(
         }
         // 启动网络监控服务
         WatchDogService.start(context)
+        // 监听U盘插拔事件
+        context.registerReceiver(usbReceiver, IntentFilter().apply {
+            addAction(Intent.ACTION_MEDIA_MOUNTED)
+            addAction(Intent.ACTION_MEDIA_UNMOUNTED)
+            addAction(Intent.ACTION_MEDIA_EJECT)
+            addDataScheme("file")
+        })
     }
 
     /**
@@ -117,6 +129,7 @@ class ISUS(
         } else {
             SSEService.stop(context)
         }
+        context.unregisterReceiver(usbReceiver)
     }
 
     /**
