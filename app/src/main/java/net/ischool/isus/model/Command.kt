@@ -9,4 +9,4 @@ import com.google.gson.annotations.SerializedName
  * Email: zhaocework@gmail.com
  * Date: 2017/9/13
  */
-data class Command(@SerializedName(value = "cmd_version", alternate = ["cmdVersion"]) val cmd_version: Long, val args: HashMap<String, String>, val cmd: String, val cmdbid: String)
+data class Command(@SerializedName(value = "cmd_version", alternate = ["cmdVersion"]) val cmd_version: Long, val args: HashMap<String, String>?, val cmd: String, val cmdbid: String)

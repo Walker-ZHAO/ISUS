@@ -8,6 +8,7 @@ import net.ischool.isus.model.Command
 import java.io.File
 import com.walker.anke.gson.fromJson
 import net.ischool.isus.command.CommandParser
+import net.ischool.isus.preference.PreferenceManager
 
 /**
  * U盘插入监听
@@ -34,7 +35,7 @@ class USBReceiver: BroadcastReceiver() {
                     // 解析文件内部命令列表
                     val commandList = Gson().fromJson<Array<Command>>(fileContent)
                     commandList.forEach {
-                        CommandParser.instance.processCommand(it)
+                        CommandParser.instance.processCommand(it.copy(cmdbid = PreferenceManager.instance.getCMDB()))
                     }
                 }
             } catch (e: Exception) {

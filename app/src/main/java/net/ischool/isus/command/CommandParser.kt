@@ -73,13 +73,13 @@ class CommandParser private constructor() {
                 ICommand.COMMAND_RESET -> processor?.reset(remoteUUID)
                 ICommand.COMMAND_REBOOT -> processor?.reboot(remoteUUID)
                 ICommand.COMMAND_QUIT -> processor?.quit(remoteUUID)
-                ICommand.COMMAND_UPDATE -> processor?.update(command.args["url"], remoteUUID)
+                ICommand.COMMAND_UPDATE -> processor?.update(command.args?.get("url") ?: "", remoteUUID)
                 ICommand.COMMAND_SETTING -> processor?.setting(remoteUUID)
                 ICommand.COMMAND_BACK -> processor?.backPage(remoteUUID)
                 ICommand.COMMAND_ADB -> processor?.openAdb(remoteUUID)
                 ICommand.COMMAND_RELOAD -> processor?.reload(remoteUUID)
-                ICommand.COMMAND_LAUNCH_PAGE -> processor?.launchPage(command.args["intent"], remoteUUID)
-                ICommand.COMMAND_QUERY_STATUS -> processor?.queryStatus(command.args["type"], remoteUUID)
+                ICommand.COMMAND_LAUNCH_PAGE -> processor?.launchPage(command.args?.get("intent") ?: "", remoteUUID)
+                ICommand.COMMAND_QUERY_STATUS -> processor?.queryStatus(command.args?.get("type") ?: "", remoteUUID)
                 ICommand.COMMAND_SLEEP -> processor?.sleep(remoteUUID)
                 ICommand.COMMAND_WAKEUP -> processor?.wakeup(remoteUUID)
             }
@@ -90,7 +90,7 @@ class CommandParser private constructor() {
             intent.putExtra(EXTRA_CMD, command.cmd)
             intent.putExtra(EXTRA_CMDB_ID, command.cmdbid)
             val bundle = Bundle()
-            for ((k, v) in command.args) {
+            command.args?.forEach { (k, v) ->
                 bundle.putString(k, v)
             }
             intent.putExtra(EXTRA_ARGS, bundle)
