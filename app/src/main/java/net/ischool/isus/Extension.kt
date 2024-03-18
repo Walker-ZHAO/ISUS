@@ -14,8 +14,8 @@ import com.ys.rkapi.MyManager
 import net.ischool.isus.preference.PreferenceManager
 import java.io.BufferedReader
 import java.io.DataOutputStream
+import java.io.IOException
 import java.io.InputStreamReader
-import kotlin.Exception
 
 /**
  * 扩展方法
@@ -66,8 +66,15 @@ fun Context.sleep() {
         isHikDevice() -> {
             InfoDisplayApi.disableBacklight()
             // 需要禁用触屏，否则触摸事件会下发至应用
-            InfoSystemApi.execCommand("su & rm -rf /dev/input/event2")
-            InfoSystemApi.execCommand("su & rm -rf /dev/input/event4")
+            val device = getSystemProperty("sys.hik.dev_type")
+            // 根据不同设备型号，删除不同触屏挂载点
+            if (device.contains("DS-D6122TH-B/I")) {
+                InfoSystemApi.execCommand("su & rm -rf /dev/input/event2")
+            } else if (device.contains("DS-D6122TH-B/C")) {
+                InfoSystemApi.execCommand("su & rm -rf /dev/input/event4")
+            } else if (device.contains("DS-D6122TL-B/C")) {
+                InfoSystemApi.execCommand("su & rm -rf /dev/input/event3")
+            }
             // 使CPU进入节能模式
             InfoSystemApi.execCommand("su & echo powersave > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor")
         }
@@ -173,4 +180,22 @@ fun execRuntimeProcess(cmd: String, needEvn: Boolean = false): String {
         e.printStackTrace()
     }
     return output.toString()
+}
+
+/**
+ * 获取系统属性
+ * @param propName
+ * @return
+ */
+private fun getSystemProperty(propName: String): String {
+    return try {
+        val process = Runtime.getRuntime().exec("getprop $propName")
+        val input = BufferedReader(InputStreamReader(process.inputStream), 1024)
+        val line = input.readLine()
+        input.close()
+        line
+    } catch (e: IOException) {
+        e.printStackTrace()
+        ""
+    }
 }
