@@ -3,8 +3,10 @@ package net.ischool.isus.network
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import com.google.gson.Gson
 import com.walker.anke.framework.longToast
 import com.walker.anke.framework.runOnUiThread
+import com.walker.anke.gson.fromJson
 import io.reactivex.rxjava3.core.Observable
 import net.ischool.isus.*
 import net.ischool.isus.command.CommandParser
@@ -280,13 +282,24 @@ interface APIService {
                                     }
                                     else -> {
                                         if (getDeviceType() == result.data.type) {
-                                            setQR(result.data.QR)
-                                            setParameter(result.data.parameter)
-                                            setInitialized(true)
-                                            // 初始化成功，非SE模式下，启动状态上报服务
-                                            ISUS.instance.apply {
-                                                if (!se)
-                                                    StatusPostService.startService(context)
+                                            val displayModel = result.data.parameter["displayModel"] ?: DisplayModel.LEGACY
+                                            val displayModelParameter = result.data.parameter["displayModelParams"] ?: ""
+                                            val parameter = Gson().fromJson<Map<String, Any>>(displayModelParameter)?:HashMap()
+                                            val homepage =  (parameter["homepage"] as? String) ?: ""
+                                            if (displayModel == DisplayModel.HYBRID && !homepage.startsWith("http")) {
+                                                /** 使用Web模式，但配置了无效的Web页地址 **/
+                                                ISUS.instance.context.runOnUiThread { longToast("页面地址[$homepage]无效，请重新配置") }
+                                                Thread.sleep(2 * 1000)
+                                                CommandParser.instance.processCommand(CommandParser.instance.genCommand(ICommand.COMMAND_RESET, null))
+                                            } else {
+                                                setQR(result.data.QR)
+                                                setParameter(result.data.parameter)
+                                                setInitialized(true)
+                                                // 初始化成功，非SE模式下，启动状态上报服务
+                                                ISUS.instance.apply {
+                                                    if (!se)
+                                                        StatusPostService.startService(context)
+                                                }
                                             }
                                         } else {
                                             /** 设备类型不匹配，可能是CMDB ID配置错误，重置应用 **/
