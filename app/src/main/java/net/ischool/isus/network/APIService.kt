@@ -286,8 +286,9 @@ interface APIService {
                                             val displayModelParameter = result.data.parameter["displayModelParams"] ?: ""
                                             val parameter = Gson().fromJson<Map<String, Any>>(displayModelParameter)?:HashMap()
                                             val homepage =  (parameter["homepage"] as? String) ?: ""
-                                            if (displayModel == DisplayModel.HYBRID && !homepage.startsWith("http")) {
-                                                /** 使用Web模式，但配置了无效的Web页地址 **/
+                                            if ((displayModel == DisplayModel.HYBRID || displayModel == DisplayModel.BOARD)
+                                                && !homepage.startsWith("http")) {
+                                                /** 使用Web或看板模式，但配置了无效的Web页地址 **/
                                                 ISUS.instance.context.runOnUiThread { longToast("页面地址[$homepage]无效，请重新配置") }
                                                 Thread.sleep(2 * 1000)
                                                 CommandParser.instance.processCommand(CommandParser.instance.genCommand(ICommand.COMMAND_RESET, null))
