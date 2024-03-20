@@ -70,13 +70,15 @@ fun Context.sleep() {
             // 根据不同设备型号，删除不同触屏挂载点
             if (device.contains("DS-D6122TH-B/I")) {
                 InfoSystemApi.execCommand("su & rm -rf /dev/input/event2")
+                // 使CPU进入节能模式
+                InfoSystemApi.execCommand("su & echo powersave > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor")
             } else if (device.contains("DS-D6122TH-B/C")) {
                 InfoSystemApi.execCommand("su & rm -rf /dev/input/event4")
+                // 使CPU进入节能模式
+                InfoSystemApi.execCommand("su & echo powersave > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor")
             } else if (device.contains("DS-D6122TL-B/C")) {
                 InfoSystemApi.execCommand("su & rm -rf /dev/input/event3")
             }
-            // 使CPU进入节能模式
-            InfoSystemApi.execCommand("su & echo powersave > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor")
         }
         isTouchWoDevice() || isDh32Device() -> {
             MyManager.getInstance(this).turnOffBackLight()
