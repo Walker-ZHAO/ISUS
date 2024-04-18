@@ -108,7 +108,7 @@ dependencies {
     // ObjectBox
     implementation "io.objectbox:objectbox-kotlin:$objectboxVersion"
     // ZXing
-    implementation 'com.google.zxing:core:3.5.1'
+    implementation 'com.google.zxing:core:3.5.3'
     // CameraX
     def camerax_version = "1.2.3"
     implementation "androidx.camera:camera-core:${camerax_version}"
