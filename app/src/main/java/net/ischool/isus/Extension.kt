@@ -78,6 +78,10 @@ fun Context.sleep() {
                 InfoSystemApi.execCommand("su & echo powersave > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor")
             } else if (device.contains("DS-D6122TL-B/C")) {
                 InfoSystemApi.execCommand("su & rm -rf /dev/input/event3")
+            } else if (device.contains("DS-D6122TL-D/C")) {
+                InfoSystemApi.execCommand("su & rm -rf /dev/input/event1")
+                // 使CPU进入节能模式
+                InfoSystemApi.execCommand("su & echo powersave > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor")
             }
         }
         isTouchWoDevice() || isDh32Device() -> {
