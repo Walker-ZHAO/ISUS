@@ -508,7 +508,7 @@ class MainActivity : RxAppCompatActivity() {
 
     private fun isHikDevice(): Boolean {
         try {   // 通过使用海康SDK获取主板信息判断是否为海康设备
-            InfoSystemApi.getMotherboardType()
+            InfoSystemApi.getMotherboardType() ?: throw Exception()
             return true
         } catch (_: Exception) { }
         return false
