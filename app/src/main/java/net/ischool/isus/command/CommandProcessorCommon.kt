@@ -1,5 +1,6 @@
 package net.ischool.isus.command
 
+import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
@@ -45,12 +46,16 @@ open class CommandProcessorCommon constructor(protected val context: Context) : 
     /**
      * 执行结果通知
      */
-    protected fun finish(result: CommandResult, remoteUUID: String) = resultCallbackList.forEach { it(result, remoteUUID) }
+    protected fun finish(result: CommandResult, remoteUUID: String) {
+        Syslog.logI("command process result: $result")
+        resultCallbackList.forEach { it(result, remoteUUID) }
+    }
 
 
     /**
      * ping响应
      */
+    @SuppressLint("CheckResult")
     override fun ping(remoteUUID: String) {
         val result = CommandResult(ICommand.COMMAND_PING)
         APIService.pong()
@@ -197,6 +202,7 @@ open class CommandProcessorCommon constructor(protected val context: Context) : 
     /**
      * 更新应用配置信息
      */
+    @SuppressLint("CheckResult")
     override fun reload(remoteUUID: String) {
         val result = CommandResult(ICommand.COMMAND_RELOAD)
         APIService.getConfig()
@@ -214,6 +220,7 @@ open class CommandProcessorCommon constructor(protected val context: Context) : 
             )
     }
 
+    @SuppressLint("CheckResult")
     override fun queryStatus(type: String?, remoteUUID: String) {
         val result = CommandResult(ICommand.COMMAND_QUERY_STATUS)
         if (type == null) {

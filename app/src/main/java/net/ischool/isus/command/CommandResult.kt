@@ -9,8 +9,6 @@ package net.ischool.isus.command
  */
 class CommandResult(cmd: String, var args: HashMap<String, String> = hashMapOf()) {
 
-    private val cmd = "result"
-
     init {
         args["response"] = cmd
         if (!args.containsKey("code"))
@@ -25,5 +23,9 @@ class CommandResult(cmd: String, var args: HashMap<String, String> = hashMapOf()
     fun success(text: String) {
         args["code"] = "0"
         args["reason"] = text
+    }
+
+    override fun toString(): String {
+        return "[cmd: ${args["response"]}, success: ${args["code"] == "0"}, reason: ${args["reason"]}]"
     }
 }
