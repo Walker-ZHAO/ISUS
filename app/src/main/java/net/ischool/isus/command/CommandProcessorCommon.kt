@@ -151,7 +151,7 @@ open class CommandProcessorCommon constructor(protected val context: Context) : 
 
                 override fun onFailure(request: Request, e: IOException) {
                     Logger.w(e.message ?: "")
-                    Syslog.logE("Update file download failure", category = SYSLOG_CATEGORY_RABBITMQ)
+                    Syslog.logE("Update file download failure: ${e.message}", category = SYSLOG_CATEGORY_RABBITMQ)
                     result.fail(e.message)
                     finish(result, remoteUUID)
                 }

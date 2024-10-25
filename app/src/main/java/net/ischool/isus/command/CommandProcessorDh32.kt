@@ -37,13 +37,16 @@ class CommandProcessorDh32(context: Context): CommandProcessorCommon(context) {
             callback = object :
                 StringCallback {
                 override fun onResponse(string: String) {
-                    MyManager.getInstance(context).silentInstallApk(string)
+                    if (!MyManager.getInstance(context).silentInstallApk(string)) {
+                        result.fail("install failed")
+                    }
                     finish(result, remoteUUID)
+
                 }
 
                 override fun onFailure(request: Request, e: IOException) {
                     Logger.w(e.message ?: "")
-                    Syslog.logE("Update file download failure", category = SYSLOG_CATEGORY_RABBITMQ)
+                    Syslog.logE("Update file download failure: ${e.message}", category = SYSLOG_CATEGORY_RABBITMQ)
                     result.fail(e.message)
                     finish(result, remoteUUID)
                 }
