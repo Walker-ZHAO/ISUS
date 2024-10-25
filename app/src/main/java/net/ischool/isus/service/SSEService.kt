@@ -61,7 +61,7 @@ class SSEService : Service() {
         override fun onOpen() {
             val msg = "SSE onOpen"
             Log.w(LOG_TAG, msg)
-            Syslog.logN(msg, SYSLOG_CATEGORY_SSE)
+            Syslog.logN(msg, category = SYSLOG_CATEGORY_SSE)
 
         }
 
@@ -69,7 +69,7 @@ class SSEService : Service() {
             if (event == "message") {
                 val msg = "SSE onMessage: $event, $messageEvent"
                 Log.i(LOG_TAG, msg)
-                Syslog.logI(msg, SYSLOG_CATEGORY_SSE)
+                Syslog.logI(msg, category = SYSLOG_CATEGORY_SSE)
                 val command = Gson().fromJson<Command>(messageEvent.data)
                 CommandParser.instance.processCommand(command)
             }
@@ -78,20 +78,20 @@ class SSEService : Service() {
         override fun onClosed() {
             val msg = "SSE onClosed"
             Log.e(LOG_TAG, msg)
-            Syslog.logE(msg, SYSLOG_CATEGORY_SSE)
+            Syslog.logE(msg, category = SYSLOG_CATEGORY_SSE)
             reCreate()
         }
 
         override fun onError(t: Throwable) {
             val msg = "SSE onError: ${t.message}"
             Log.e(LOG_TAG, msg)
-            Syslog.logE(msg, SYSLOG_CATEGORY_SSE)
+            Syslog.logE(msg, category = SYSLOG_CATEGORY_SSE)
         }
 
         override fun onComment(comment: String) {
             val msg = "SSE onComment: $comment"
             Log.w(LOG_TAG, msg)
-            Syslog.logN(msg, SYSLOG_CATEGORY_SSE)
+            Syslog.logN(msg, category = SYSLOG_CATEGORY_SSE)
         }
     }
 
@@ -137,7 +137,7 @@ class SSEService : Service() {
         } catch (e: Exception) {
             val errorMsg = "SSE setup failed: ${e.message}"
             Log.e(LOG_TAG, errorMsg)
-            Syslog.logE(errorMsg, SYSLOG_CATEGORY_SSE)
+            Syslog.logE(errorMsg, category = SYSLOG_CATEGORY_SSE)
             reCreate()
         }
     }

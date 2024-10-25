@@ -57,7 +57,7 @@ class UserSyncActivity : AppCompatActivity() {
                     val result = checkNotNull(it.body())
                     if (result.errno != 0) {
                         longToast("用户信息列表获取失败, 请稍后重试")
-                        Syslog.logN("用户信息列表获取失败(${result.error})", SYSLOG_CATEGORY_RABBITMQ)
+                        Syslog.logN("用户信息列表获取失败(${result.error})", category = SYSLOG_CATEGORY_RABBITMQ)
                         finish()
                         return@subscribeBy
                     }
@@ -68,7 +68,7 @@ class UserSyncActivity : AppCompatActivity() {
                 },
                 onError = {
                     longToast("用户信息列表获取失败, 请稍后重试")
-                    Syslog.logE("用户信息列表获取失败(${it.message})", SYSLOG_CATEGORY_RABBITMQ)
+                    Syslog.logE("用户信息列表获取失败(${it.message})", category = SYSLOG_CATEGORY_RABBITMQ)
                     finish()
                 }
             )
@@ -92,7 +92,7 @@ class UserSyncActivity : AppCompatActivity() {
                         PreferenceManager.instance.apply {
                             setSyncCount(getSyncCount() + 1)
                         }
-                        Syslog.logI("用户信息全量同步成功", SYSLOG_CATEGORY_RABBITMQ)
+                        Syslog.logI("用户信息全量同步成功", category = SYSLOG_CATEGORY_RABBITMQ)
                         longToast("用户信息同步成功")
                         finish()
                     } else {

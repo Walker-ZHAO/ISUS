@@ -60,7 +60,7 @@ open class CommandProcessorCommon constructor(protected val context: Context) : 
                     finish(result, remoteUUID)
                 },
                 onError = {
-                    Syslog.logE("Response ping command failure: ${it.message}", SYSLOG_CATEGORY_RABBITMQ)
+                    Syslog.logE("Response ping command failure: ${it.message}", category = SYSLOG_CATEGORY_RABBITMQ)
                     result.fail(it.message)
                     finish(result, remoteUUID)
                 }
@@ -146,7 +146,7 @@ open class CommandProcessorCommon constructor(protected val context: Context) : 
 
                 override fun onFailure(request: Request, e: IOException) {
                     Logger.w(e.message ?: "")
-                    Syslog.logE("Update file download failure", SYSLOG_CATEGORY_RABBITMQ)
+                    Syslog.logE("Update file download failure", category = SYSLOG_CATEGORY_RABBITMQ)
                     result.fail(e.message)
                     finish(result, remoteUUID)
                 }
@@ -207,7 +207,7 @@ open class CommandProcessorCommon constructor(protected val context: Context) : 
                     reboot(remoteUUID)
                 },
                 onError = {
-                    Syslog.logE("Reload config failure: ${it.message}", SYSLOG_CATEGORY_RABBITMQ)
+                    Syslog.logE("Reload config failure: ${it.message}", category = SYSLOG_CATEGORY_RABBITMQ)
                     result.fail(it.message)
                     finish(result, remoteUUID)
                 }

@@ -5,6 +5,7 @@ import android.os.Process
 import com.walker.anke.framework.activityManager
 import com.walker.anke.framework.doAsync
 import net.ischool.isus.BuildConfig
+import net.ischool.isus.DeviceType
 import net.ischool.isus.ISUS
 import net.ischool.isus.UDP_PORT
 import net.ischool.isus.preference.PreferenceManager
@@ -43,13 +44,15 @@ class Syslog {
         private fun createLog(pri: Int = PRI_INFO, message: String, version: String, category: String = DEFAULT_CATEGORY, tag: String): String {
             val ts = SimpleDateFormat("MMM dd HH:mm:ss", Locale.ENGLISH).format(Date())
             return with(ISUS.instance.context) {
-                val tagName = if (tag.isEmpty()) {
-                    activityManager.runningAppProcesses
-                        .filter { it.pid == Process.myPid() }
-                        .map { it.processName }
-                        .firstOrNull() ?: "null"
-                } else {
-                    tag
+                val tagName = tag.ifEmpty {
+                    when (PreferenceManager.instance.getDeviceType()) {
+                        DeviceType.BADGE -> "billboard"
+                        DeviceType.SECURITY -> "gate"
+                        else -> activityManager.runningAppProcesses
+                            .filter { it.pid == Process.myPid() }
+                            .map { it.processName }
+                            .firstOrNull() ?: "null"
+                    }
                 }
                 "<$pri>$ts $tagName[${Process.myPid()}]:${PreferenceManager.instance.getSchoolId()},${PreferenceManager.instance.getCMDB()},$version,$category,$message"
             }

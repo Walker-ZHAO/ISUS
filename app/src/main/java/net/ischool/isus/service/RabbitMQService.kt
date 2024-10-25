@@ -45,21 +45,21 @@ class RabbitMQService : Service() {
         val type = if (cause.isHardError) "Connection" else "Channel"
         val errorMsg = "RabbitMQ $type shutdown: ${cause.reason}"
         Log.e(LOG_TAG, errorMsg)
-        Syslog.logE(errorMsg, SYSLOG_CATEGORY_RABBITMQ)
+        Syslog.logE(errorMsg, category = SYSLOG_CATEGORY_RABBITMQ)
         changeState(QueueState.STATE_BLOCK)
     }
     private val recoveryListener = object : RecoveryListener {
         override fun handleRecovery(recoverable: Recoverable?) {
             val msg = "RabbitMQ connect recovery completed"
             Log.w(LOG_TAG, msg)
-            Syslog.logN(msg, SYSLOG_CATEGORY_RABBITMQ)
+            Syslog.logN(msg, category = SYSLOG_CATEGORY_RABBITMQ)
             changeState(QueueState.STATE_STANDBY)
         }
 
         override fun handleRecoveryStarted(recoverable: Recoverable?) {
             val msg = "RabbitMQ connect recovery Started"
             Log.w(LOG_TAG, msg)
-            Syslog.logN(msg, SYSLOG_CATEGORY_RABBITMQ)
+            Syslog.logN(msg, category = SYSLOG_CATEGORY_RABBITMQ)
         }
     }
 
@@ -74,7 +74,7 @@ class RabbitMQService : Service() {
             super.handleDelivery(consumerTag, envelope, properties, body)
             val msg = body?.toString(charset("UTF-8"))
             Log.i(LOG_TAG, "RabbitMQ message: $msg")
-            Syslog.logI("getCommand Info: $msg", SYSLOG_CATEGORY_RABBITMQ)
+            Syslog.logI("getCommand Info: $msg", category = SYSLOG_CATEGORY_RABBITMQ)
             msg?.let {
                 val command = Gson().fromJson<Command>(it)
                 CommandParser.instance.processCommand(command)
@@ -85,7 +85,7 @@ class RabbitMQService : Service() {
             super.handleShutdownSignal(consumerTag, sig)
             val errorMsg = "RabbitMQ consume($consumerTag) get ShutdownSignalException, ${sig?.reason}"
             Log.e(LOG_TAG, errorMsg)
-            Syslog.logE(errorMsg, SYSLOG_CATEGORY_RABBITMQ)
+            Syslog.logE(errorMsg, category = SYSLOG_CATEGORY_RABBITMQ)
         }
     }
 
@@ -106,7 +106,7 @@ class RabbitMQService : Service() {
             msg?.let {
                 when (envelope?.routingKey) {
                     MQ_ROUTING_KEY_COMET -> {   // 普通命令
-                        Syslog.logI("getCommand SE Info: $it", SYSLOG_CATEGORY_RABBITMQ)
+                        Syslog.logI("getCommand SE Info: $it", category = SYSLOG_CATEGORY_RABBITMQ)
                         // 直接ack
                         channel?.basicAck(envelope.deliveryTag, false)
                         Gson().fromJson<SECommand>(it).payload.payload.apply {
@@ -119,7 +119,7 @@ class RabbitMQService : Service() {
                         if (PreferenceManager.instance.getDeviceType() != DeviceType.SECURITY) {
                             return@let
                         }
-                        Syslog.logI("syncUser SE Info: $msg", SYSLOG_CATEGORY_RABBITMQ)
+                        Syslog.logI("syncUser SE Info: $msg", category = SYSLOG_CATEGORY_RABBITMQ)
                         Gson().fromJson<SEUserSync>(it).payload.uid.apply {
                             syncUserInfo(
                                 toLong(),
@@ -139,7 +139,7 @@ class RabbitMQService : Service() {
             super.handleShutdownSignal(consumerTag, sig)
             val errorMsg = "RabbitMQ SE consume($consumerTag) get ShutdownSignalException, ${sig?.reason}"
             Log.e(LOG_TAG, errorMsg)
-            Syslog.logE(errorMsg, SYSLOG_CATEGORY_RABBITMQ)
+            Syslog.logE(errorMsg, category = SYSLOG_CATEGORY_RABBITMQ)
         }
     }
 
@@ -148,7 +148,7 @@ class RabbitMQService : Service() {
             super.handleBlockedListenerException(connection, exception)
             val msg = "RabbitMQ Blocked Exception: ${exception?.cause}"
             Log.e(LOG_TAG, msg)
-            Syslog.logE(msg, SYSLOG_CATEGORY_RABBITMQ)
+            Syslog.logE(msg, category = SYSLOG_CATEGORY_RABBITMQ)
         }
 
         override fun handleTopologyRecoveryException(
@@ -159,7 +159,7 @@ class RabbitMQService : Service() {
             super.handleTopologyRecoveryException(conn, ch, exception)
             val msg = "RabbitMQ Topology Recovery Exception: ${exception?.cause}"
             Log.e(LOG_TAG, msg)
-            Syslog.logE(msg, SYSLOG_CATEGORY_RABBITMQ)
+            Syslog.logE(msg, category = SYSLOG_CATEGORY_RABBITMQ)
         }
 
         override fun handleConsumerException(
@@ -172,7 +172,7 @@ class RabbitMQService : Service() {
             super.handleConsumerException(channel, exception, consumer, consumerTag, methodName)
             val msg = "RabbitMQ Consumer($consumerTag) Exception: ${exception?.cause}"
             Log.e(LOG_TAG, msg)
-            Syslog.logE(msg, SYSLOG_CATEGORY_RABBITMQ)
+            Syslog.logE(msg, category = SYSLOG_CATEGORY_RABBITMQ)
             // 消费事件时产生异常，会导致Channel关闭，需要重新设置连接
             Thread.sleep(5000)
             subscribe()
@@ -182,35 +182,35 @@ class RabbitMQService : Service() {
             super.handleConnectionRecoveryException(conn, exception)
             val msg = "RabbitMQ Connection Recovery Exception: ${exception?.cause}"
             Log.e(LOG_TAG, msg)
-            Syslog.logE(msg, SYSLOG_CATEGORY_RABBITMQ)
+            Syslog.logE(msg, category = SYSLOG_CATEGORY_RABBITMQ)
         }
 
         override fun handleUnexpectedConnectionDriverException(conn: Connection?, exception: Throwable?) {
             super.handleUnexpectedConnectionDriverException(conn, exception)
             val msg = "RabbitMQ Connection Driver Exception: ${exception?.cause}"
             Log.e(LOG_TAG, msg)
-            Syslog.logE(msg, SYSLOG_CATEGORY_RABBITMQ)
+            Syslog.logE(msg, category = SYSLOG_CATEGORY_RABBITMQ)
         }
 
         override fun handleChannelRecoveryException(ch: Channel?, exception: Throwable?) {
             super.handleChannelRecoveryException(ch, exception)
             val msg = "RabbitMQ Channel Recovery Exception: ${exception?.cause}"
             Log.e(LOG_TAG, msg)
-            Syslog.logE(msg, SYSLOG_CATEGORY_RABBITMQ)
+            Syslog.logE(msg, category = SYSLOG_CATEGORY_RABBITMQ)
         }
 
         override fun handleReturnListenerException(channel: Channel?, exception: Throwable?) {
             super.handleReturnListenerException(channel, exception)
             val msg = "RabbitMQ Return Exception: ${exception?.cause}"
             Log.e(LOG_TAG, msg)
-            Syslog.logE(msg, SYSLOG_CATEGORY_RABBITMQ)
+            Syslog.logE(msg, category = SYSLOG_CATEGORY_RABBITMQ)
         }
 
         override fun handleConfirmListenerException(channel: Channel?, exception: Throwable?) {
             super.handleConfirmListenerException(channel, exception)
             val msg = "RabbitMQ Confirm Exception: ${exception?.cause}"
             Log.e(LOG_TAG, msg)
-            Syslog.logE(msg, SYSLOG_CATEGORY_RABBITMQ)
+            Syslog.logE(msg, category = SYSLOG_CATEGORY_RABBITMQ)
         }
     }
 
@@ -271,7 +271,7 @@ class RabbitMQService : Service() {
                                         }
 
                                         override fun onFailure(request: Request, e: IOException) {
-                                            Syslog.logN("同步头像($uid)下载失败: ${e.message}", SYSLOG_CATEGORY_RABBITMQ)
+                                            Syslog.logN("同步头像($uid)下载失败: ${e.message}", category = SYSLOG_CATEGORY_RABBITMQ)
                                             user.cacheAvatar = ""
                                             ObjectBox.updateUser(user)
                                             success()
@@ -284,13 +284,13 @@ class RabbitMQService : Service() {
                                 success()
                             }
                             else -> {   // 其他错误，拒收消息
-                                Syslog.logN("同步用户信息失败，服务器错误(${result.error}) uid: $uid", SYSLOG_CATEGORY_RABBITMQ)
+                                Syslog.logN("同步用户信息失败，服务器错误(${result.error}) uid: $uid", category = SYSLOG_CATEGORY_RABBITMQ)
                                 fail()
                             }
                         }
                     },
                     onError = {
-                        Syslog.logE("同步用户信息失败，内部错误(${it.message}) uid: $uid", SYSLOG_CATEGORY_RABBITMQ)
+                        Syslog.logE("同步用户信息失败，内部错误(${it.message}) uid: $uid", category = SYSLOG_CATEGORY_RABBITMQ)
                         fail()
                     }
                 )
@@ -424,7 +424,7 @@ class RabbitMQService : Service() {
             } catch (e: Exception) { // 初次创建连接及相关Topology失败时，不会自动修复连接，需要手动处理
                 val errorMsg = "RabbitMQ initial connect and topology failed: ${e.message}"
                 Log.e(LOG_TAG, errorMsg)
-                Syslog.logE(errorMsg, SYSLOG_CATEGORY_RABBITMQ)
+                Syslog.logE(errorMsg, category = SYSLOG_CATEGORY_RABBITMQ)
                 Thread.sleep(5000)
                 subscribe()
             }

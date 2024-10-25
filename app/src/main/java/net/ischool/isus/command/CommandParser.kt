@@ -65,7 +65,7 @@ class CommandParser private constructor() {
      * 命令处理器
      */
     fun processCommand(command: Command, remoteUUID: String = "") {
-        Syslog.logI("ISUS process command: $command", SYSLOG_CATEGORY_RABBITMQ)
+        Syslog.logI("ISUS process command: $command", category = SYSLOG_CATEGORY_SSE)
         if (canProcess(command)) {
             when (command.cmd.lowercase(Locale.getDefault())) {
                 ICommand.COMMAND_PING -> processor?.ping(remoteUUID)
