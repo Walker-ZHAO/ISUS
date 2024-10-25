@@ -193,8 +193,6 @@ interface APIService {
             builder.build()
         }
 
-        private val downloadClient: OkHttpClient by lazy { OkHttpClient.Builder().build() }
-
         private val delivery: Handler by lazy { Handler(Looper.getMainLooper()) }
 
         fun getSchoolId(): Observable<Response<Result<SchoolInfo>>> {
@@ -397,7 +395,6 @@ interface APIService {
          */
         fun cancel() {
             client.dispatcher.cancelAll()
-            downloadClient.dispatcher.cancelAll()
         }
 
         /**
@@ -412,8 +409,7 @@ interface APIService {
             val request = Request.Builder()
                     .url(url)
                     .build()
-            // 下载文件使用独立的Http Client
-            val call = downloadClient.newCall(request)
+            val call = client.newCall(request)
             call.enqueue(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     sendFailedStringCallback(request, e, callback)

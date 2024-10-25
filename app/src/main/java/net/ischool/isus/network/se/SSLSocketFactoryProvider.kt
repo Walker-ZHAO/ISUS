@@ -147,6 +147,7 @@ class SSLSocketFactoryProvider {
 
 /**
  * 为OkHttp构建器设置可信CA证书及客户端证书
+ * 该方法不可调用多次，只能调用一次
  */
 fun OkHttpClient.Builder.setCert(): OkHttpClient.Builder {
     sslSocketFactory(SSLSocketFactoryProvider.getSSLSocketFactory(), SSLSocketFactoryProvider.getTrustManagers().first() as X509TrustManager)
