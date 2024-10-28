@@ -118,7 +118,7 @@ class SSEService : Service() {
                 disconnect()
             }
         }
-        return START_NOT_STICKY
+        return START_STICKY
     }
 
     private fun setup() {
