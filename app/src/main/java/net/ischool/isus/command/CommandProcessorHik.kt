@@ -36,16 +36,19 @@ class CommandProcessorHik(context: Context): CommandProcessorCommon(context) {
     override fun update(url: String?, remoteUUID: String) {
         val result = CommandResult(ICommand.COMMAND_UPDATE)
         if (url == null) {
-            result.fail("URL is invalid")
+            result.fail("Update url is invalid")
             finish(result, remoteUUID)
             return
         }
+
+        Syslog.logI("Update start download")
         APIService.downloadAsync(
             url,
             Environment.getExternalStorageDirectory().path,
             callback = object :
                 StringCallback {
                 override fun onResponse(string: String) {
+                    Syslog.logI("Update download success, start install")
                     if (InfoSystemApi.execCommand("pm install -r $string") != 0) {
                         result.fail("install failed")
 
