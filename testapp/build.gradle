@@ -1,7 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
-    id 'kotlin-kapt'
+    id 'com.google.devtools.ksp'
 }
 
 android {
@@ -35,11 +35,11 @@ android {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_17.toString()
     }
-    lintOptions {
-        abortOnError false
-    }
     configurations {
         all*.exclude group: 'com.google.code.gson'
+    }
+    lint {
+        abortOnError false
     }
 }
 
