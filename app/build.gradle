@@ -121,6 +121,9 @@ dependencies {
     implementation 'androidx.fragment:fragment-ktx:1.5.7'
     // 希沃SDK
     compileOnly project(':seewo')
+    // TOTP 生成与验证
+    implementation("dev.turingcomplete:kotlin-onetimepassword:2.4.0")
+    implementation("commons-codec:commons-codec:1.15")
 }
 
 afterEvaluate {
