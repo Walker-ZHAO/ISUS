@@ -92,3 +92,5 @@ internal const val LOG_TAG = "ISUS"
 internal const val SYSLOG_CATEGORY_RABBITMQ = "RabbitMQ"
 // EventSource
 internal const val SYSLOG_CATEGORY_SSE = "SSE"
+// BLE广播
+internal const val SYSLOG_CATEGORY_BLE = "BLE"
