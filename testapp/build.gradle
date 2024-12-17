@@ -35,6 +35,9 @@ android {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_17.toString()
     }
+    buildFeatures {
+        viewBinding true
+    }
     configurations {
         all*.exclude group: 'com.google.code.gson'
     }

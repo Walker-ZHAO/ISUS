@@ -9,6 +9,7 @@ import android.lamy.system.Magicbox
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.util.Log
+import com.example.testapp.databinding.ActivityMainBinding
 import com.hikvision.dmb.system.InfoSystemApi
 import com.hikvision.dmb.time.InfoTimeApi
 import com.jakewharton.rxbinding4.view.clicks
@@ -40,8 +41,8 @@ import net.ischool.isus.ISUS
 import net.ischool.isus.activity.ConfigActivity
 import net.ischool.isus.activity.InitActivity
 import net.ischool.isus.broadcast.UserSyncReceiver
-import net.ischool.isus.databinding.ActivityMainBinding
 import net.ischool.isus.db.ObjectBox
+import net.ischool.isus.io.IBeaconAdvertiser
 import net.ischool.isus.isDh32Device
 import net.ischool.isus.isHongHeDevice
 import net.ischool.isus.isTouchWoDevice
@@ -202,6 +203,18 @@ class MainActivity : RxAppCompatActivity() {
 //            btn_stop.snack("Hello Android") {
 //                action("OK") { toast("Kotlin power!") }
 //            }
+        }
+
+        binding.btnInitBle.setOnClickListener {
+            IBeaconAdvertiser.init(this)
+        }
+
+        binding.btnStartBle.setOnClickListener {
+            IBeaconAdvertiser.instance.startAdvertise(this)
+        }
+
+        binding.btnStopBle.setOnClickListener {
+            IBeaconAdvertiser.instance.stopAdvertise(this)
         }
 
         binding.mqTest.setOnClickListener {
