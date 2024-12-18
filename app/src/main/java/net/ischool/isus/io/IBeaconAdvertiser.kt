@@ -20,6 +20,7 @@ import com.tbruyelle.rxpermissions3.RxPermissions
 import net.ischool.isus.LOG_TAG
 import net.ischool.isus.SYSLOG_CATEGORY_BLE
 import net.ischool.isus.log.Syslog
+import net.ischool.isus.preference.PreferenceManager
 import java.nio.ByteBuffer
 
 /**
@@ -120,8 +121,8 @@ class IBeaconAdvertiser {
          */
         @SuppressLint("MissingPermission")
         private fun setAdapterName() {
-            // TODO 修改成设备名称
-            bleAdapter.name = "ISUS"
+            // 设置设备名称，iBeacon最多支持9个汉字字符
+            bleAdapter.name = PreferenceManager.instance.getDeviceName().take(9)
         }
 
         /**
