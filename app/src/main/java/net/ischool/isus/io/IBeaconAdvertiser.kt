@@ -150,12 +150,12 @@ class IBeaconAdvertiser {
             for (i in 2..17) {
                 manufactureData.put(i, (0x2F).toByte())
             }
-            // Major
-            manufactureData.put(18, 0x00.toByte())
-            manufactureData.put(19, 0x09.toByte())
-            // Minor
-            manufactureData.put(20, 0x00.toByte())
-            manufactureData.put(21, 0x06.toByte())
+            // Major：固定值zx
+            manufactureData.put(18, 'z'.code.toByte())
+            manufactureData.put(19, 'x'.code.toByte())
+            // Minor: 设备类型 - uuid版本号
+            manufactureData.put(20, PreferenceManager.instance.getDeviceType().toByte())
+            manufactureData.put(21, 1)
             // txPower
             manufactureData.put(22, (-75).toByte())
             // Apple厂商ID
