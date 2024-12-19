@@ -1,5 +1,7 @@
 package net.ischool.isus.service
 
+import android.annotation.SuppressLint
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import net.ischool.isus.RESULT_OK
 import net.ischool.isus.model.ALARM_TYPE_DISCONNECT
@@ -16,6 +18,25 @@ import java.util.concurrent.TimeUnit
  * Email: zhaocework@gmail.com
  * Date: 2023/5/30
  */
+
+/**
+ * 自检测数据源
+ */
+val alarmInfoObservable = alarmIntervalDetect();
+
+@SuppressLint("CheckResult")
+object AlarmService {
+    // 报警检测数据
+    var alarmInfos: List<AlarmInfo> = listOf()
+        private set
+
+    init {
+        // 触发周期性自检
+        alarmIntervalDetect()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe { alarmInfos = it }
+    }
+}
 
 /**
  * 周期性检测报警信息

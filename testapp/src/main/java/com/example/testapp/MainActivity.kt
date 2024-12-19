@@ -48,8 +48,10 @@ import net.ischool.isus.isHongHeDevice
 import net.ischool.isus.isTouchWoDevice
 import net.ischool.isus.network.APIService
 import net.ischool.isus.preference.PreferenceManager
+import net.ischool.isus.service.AlarmService
 import net.ischool.isus.service.RabbitMQService
 import net.ischool.isus.service.UDPService
+import net.ischool.isus.service.alarmInfoObservable
 import net.ischool.isus.service.alarmIntervalDetect
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
@@ -192,9 +194,6 @@ class MainActivity : RxAppCompatActivity() {
 //                    .subscribe { "$it" }
 //            val p = execRuntimeProcess("sunew /system/xbin/system_reboot.sh")
 //            btn_start.snack("Hello Kotlin")
-            alarmIntervalDetect().subscribeBy {
-                Log.i("Walker", "alarm: $it")
-            }
         }
 
         binding.btnStop.setOnClickListener{

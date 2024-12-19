@@ -17,6 +17,7 @@ import net.ischool.isus.command.ICommand
 import net.ischool.isus.db.ObjectBox
 import net.ischool.isus.network.APIService
 import net.ischool.isus.preference.PreferenceManager
+import net.ischool.isus.service.AlarmService
 import net.ischool.isus.service.RabbitMQService
 import net.ischool.isus.service.SSEService
 import net.ischool.isus.service.StatusPostService
@@ -116,6 +117,8 @@ class ISUS(
             addAction(Intent.ACTION_MEDIA_EJECT)
             addDataScheme("file")
         })
+        // 触发定期状态检测
+        AlarmService.alarmInfos
     }
 
     /**
