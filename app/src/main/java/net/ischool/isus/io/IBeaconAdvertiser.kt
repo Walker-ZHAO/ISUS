@@ -20,7 +20,11 @@ import com.tbruyelle.rxpermissions3.RxPermissions
 import net.ischool.isus.LOG_TAG
 import net.ischool.isus.SYSLOG_CATEGORY_BLE
 import net.ischool.isus.log.Syslog
+import net.ischool.isus.model.ALARM_TYPE_DISCONNECT
+import net.ischool.isus.model.ALARM_TYPE_MQ
+import net.ischool.isus.model.ALARM_TYPE_PLATFORM
 import net.ischool.isus.preference.PreferenceManager
+import net.ischool.isus.service.AlarmService
 import net.ischool.isus.util.NetworkUtil
 import java.nio.ByteBuffer
 
@@ -149,7 +153,15 @@ class IBeaconAdvertiser {
             manufactureData.put(1, (0x15).toByte())
             // UUID
             // 1字节自诊断状态
-            manufactureData.put(2, (0x2F).toByte())
+            var status = 0
+            if (AlarmService.alarmInfos.firstOrNull { it.type == ALARM_TYPE_DISCONNECT } != null) {
+                // 边缘云无法连通
+                status = 1
+            } else if (AlarmService.alarmInfos.firstOrNull { it.type == ALARM_TYPE_MQ || it.type == ALARM_TYPE_PLATFORM } != null) {
+                // 平台无法连通
+                status = 2
+            }
+            manufactureData.put(2, status.toByte())
             // 4字节IPV4地址
             val ipSegments = NetworkUtil.getIpAddress(context).split(".")
             manufactureData.put(3, ipSegments[0].toUByte().toByte())
