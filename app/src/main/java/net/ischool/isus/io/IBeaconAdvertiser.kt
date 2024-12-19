@@ -17,6 +17,8 @@ import androidx.appcompat.app.AppCompatActivity.BLUETOOTH_SERVICE
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.FragmentActivity
 import com.tbruyelle.rxpermissions3.RxPermissions
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.disposables.Disposable
 import net.ischool.isus.LOG_TAG
 import net.ischool.isus.SYSLOG_CATEGORY_BLE
 import net.ischool.isus.log.Syslog
@@ -27,6 +29,7 @@ import net.ischool.isus.preference.PreferenceManager
 import net.ischool.isus.service.AlarmService
 import net.ischool.isus.util.NetworkUtil
 import java.nio.ByteBuffer
+import java.util.concurrent.TimeUnit
 
 /**
  * iBeacon标签广播器
@@ -72,6 +75,9 @@ class IBeaconAdvertiser {
                 Log.e(LOG_TAG, "advertise failed: $errorCode")
             }
         }
+
+        // 周期性广播
+        private var bleAdvDisposable: Disposable? = null
 
         @SuppressLint("CheckResult")
         @Synchronized
@@ -207,6 +213,31 @@ class IBeaconAdvertiser {
      * 开启BLE广播
      */
     fun startAdvertise(context: Context) {
+        bleAdvDisposable?.dispose()
+        // 每60秒更新一次广播数据并重新广播
+        bleAdvDisposable = Observable.interval(0, 60, TimeUnit.SECONDS)
+            .subscribe {
+                // 停止广播
+                stopAdvertiseSingle(context)
+                // 更新广播数据
+                setAdvertiseData(context)
+                // 重新广播
+                startAdvertiseSingle(context)
+            }
+    }
+
+    /**
+     * 停止BLE广播
+     */
+    fun stopAdvertise(context: Context) {
+        bleAdvDisposable?.dispose()
+        stopAdvertiseSingle(context)
+    }
+
+    /**
+     * 开始单次BLE广播
+     */
+    private fun startAdvertiseSingle(context: Context) {
         if (Build.VERSION.SDK_INT >= 31 && ActivityCompat.checkSelfPermission(
                 context,
                 Manifest.permission.BLUETOOTH_ADVERTISE
@@ -228,9 +259,9 @@ class IBeaconAdvertiser {
     }
 
     /**
-     * 停止BLE广播
+     * 停止单次BLE广播
      */
-    fun stopAdvertise(context: Context) {
+    private fun stopAdvertiseSingle(context: Context) {
         if (Build.VERSION.SDK_INT >= 31 && ActivityCompat.checkSelfPermission(
                 context,
                 Manifest.permission.BLUETOOTH_ADVERTISE
