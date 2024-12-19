@@ -148,23 +148,22 @@ class IBeaconAdvertiser {
             manufactureData.put(0, (0x02).toByte())
             manufactureData.put(1, (0x15).toByte())
             // UUID
-            // 2字节自诊断状态
+            // 1字节自诊断状态
             manufactureData.put(2, (0x2F).toByte())
-            manufactureData.put(3, (0x2F).toByte())
             // 4字节IPV4地址
             val ipSegments = NetworkUtil.getIpAddress(context).split(".")
-            manufactureData.put(4, ipSegments[0].toUByte().toByte())
-            manufactureData.put(5, ipSegments[1].toUByte().toByte())
-            manufactureData.put(6, ipSegments[2].toUByte().toByte())
-            manufactureData.put(7, ipSegments[3].toUByte().toByte())
+            manufactureData.put(3, ipSegments[0].toUByte().toByte())
+            manufactureData.put(4, ipSegments[1].toUByte().toByte())
+            manufactureData.put(5, ipSegments[2].toUByte().toByte())
+            manufactureData.put(6, ipSegments[3].toUByte().toByte())
             // 4字节CMDB ID
             val cmdb = PreferenceManager.instance.getCMDB().toInt()
-            manufactureData.put(8, ((cmdb shr 24) and 0xff).toByte())
-            manufactureData.put(9, ((cmdb shr 16) and 0xff).toByte())
-            manufactureData.put(10, ((cmdb shr 8) and 0xff).toByte())
-            manufactureData.put(11, (cmdb and 0xff).toByte())
-            // 6字节保留
-            for (i in 12..17) {
+            manufactureData.put(7, ((cmdb shr 24) and 0xff).toByte())
+            manufactureData.put(8, ((cmdb shr 16) and 0xff).toByte())
+            manufactureData.put(9, ((cmdb shr 8) and 0xff).toByte())
+            manufactureData.put(10, (cmdb and 0xff).toByte())
+            // 7字节保留
+            for (i in 11..17) {
                 manufactureData.put(i, (0x00).toByte())
             }
             // Major：固定值zx
