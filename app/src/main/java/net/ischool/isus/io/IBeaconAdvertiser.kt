@@ -28,7 +28,9 @@ import net.ischool.isus.model.ALARM_TYPE_PLATFORM
 import net.ischool.isus.preference.PreferenceManager
 import net.ischool.isus.service.AlarmService
 import net.ischool.isus.util.NetworkUtil
+import org.apache.commons.codec.binary.Base32
 import java.nio.ByteBuffer
+import java.security.MessageDigest
 import java.util.concurrent.TimeUnit
 
 /**
@@ -152,12 +154,8 @@ class IBeaconAdvertiser {
          * 设置BLE广播数据
          */
         private fun setAdvertiseData(context: Context) {
-            val builder = AdvertiseData.Builder()
-            val manufactureData = ByteBuffer.allocate(24)
-            // iBeacon协议头
-            manufactureData.put(0, (0x02).toByte())
-            manufactureData.put(1, (0x15).toByte())
             // UUID
+            val uuid = ByteBuffer.allocate(16)
             // 1字节自诊断状态
             var status = 0
             if (AlarmService.alarmInfos.firstOrNull { it.type == ALARM_TYPE_DISCONNECT } != null) {
@@ -167,22 +165,44 @@ class IBeaconAdvertiser {
                 // 平台无法连通
                 status = 2
             }
-            manufactureData.put(2, status.toByte())
+            uuid.put(0, status.toByte())
             // 4字节IPV4地址
             val ipSegments = NetworkUtil.getIpAddress(context).split(".")
-            manufactureData.put(3, ipSegments[0].toUByte().toByte())
-            manufactureData.put(4, ipSegments[1].toUByte().toByte())
-            manufactureData.put(5, ipSegments[2].toUByte().toByte())
-            manufactureData.put(6, ipSegments[3].toUByte().toByte())
+            uuid.put(1, ipSegments[0].toUByte().toByte())
+            uuid.put(2, ipSegments[1].toUByte().toByte())
+            uuid.put(3, ipSegments[2].toUByte().toByte())
+            uuid.put(4, ipSegments[3].toUByte().toByte())
             // 4字节CMDB ID
             val cmdb = PreferenceManager.instance.getCMDB().toInt()
-            manufactureData.put(7, ((cmdb shr 24) and 0xff).toByte())
-            manufactureData.put(8, ((cmdb shr 16) and 0xff).toByte())
-            manufactureData.put(9, ((cmdb shr 8) and 0xff).toByte())
-            manufactureData.put(10, (cmdb and 0xff).toByte())
+            uuid.put(5, ((cmdb shr 24) and 0xff).toByte())
+            uuid.put(6, ((cmdb shr 16) and 0xff).toByte())
+            uuid.put(7, ((cmdb shr 8) and 0xff).toByte())
+            uuid.put(8, (cmdb and 0xff).toByte())
             // 7字节保留
-            for (i in 11..17) {
-                manufactureData.put(i, (0x00).toByte())
+            for (i in 9..15) {
+                uuid.put(i, (0x00).toByte())
+            }
+
+            // 计算UUID校验值（SHA-256）
+            val totpSecret = Base32().decode(PreferenceManager.instance.totpKeyWithBase32())
+            val hmacBuffer = ByteBuffer.allocate(16 + totpSecret.size)
+            // UUID与TOTP拼接后进行SHA-256计算
+            hmacBuffer.put(uuid.array())
+            hmacBuffer.put(totpSecret)
+            // 计算校验值
+            val hmac = MessageDigest.getInstance("SHA-256").digest(hmacBuffer.array())
+            // UUID最后一位使用校验值的最后一位
+            uuid.put(15, hmac.last())
+
+            // 构建广播消息
+            val builder = AdvertiseData.Builder()
+            val manufactureData = ByteBuffer.allocate(24)
+            // iBeacon协议头
+            manufactureData.put(0, (0x02).toByte())
+            manufactureData.put(1, (0x15).toByte())
+            // UUID
+            for (i in 2..17) {
+                manufactureData.put(i, uuid.get(i - 2))
             }
             // Major：固定值zx
             manufactureData.put(18, 'z'.code.toByte())
