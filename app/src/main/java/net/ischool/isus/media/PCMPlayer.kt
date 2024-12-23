@@ -7,6 +7,7 @@ import android.media.AudioTrack
 import net.ischool.isus.ISUS
 import java.io.FileInputStream
 import java.io.IOException
+import java.util.concurrent.Executors
 
 /**
  * PCM播放器
@@ -16,6 +17,8 @@ import java.io.IOException
  * Date: 2023/11/6
  */
 object PCMPlayer {
+    private val executor = Executors.newSingleThreadExecutor()
+
     /**
      * 播放PCM音频文件
      *
@@ -50,22 +53,25 @@ object PCMPlayer {
             AudioTrack.MODE_STREAM
         )
 
-        try {
-            FileInputStream(filePath).use { fis ->
-                audioTrack.play()
+        executor.execute {
+            try {
+                FileInputStream(filePath).use { fis ->
+                    audioTrack.play()
 
-                val buffer = ByteArray(bufferSize)
-                var bytesRead: Int
-                while (fis.read(buffer).also { bytesRead = it } != -1) {
-                    audioTrack.write(buffer, 0, bytesRead)
+                    val buffer = ByteArray(bufferSize)
+                    var bytesRead: Int
+                    while (fis.read(buffer).also { bytesRead = it } != -1) {
+                        audioTrack.write(buffer, 0, bytesRead)
+                    }
                 }
+            }  catch (e: IOException) {
+                e.printStackTrace()
             }
-        }  catch (e: IOException) {
-            e.printStackTrace()
+
+            audioTrack.stop()
+            audioTrack.release()
         }
 
-        audioTrack.stop()
-        audioTrack.release()
         // 恢复系统音量
         if (useMaxVolume) audioManager.setStreamVolume(streamType, volumeCurrent, 0)
     }
