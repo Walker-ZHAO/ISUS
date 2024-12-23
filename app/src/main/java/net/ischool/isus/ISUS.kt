@@ -15,6 +15,7 @@ import net.ischool.isus.broadcast.USBReceiver
 import net.ischool.isus.command.CommandParser
 import net.ischool.isus.command.ICommand
 import net.ischool.isus.db.ObjectBox
+import net.ischool.isus.io.IBeaconAdvertiser
 import net.ischool.isus.network.APIService
 import net.ischool.isus.preference.PreferenceManager
 import net.ischool.isus.service.AlarmService
@@ -119,6 +120,12 @@ class ISUS(
         })
         // 触发定期状态检测
         AlarmService.alarmInfos
+        // 初始化iBeacon配置
+        IBeaconAdvertiser.init(context)
+        // 如果启用iBeacon，则进行iBeacon广播
+        if (PreferenceManager.instance.getIBeacon()) {
+            IBeaconAdvertiser.instance.startAdvertise(context)
+        }
     }
 
     /**
