@@ -21,6 +21,7 @@ import net.ischool.isus.adapter.StaticConfigurationAdapter
 import net.ischool.isus.command.CommandParser
 import net.ischool.isus.databinding.ActivityConfigBinding
 import net.ischool.isus.dialog.RebindClassDialog
+import net.ischool.isus.io.IBeaconAdvertiser
 import net.ischool.isus.model.ALARM_TYPE_CAMPUSNG
 import net.ischool.isus.model.ALARM_TYPE_DISCONNECT
 import net.ischool.isus.model.ALARM_TYPE_MQ
@@ -81,6 +82,17 @@ class ConfigActivity : AppCompatActivity() {
         binding.dynamicConfigRv.apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
             adapter = dynamicConfigAdapter
+        }
+
+        // iBeacon广播配置
+        binding.ibeaconSwitch.isChecked = PreferenceManager.instance.getIBeacon()
+        binding.ibeaconSwitch.setOnCheckedChangeListener { _, checked ->
+            PreferenceManager.instance.setIBeacon(checked)
+            if (checked) {
+                IBeaconAdvertiser.instance.startAdvertise(this)
+            } else {
+                IBeaconAdvertiser.instance.stopAdvertise(this)
+            }
         }
 
         binding.back.setOnClickListener { finish() }

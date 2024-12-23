@@ -247,11 +247,42 @@
         android:background="@mipmap/bg_page"/>
 
     <View
+        android:id="@+id/ibeacon"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/x36"
+        android:background="@drawable/white_corner_rect"
+        app:layout_constraintTop_toTopOf="@id/pageStart"
+        app:layout_constraintStart_toStartOf="@id/pageStart"
+        app:layout_constraintEnd_toEndOf="@id/pageStart"
+        android:layout_marginTop="@dimen/x20"
+        android:layout_marginHorizontal="@dimen/x20"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/ibeacon"
+        android:textSize="@dimen/xs16"
+        android:textColor="@color/title_black"
+        app:layout_constraintTop_toTopOf="@id/ibeacon"
+        app:layout_constraintBottom_toBottomOf="@id/ibeacon"
+        app:layout_constraintStart_toStartOf="@id/ibeacon"
+        android:layout_marginStart="@dimen/x20"/>
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/ibeaconSwitch"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/ibeacon"
+        app:layout_constraintBottom_toBottomOf="@id/ibeacon"
+        app:layout_constraintEnd_toEndOf="@id/ibeacon"
+        android:layout_marginEnd="@dimen/x20"/>
+
+    <View
         android:id="@+id/cdnDiag"
         android:layout_width="0dp"
         android:layout_height="@dimen/x145"
         android:background="@drawable/white_corner_rect"
-        app:layout_constraintTop_toTopOf="@id/pageStart"
+        app:layout_constraintTop_toBottomOf="@id/ibeacon"
         app:layout_constraintStart_toStartOf="@id/pageStart"
         app:layout_constraintEnd_toStartOf="@id/platformDiag"
         android:layout_marginTop="@dimen/x20"
@@ -344,10 +375,9 @@
         android:layout_width="0dp"
         android:layout_height="@dimen/x94"
         android:background="@drawable/white_corner_rect"
-        app:layout_constraintTop_toTopOf="@id/pageStart"
+        app:layout_constraintTop_toTopOf="@id/cdnDiag"
         app:layout_constraintStart_toEndOf="@id/cdnDiag"
         app:layout_constraintEnd_toEndOf="@id/pageStart"
-        android:layout_marginTop="@dimen/x20"
         android:layout_marginEnd="@dimen/x20" />
 
     <View
