@@ -11,6 +11,8 @@ import com.orhanobut.logger.Logger
 import com.tbruyelle.rxpermissions3.RxPermissions
 import com.walker.anke.framework.packageVersionName
 import com.walker.anke.framework.toast
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.core.Observable
 import net.ischool.isus.broadcast.USBReceiver
 import net.ischool.isus.command.CommandParser
 import net.ischool.isus.command.ICommand
@@ -25,6 +27,7 @@ import net.ischool.isus.service.StatusPostService
 import net.ischool.isus.service.UDPService
 import net.ischool.isus.service.WatchDogService
 import java.io.InputStream
+import java.util.concurrent.TimeUnit
 
 /**
  * 库入口类
@@ -101,6 +104,7 @@ class ISUS(
     /**
      * 开启统一推送服务
      */
+    @SuppressLint("CheckResult")
     fun startService() {
         // 安全增强模式下直连公网，依然使用RabbitMQ做消息推送
         if (instance.se) {
@@ -124,7 +128,10 @@ class ISUS(
         IBeaconAdvertiser.init(context)
         // 如果启用iBeacon，则进行iBeacon广播
         if (PreferenceManager.instance.getIBeacon()) {
-            IBeaconAdvertiser.instance.startAdvertise(context)
+            // 延迟广播
+            Observable.timer(10, TimeUnit.SECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe { IBeaconAdvertiser.instance.startAdvertise(context) }
         }
     }
 

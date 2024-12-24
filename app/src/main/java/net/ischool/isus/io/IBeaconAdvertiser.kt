@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity.BLUETOOTH_SERVICE
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.FragmentActivity
 import com.tbruyelle.rxpermissions3.RxPermissions
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 import net.ischool.isus.LOG_TAG
@@ -112,7 +113,7 @@ class IBeaconAdvertiser {
         /**
          * 初始化BLE广播相关数据
          */
-        @SuppressLint("MissingPermission")
+        @SuppressLint("MissingPermission", "CheckResult")
         private fun initBle(context: Context) {
             // 开启蓝牙
             if (!bleAdapter.isEnabled) {
@@ -121,7 +122,20 @@ class IBeaconAdvertiser {
                     return
                 }
                 bleAdapter.enable()
+                // 延迟等待设备开启蓝牙后再设置蓝牙相关配置
+                Observable.timer(5, TimeUnit.SECONDS)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe { setupBle(context) }
+            } else {
+                setupBle(context)
             }
+
+        }
+
+        /**
+         * 设置BLE相关配置
+         */
+        private fun setupBle(context: Context) {
             setAdapterName()
             bleAdvertiser = bleAdapter.bluetoothLeAdvertiser
             setAdvertiseSettings()
