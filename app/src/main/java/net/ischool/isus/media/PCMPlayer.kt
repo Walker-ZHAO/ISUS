@@ -36,24 +36,24 @@ object PCMPlayer {
         channelConfig: Int = AudioFormat.CHANNEL_OUT_MONO,
         audioFormat: Int = AudioFormat.ENCODING_PCM_16BIT,
     ) {
-        val audioManager = ISUS.instance.context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        val streamType = AudioManager.STREAM_MUSIC
-        val volumeMax = audioManager.getStreamMaxVolume(streamType)
-        val volumeCurrent = audioManager.getStreamVolume(streamType)
-
-        // 使用最大音量播放
-        if (useMaxVolume) audioManager.setStreamVolume(streamType, volumeMax, 0)
-        val bufferSize = AudioTrack.getMinBufferSize(sampleRate, channelConfig, audioFormat)
-        val audioTrack = AudioTrack(
-            AudioManager.STREAM_MUSIC,
-            sampleRate,
-            channelConfig,
-            audioFormat,
-            bufferSize,
-            AudioTrack.MODE_STREAM
-        )
-
         executor.execute {
+            val audioManager = ISUS.instance.context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            val streamType = AudioManager.STREAM_MUSIC
+            val volumeMax = audioManager.getStreamMaxVolume(streamType)
+            val volumeCurrent = audioManager.getStreamVolume(streamType)
+
+            // 使用最大音量播放
+            if (useMaxVolume) audioManager.setStreamVolume(streamType, volumeMax, 0)
+            val bufferSize = AudioTrack.getMinBufferSize(sampleRate, channelConfig, audioFormat)
+            val audioTrack = AudioTrack(
+                AudioManager.STREAM_MUSIC,
+                sampleRate,
+                channelConfig,
+                audioFormat,
+                bufferSize,
+                AudioTrack.MODE_STREAM
+            )
+
             try {
                 FileInputStream(filePath).use { fis ->
                     audioTrack.play()
@@ -70,9 +70,9 @@ object PCMPlayer {
 
             audioTrack.stop()
             audioTrack.release()
-        }
 
-        // 恢复系统音量
-        if (useMaxVolume) audioManager.setStreamVolume(streamType, volumeCurrent, 0)
+            // 恢复系统音量
+            if (useMaxVolume) audioManager.setStreamVolume(streamType, volumeCurrent, 0)
+        }
     }
 }
