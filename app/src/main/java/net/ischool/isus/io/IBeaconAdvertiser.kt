@@ -250,14 +250,16 @@ class IBeaconAdvertiser {
         bleAdvDisposable?.dispose()
         // 每60秒更新一次广播数据并重新广播
         bleAdvDisposable = Observable.interval(0, 60, TimeUnit.SECONDS)
-            .subscribe {
+            .subscribe({
                 // 停止广播
                 stopAdvertiseSingle(context)
                 // 更新广播数据
                 setAdvertiseData(context)
                 // 重新广播
                 startAdvertiseSingle(context)
-            }
+            }, {
+                Syslog.logE("start advertise failed: ${it.message}", category = SYSLOG_CATEGORY_BLE)
+            })
     }
 
     /**
