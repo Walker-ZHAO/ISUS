@@ -11,6 +11,7 @@ import android.bluetooth.le.BluetoothLeAdvertiser
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.ParcelUuid
 import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity.BLUETOOTH_SERVICE
@@ -237,8 +238,11 @@ class IBeaconAdvertiser {
          * BLE广播增加设备名称
          */
         private fun setScanResponse() {
+            val uuid = "${'z'.code.toString(16)}${'x'.code.toString(16)}"
             scanResponse = AdvertiseData.Builder()
                 .setIncludeDeviceName(true)
+                // 服务UUID，用于标识服务提供商，可用于扫描端过滤
+                .addServiceUuid(ParcelUuid.fromString("0000${uuid}-0000-1000-8000-00805f9b34fb"))
                 .build()
         }
     }
