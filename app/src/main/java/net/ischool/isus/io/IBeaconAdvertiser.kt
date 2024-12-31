@@ -53,10 +53,10 @@ class IBeaconAdvertiser {
             private set
 
         // 蓝牙适配器
-        private lateinit var bleAdapter: BluetoothAdapter
+        private var bleAdapter: BluetoothAdapter? = null
 
         // BLE广播适配器
-        private lateinit var bleAdvertiser: BluetoothLeAdvertiser
+        private var bleAdvertiser: BluetoothLeAdvertiser? = null
 
         // BLE广播设置
         private lateinit var advertiseSettings: AdvertiseSettings
@@ -83,12 +83,23 @@ class IBeaconAdvertiser {
         // 周期性广播
         private var bleAdvDisposable: Disposable? = null
 
+        /**
+         * 是否支持蓝牙设备
+         */
+        fun supportBle(): Boolean = bleAdapter != null
+
         @SuppressLint("CheckResult")
         @Synchronized
         @JvmStatic
         fun init(context: Context) {
             instance = IBeaconAdvertiser()
             bleAdapter = (context.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager).adapter
+            if (!supportBle()) {
+                // 设备无蓝牙硬件，直接退出
+                PreferenceManager.instance.setIBeacon(false)
+                Syslog.logE("Device has no bluetooth hardware", category = SYSLOG_CATEGORY_BLE)
+                return
+            }
             // Android S 以上需要动态申请权限
             if (Build.VERSION.SDK_INT < 31) {
                 initBle(context)
@@ -117,20 +128,21 @@ class IBeaconAdvertiser {
         @SuppressLint("MissingPermission", "CheckResult")
         private fun initBle(context: Context) {
             // 开启蓝牙
-            if (!bleAdapter.isEnabled) {
-                if (Build.VERSION.SDK_INT > 33) {
-                    Toast.makeText(context, "请开启蓝牙", Toast.LENGTH_LONG).show()
-                    return
+            bleAdapter?.let {
+                if (!it.isEnabled) {
+                    if (Build.VERSION.SDK_INT > 33) {
+                        Toast.makeText(context, "请开启蓝牙", Toast.LENGTH_LONG).show()
+                        return
+                    }
+                    it.enable()
+                    // 延迟等待设备开启蓝牙后再设置蓝牙相关配置
+                    Observable.timer(5, TimeUnit.SECONDS)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe { setupBle(context) }
+                } else {
+                    setupBle(context)
                 }
-                bleAdapter.enable()
-                // 延迟等待设备开启蓝牙后再设置蓝牙相关配置
-                Observable.timer(5, TimeUnit.SECONDS)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe { setupBle(context) }
-            } else {
-                setupBle(context)
             }
-
         }
 
         /**
@@ -138,7 +150,7 @@ class IBeaconAdvertiser {
          */
         private fun setupBle(context: Context) {
             setAdapterName()
-            bleAdvertiser = bleAdapter.bluetoothLeAdvertiser
+            bleAdvertiser = bleAdapter?.bluetoothLeAdvertiser
             setAdvertiseSettings()
             setAdvertiseData(context)
             setScanResponse()
@@ -150,7 +162,7 @@ class IBeaconAdvertiser {
         @SuppressLint("MissingPermission")
         private fun setAdapterName() {
             // 设置设备名称，iBeacon最多支持9个汉字字符
-            bleAdapter.name = PreferenceManager.instance.getDeviceName().take(9)
+            bleAdapter?.name = PreferenceManager.instance.getDeviceName().take(9)
         }
 
         /**
@@ -289,7 +301,7 @@ class IBeaconAdvertiser {
             )
             return
         }
-        bleAdvertiser.startAdvertising(
+        bleAdvertiser?.startAdvertising(
             advertiseSettings,
             advertiseData,
             scanResponse,
@@ -313,7 +325,7 @@ class IBeaconAdvertiser {
             )
             return
         }
-        bleAdvertiser.stopAdvertising(advertiseCallback)
+        bleAdvertiser?.stopAdvertising(advertiseCallback)
         isStart = false
     }
 }

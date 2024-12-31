@@ -86,6 +86,7 @@ class ConfigActivity : AppCompatActivity() {
 
         // iBeacon广播配置
         binding.ibeaconSwitch.isChecked = PreferenceManager.instance.getIBeacon()
+        binding.ibeaconSwitch.isEnabled = IBeaconAdvertiser.supportBle()
         binding.ibeaconSwitch.setOnCheckedChangeListener { _, checked ->
             PreferenceManager.instance.setIBeacon(checked)
             if (checked) {
