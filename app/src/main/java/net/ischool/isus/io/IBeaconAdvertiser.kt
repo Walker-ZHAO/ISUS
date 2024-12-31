@@ -265,7 +265,7 @@ class IBeaconAdvertiser {
     fun startAdvertise(context: Context) {
         bleAdvDisposable?.dispose()
         // 每60秒更新一次广播数据并重新广播
-        bleAdvDisposable = Observable.interval(0, 60, TimeUnit.SECONDS)
+        bleAdvDisposable = Observable.interval(0, 5, TimeUnit.SECONDS)
             .subscribe({
                 // 停止广播
                 stopAdvertiseSingle(context)
