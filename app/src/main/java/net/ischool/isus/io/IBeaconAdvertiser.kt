@@ -9,6 +9,7 @@ import android.bluetooth.le.AdvertiseData
 import android.bluetooth.le.AdvertiseSettings
 import android.bluetooth.le.BluetoothLeAdvertiser
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.ParcelUuid
@@ -131,10 +132,11 @@ class IBeaconAdvertiser {
             bleAdapter?.let {
                 if (!it.isEnabled) {
                     if (Build.VERSION.SDK_INT > 33) {
+                        context.startActivity(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
                         Toast.makeText(context, "请开启蓝牙", Toast.LENGTH_LONG).show()
-                        return
+                    } else {
+                        it.enable()
                     }
-                    it.enable()
                     // 延迟等待设备开启蓝牙后再设置蓝牙相关配置
                     Observable.timer(5, TimeUnit.SECONDS)
                         .observeOn(AndroidSchedulers.mainThread())

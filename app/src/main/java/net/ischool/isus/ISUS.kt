@@ -74,7 +74,7 @@ class ISUS(
             clientCert: InputStream? = null,
             clientCertPwd: String? = null,
         ) {
-            instance = ISUS(context.applicationContext, securityEnhance, iam, certificate, clientCert, clientCertPwd)
+            instance = ISUS(context, securityEnhance, iam, certificate, clientCert, clientCertPwd)
             CommandParser.init(commandProcessor)
             Logger.addLogAdapter(AndroidLogAdapter())
             PreferenceManager.initPreference(context, deviceType)
@@ -108,15 +108,15 @@ class ISUS(
     fun startService() {
         // 安全增强模式下直连公网，依然使用RabbitMQ做消息推送
         if (instance.se) {
-            RabbitMQService.start(context)
+            RabbitMQService.start(context.applicationContext)
         } else {
             // 与边缘云链接模式下，使用EventSource(SSE)做消息推送
-            SSEService.start(context)
+            SSEService.start(context.applicationContext)
         }
         // 启动网络监控服务
-        WatchDogService.start(context)
+        WatchDogService.start(context.applicationContext)
         // 监听U盘插拔事件
-        context.registerReceiver(usbReceiver, IntentFilter().apply {
+        context.applicationContext.registerReceiver(usbReceiver, IntentFilter().apply {
             addAction(Intent.ACTION_MEDIA_MOUNTED)
             addAction(Intent.ACTION_MEDIA_UNMOUNTED)
             addAction(Intent.ACTION_MEDIA_EJECT)
