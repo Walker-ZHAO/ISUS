@@ -10,6 +10,7 @@ import android.provider.Settings
 import android.util.Log
 import com.hikvision.dmb.system.InfoSystemApi
 import com.seewo.sdk.OpenSDK
+import com.seewo.udsservice.client.plugins.system.UDSSystemHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.ischool.isus.preference.PreferenceManager
@@ -59,14 +60,34 @@ fun isHikDevice(): Boolean {
 }
 
 /**
- * 判断是否是希沃设备
+ * 是否是希沃设备
  */
 fun isSeeWoDevice(): Boolean {
+    return isSeeWo03Device() || isSeeWo06Device();
+}
+
+/**
+ * 是否是希沃SK03设备
+ */
+fun isSeeWo03Device(): Boolean {
     try {
         if (!OpenSDK.getInstance().isConnected)
             OpenSDK.getInstance().connect(ISUS.instance.context)
         return OpenSDK.getInstance().isConnected
-    } catch (e: Throwable) { }
+    } catch (e: Throwable) { e.printStackTrace() }
+    return false
+}
+
+/**
+ * 是否是希沃SK06/SK07设备
+ */
+fun isSeeWo06Device(): Boolean {
+    try {
+        val systemHelper = UDSSystemHelper()
+        val serialCode = systemHelper.serialCode
+        systemHelper.release()
+        return serialCode != null
+    } catch (e: Throwable) { e.printStackTrace() }
     return false
 }
 

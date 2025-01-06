@@ -1,2 +1,12 @@
-configurations.maybeCreate("default")
-artifacts.add("default", file('OpenSDK-releaseBanpai-3.2.48.aar'))
+plugins {
+    id 'java-library'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+dependencies {
+    api fileTree(include: ['*.aar'], dir: 'libs')
+}
