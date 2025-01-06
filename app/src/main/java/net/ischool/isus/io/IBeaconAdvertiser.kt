@@ -24,6 +24,7 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 import net.ischool.isus.LOG_TAG
 import net.ischool.isus.SYSLOG_CATEGORY_BLE
+import net.ischool.isus.isSeeWoDevice
 import net.ischool.isus.log.Syslog
 import net.ischool.isus.model.ALARM_TYPE_DISCONNECT
 import net.ischool.isus.model.ALARM_TYPE_MQ
@@ -86,8 +87,9 @@ class IBeaconAdvertiser {
 
         /**
          * 是否支持蓝牙设备
+         * 希沃设备不支持蓝牙，但可以获取蓝牙适配器，会导致系统蓝牙应用崩溃
          */
-        fun supportBle(): Boolean = bleAdapter != null
+        fun supportBle(): Boolean = bleAdapter != null && !isSeeWoDevice()
 
         @SuppressLint("CheckResult")
         @Synchronized
