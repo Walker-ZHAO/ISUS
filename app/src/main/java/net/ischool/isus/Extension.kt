@@ -117,7 +117,7 @@ fun Context.sleep() {
         }
         isSeeWoDevice() -> {
             // 希沃设备不支持删除触屏设备节点，使用其他实现方式
-            val intent = Intent(this, BlackHoleActivity::class.java)
+            val intent = Intent(this, BlackHoleActivity::class.java).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
             startActivity(intent)
         }
     }
