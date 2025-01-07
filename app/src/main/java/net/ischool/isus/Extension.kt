@@ -7,10 +7,13 @@ import android.lamy.display.screen.Screen
 import android.os.Build
 import com.hikvision.dmb.display.InfoDisplayApi
 import com.hikvision.dmb.system.InfoSystemApi
+import com.seewo.sdk.SDKSystemHelper
+import com.seewo.udsservice.client.plugins.device.UDSDeviceHelper
 import com.walker.anke.framework.reboot
 import com.xbh.sdk3.Picture.PictureHelper
 import com.xbh.sdk3.System.SystemHelper
 import com.ys.rkapi.MyManager
+import net.ischool.isus.activity.BlackHoleActivity
 import net.ischool.isus.preference.PreferenceManager
 import java.io.BufferedReader
 import java.io.DataOutputStream
@@ -112,6 +115,11 @@ fun Context.sleep() {
                 executeCommand("su & echo powersave > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor")
             }
         }
+        isSeeWoDevice() -> {
+            // 希沃设备不支持删除触屏设备节点，使用其他实现方式
+            val intent = Intent(this, BlackHoleActivity::class.java)
+            startActivity(intent)
+        }
     }
 }
 
@@ -131,6 +139,9 @@ fun Context.inSleep(): Boolean {
         }
         isHongHeDevice() -> {
             SystemHelper().executeCommand("cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor").contains("powersave")
+        }
+        isSeeWoDevice() -> {
+            !UDSDeviceHelper().isScreenOn
         }
         else -> false
     }
@@ -154,6 +165,9 @@ fun Context.wakeup() {
         }
         isHongHeDevice() -> {
             SystemHelper().reboot()
+        }
+        isSeeWoDevice() -> {
+            SDKSystemHelper.I.reboot()
         }
     }
 }

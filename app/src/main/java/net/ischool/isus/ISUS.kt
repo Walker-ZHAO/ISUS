@@ -8,6 +8,8 @@ import android.content.IntentFilter
 import androidx.fragment.app.FragmentActivity
 import com.orhanobut.logger.AndroidLogAdapter
 import com.orhanobut.logger.Logger
+import com.seewo.udsservice.client.core.UDSCallback
+import com.seewo.udsservice.client.core.UDSSDK
 import com.tbruyelle.rxpermissions3.RxPermissions
 import com.walker.anke.framework.packageVersionName
 import com.walker.anke.framework.toast
@@ -98,6 +100,11 @@ class ISUS(
 
             // 启动UDP监听
             UDPService.start()
+
+            // 初始化希沃 SDK
+            UDSSDK.INSTANCE.init(context, object : UDSCallback(true) {
+                override fun onConnectCompleted() { }
+            })
         }
     }
 
