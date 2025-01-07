@@ -116,9 +116,11 @@ fun Context.sleep() {
             }
         }
         isSeeWoDevice() -> {
-            // 希沃设备不支持删除触屏设备节点，使用其他实现方式
-            val intent = Intent(this, BlackHoleActivity::class.java).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
-            startActivity(intent)
+            UDSDeviceHelper().setScreenStatus(false)
+            // 需要禁用触屏，否则触摸事件会下发至应用
+            SDKSystemHelper.I.executeCommandWithRoot("rm -rf /dev/input/event5")
+            // 希沃设备无法进入节能模式
+            SDKSystemHelper.I.executeCommandWithRoot("echo powersave > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor")
         }
     }
 }
