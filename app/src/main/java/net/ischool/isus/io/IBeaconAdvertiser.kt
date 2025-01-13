@@ -72,7 +72,6 @@ class IBeaconAdvertiser {
         // BLE广播结果回调
         private val advertiseCallback = object : AdvertiseCallback() {
             override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) {
-                Syslog.logI("advertise success: $settingsInEffect", category = SYSLOG_CATEGORY_BLE)
                 Log.d(LOG_TAG, "advertise success: $settingsInEffect")
             }
 
