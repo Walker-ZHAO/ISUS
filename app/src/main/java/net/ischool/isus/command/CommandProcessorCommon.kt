@@ -195,7 +195,7 @@ open class CommandProcessorCommon constructor(protected val context: Context) : 
 
     /**
      * 开启ADB
-     * 仅海康设备有效，默认的命令执行器不实现
+     * 仅海康&触沃设备有效，默认的命令执行器不实现
      */
     override fun openAdb(remoteUUID: String) {
         finish(CommandResult(ICommand.COMMAND_ADB).apply { fail("Current device doesn't support") }, remoteUUID)

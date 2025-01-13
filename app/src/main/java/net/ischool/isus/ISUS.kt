@@ -13,6 +13,7 @@ import com.seewo.udsservice.client.core.UDSSDK
 import com.tbruyelle.rxpermissions3.RxPermissions
 import com.walker.anke.framework.packageVersionName
 import com.walker.anke.framework.toast
+import com.ys.rkapi.MyManager
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
 import net.ischool.isus.broadcast.USBReceiver
@@ -105,6 +106,10 @@ class ISUS(
             UDSSDK.INSTANCE.init(context, object : UDSCallback(true) {
                 override fun onConnectCompleted() { }
             })
+
+            // 初始化触沃 SDK
+            MyManager.getInstance(context).bindAIDLService(context)
+
         }
     }
 
@@ -164,6 +169,7 @@ class ISUS(
         stopService()
         UDPService.stop()
         APIService.cancel()
+        MyManager.getInstance(context).unBindAIDLService(context)
     }
 
 
