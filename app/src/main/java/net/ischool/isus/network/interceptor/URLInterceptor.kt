@@ -17,6 +17,11 @@ class URLInterceptor : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
         var request = chain.request()
+        // 针对下载 APK 升级包的 URL，不进行地址替换
+        if (request.url.toString().endsWith("apk")) {
+            return chain.proceed(request)
+        }
+
         val platformApi = PreferenceManager.instance.getCdnUrl()
         val uri = Uri.parse(platformApi)
         val host = uri.host
