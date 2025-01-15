@@ -102,13 +102,15 @@ class ISUS(
             // 启动UDP监听
             UDPService.start()
 
-            // 初始化希沃 SDK
-            UDSSDK.INSTANCE.init(context, object : UDSCallback(true) {
-                override fun onConnectCompleted() { }
-            })
+            try {
+                // 初始化希沃 SDK
+                UDSSDK.INSTANCE.init(context, object : UDSCallback(true) {
+                    override fun onConnectCompleted() { }
+                })
 
-            // 初始化触沃 SDK
-            MyManager.getInstance(context).bindAIDLService(context)
+                // 初始化触沃 SDK
+                MyManager.getInstance(context).bindAIDLService(context)
+            } catch (e: Exception) { e.printStackTrace() }
 
         }
     }
@@ -158,7 +160,10 @@ class ISUS(
         } else {
             SSEService.stop(context)
         }
-        context.unregisterReceiver(usbReceiver)
+        try {
+            context.unregisterReceiver(usbReceiver)
+        } catch (e: Exception) { e.printStackTrace() }
+
     }
 
     /**
@@ -169,7 +174,9 @@ class ISUS(
         stopService()
         UDPService.stop()
         APIService.cancel()
-        MyManager.getInstance(context).unBindAIDLService(context)
+        try {
+            MyManager.getInstance(context).unBindAIDLService(context)
+        } catch (e: Error) { e.printStackTrace() }
     }
 
 
