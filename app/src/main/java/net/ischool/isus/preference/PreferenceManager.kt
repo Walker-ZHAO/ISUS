@@ -395,4 +395,11 @@ class PreferenceManager private constructor(context: Context, deviceType: Int) {
         val parameter = Gson().fromJson<Map<String, Any>>(totp) ?: HashMap()
         return parameter["key"] as? String? ?: ""
     }
+
+    /**
+     * 是否为学校设备
+     */
+    fun isSchoolDevice(): Boolean {
+        return getSchoolId() == getClassId()
+    }
 }
