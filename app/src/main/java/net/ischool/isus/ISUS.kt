@@ -110,7 +110,7 @@ class ISUS(
 
                 // 初始化触沃 SDK
                 MyManager.getInstance(context).bindAIDLService(context)
-            } catch (e: Exception) { e.printStackTrace() }
+            } catch (e: Throwable) { e.printStackTrace() }
 
         }
     }
