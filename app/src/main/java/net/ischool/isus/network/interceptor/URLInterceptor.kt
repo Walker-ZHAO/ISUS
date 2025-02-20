@@ -17,8 +17,8 @@ class URLInterceptor : Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
         var request = chain.request()
-        // 针对下载 APK 升级包的 URL，不进行地址替换
-        if (request.url.toString().endsWith("apk")) {
+        // 针对下载 APK 升级包 或证书文件的 URL，不进行地址替换
+        if (request.url.toString().endsWith("apk") || request.url.toString().endsWith("p12")) {
             return chain.proceed(request)
         }
 
