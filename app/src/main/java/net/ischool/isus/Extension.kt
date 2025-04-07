@@ -1,8 +1,13 @@
 package net.ischool.isus
 
+import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
+import android.content.pm.PackageInfo
+import android.content.pm.PackageInstaller
 import android.lamy.display.screen.Screen
 import android.os.Build
 import com.hikvision.dmb.display.InfoDisplayApi
@@ -16,6 +21,7 @@ import com.ys.rkapi.MyManager
 import net.ischool.isus.preference.PreferenceManager
 import java.io.BufferedReader
 import java.io.DataOutputStream
+import java.io.File
 import java.io.IOException
 import java.io.InputStreamReader
 
@@ -240,6 +246,86 @@ fun execRuntimeProcess(cmd: String, needEvn: Boolean = false): String {
 fun isArch64(): Boolean {
     return System.getProperty("os.arch")?.contains("64") ?: false
 }
+
+/**
+ * 静默安装 APK
+ * 该方法需要系统签名权限
+ * @param apkFile APK 文件
+ * @param callback 安装结果回调
+ */
+fun Context.silentInstallApk(apkFile: File, callback: (Boolean, String) -> Unit) {
+    if (!apkFile.exists()) {
+        callback(false, "APK 文件不存在")
+        return
+    }
+
+    try {
+        val packageInstaller = packageManager.packageInstaller
+
+        // 创建安装会话
+        val params = PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL).apply {
+            setInstallLocation(PackageInfo.INSTALL_LOCATION_AUTO)
+        }
+
+        // 获取会话ID
+        val sessionId = packageInstaller.createSession(params)
+        val session = packageInstaller.openSession(sessionId)
+
+        // 写入APK文件
+        session.openWrite("package", 0, apkFile.length()).use { outputStream ->
+            apkFile.inputStream().use { inputStream ->
+                inputStream.copyTo(outputStream)
+                session.fsync(outputStream)
+            }
+        }
+
+        // 注册安装广播接收器
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                when (intent?.getIntExtra(PackageInstaller.EXTRA_STATUS, PackageInstaller.STATUS_FAILURE)) {
+                    PackageInstaller.STATUS_SUCCESS -> {
+                        callback(true, "安装成功")
+                    }
+                    PackageInstaller.STATUS_FAILURE,
+                    PackageInstaller.STATUS_FAILURE_ABORTED -> {
+                        val msg = intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE) ?: "安装失败"
+                        callback(false, msg)
+                    }
+                }
+                context?.unregisterReceiver(this)
+            }
+        }
+
+        // 注册广播
+        val intentFilter = IntentFilter(INSTALL_ACTION)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(receiver, intentFilter, Context.RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(receiver, intentFilter)
+        }
+
+        // 创建 PendingIntent
+        val pendingIntent = PendingIntent.getBroadcast(
+            this,
+            sessionId,
+            Intent(INSTALL_ACTION),
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+            else PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+        // 提交安装
+        session.commit(pendingIntent.intentSender)
+        session.close()
+
+    } catch (e: Exception) {
+        callback(false, "安装失败：${e.message}")
+    }
+}
+
+/**
+ * 用于接收应用安装结果的广播Action
+ */
+private const val INSTALL_ACTION = "net.ischool.isus.INSTALL_COMPLETE"
 
 /**
  * 获取系统属性
