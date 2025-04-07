@@ -235,6 +235,24 @@ fun execRuntimeProcess(cmd: String, needEvn: Boolean = false): String {
 }
 
 /**
+ * 是否处于64位运行模式
+ */
+fun isArch64(): Boolean {
+    return System.getProperty("os.arch")?.contains("64") ?: false
+}
+
+/**
+ * 获取输入法应用下载地址
+ */
+fun getIMUrl(): String {
+    return if (isArch64()) {
+        "${PreferenceManager.instance.getCdnUrl()}/webui/asset/fcitx5/fcitx5-arm64-v8a.apk"
+    } else {
+        "${PreferenceManager.instance.getCdnUrl()}/webui/asset/fcitx5/fcitx5-armeabi-v7a.apk"
+    }
+}
+
+/**
  * 获取系统属性
  * @param propName
  * @return
