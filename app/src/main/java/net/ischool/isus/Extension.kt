@@ -5,6 +5,8 @@ import android.content.Context
 import android.content.Intent
 import android.lamy.display.screen.Screen
 import android.os.Build
+import android.provider.Settings
+import android.view.inputmethod.InputMethodManager
 import androidx.annotation.ChecksSdkIntAtLeast
 import com.hikvision.dmb.display.InfoDisplayApi
 import com.hikvision.dmb.system.InfoSystemApi
@@ -260,6 +262,32 @@ fun getIMUrl(): String {
         "${PreferenceManager.instance.getCdnUrl()}/webui/asset/fcitx5/fcitx5-armeabi-v7a.apk"
     }
 }
+
+/**
+ * 获取系统当前默认输入法
+ */
+fun Context.getDefaultIM(): String {
+    // 获取 InputMethodManager 实例
+    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    // 获取默认输入法的 ID
+    val defaultIme = Settings.Secure.getString(
+        contentResolver,
+        Settings.Secure.DEFAULT_INPUT_METHOD
+    ) ?: ""
+    return defaultIme
+}
+
+/**
+ * 系统当前输入法是否为自定义输入法
+ */
+fun Context.isCustomIMAsDefault(): Boolean {
+    return getDefaultIM() == CUSTOM_IM_ID
+}
+
+/**
+ * 自定义输入法 ID
+ */
+private const val CUSTOM_IM_ID = "org.fcitx.fcitx5.android/.input.FcitxInputMethodService"
 
 /**
  * 获取系统属性
