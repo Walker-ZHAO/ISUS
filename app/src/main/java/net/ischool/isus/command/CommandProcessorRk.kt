@@ -36,7 +36,7 @@ open class CommandProcessorRk(context: Context): CommandProcessorCommon(context)
      */
     override fun update(url: String?, remoteUUID: String) {
         val model = MyManager.getInstance(context).androidModle
-        // 希沃老版本设备，不支持 SDK 静默安装，使用通用方法安装升级
+        // 触沃老版本设备，不支持 SDK 静默安装，使用通用方法安装升级
         if (!(model.contains("rk3568") || isDh32Device())) {
             super.update(url, remoteUUID)
             return
