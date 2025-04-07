@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.lamy.display.screen.Screen
 import android.os.Build
+import androidx.annotation.ChecksSdkIntAtLeast
 import com.hikvision.dmb.display.InfoDisplayApi
 import com.hikvision.dmb.system.InfoSystemApi
 import com.seewo.sdk.SDKSystemHelper
@@ -239,6 +240,14 @@ fun execRuntimeProcess(cmd: String, needEvn: Boolean = false): String {
  */
 fun isArch64(): Boolean {
     return System.getProperty("os.arch")?.contains("64") ?: false
+}
+
+/**
+ * 是否支持自定义输入法
+ */
+@ChecksSdkIntAtLeast(api = Build.VERSION_CODES.M)
+fun supportCustomIM(): Boolean {
+    return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
 }
 
 /**
