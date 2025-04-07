@@ -94,3 +94,5 @@ internal const val SYSLOG_CATEGORY_RABBITMQ = "RabbitMQ"
 internal const val SYSLOG_CATEGORY_SSE = "SSE"
 // BLE广播
 internal const val SYSLOG_CATEGORY_BLE = "BLE"
+// 输入法
+internal const val SYSLOG_CATEGORY_IME = "IME"

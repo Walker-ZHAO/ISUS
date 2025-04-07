@@ -2,11 +2,21 @@ package net.ischool.isus.util
 
 import android.content.Context
 import android.os.Build
+import android.os.Environment
+import android.os.Handler
 import android.provider.Settings
 import android.view.inputmethod.InputMethodManager
 import androidx.annotation.ChecksSdkIntAtLeast
+import net.ischool.isus.SYSLOG_CATEGORY_IME
 import net.ischool.isus.isArch64
+import net.ischool.isus.log.Syslog
+import net.ischool.isus.network.APIService
+import net.ischool.isus.network.callback.StringCallback
 import net.ischool.isus.preference.PreferenceManager
+import net.ischool.isus.silentInstallApk
+import okhttp3.Request
+import java.io.File
+import java.io.IOException
 
 /**
  * 输入法相关工具
@@ -20,6 +30,65 @@ import net.ischool.isus.preference.PreferenceManager
  * 自定义输入法 ID
  */
 private const val CUSTOM_IME_ID = "org.fcitx.fcitx5.android/.input.FcitxInputMethodService"
+
+/**
+ * 设置自定义输入法
+ */
+fun Context.setupCustomIME() {
+    // 如果不支持使用自定义输入法，直接退出
+    if (!supportCustomIME()) return
+
+    // 如果当前自定义输入法为默认输入方，代表已设置成功，直接退出
+    if (isCustomIMEAsDefault()) {
+        Syslog.logI("Custom IME is already set as default.", category = SYSLOG_CATEGORY_IME)
+        return
+    }
+
+    if (isCustomIMEInstalled()) {
+        // 如果当前自定义输入法已安装，则将其设置为默认输入法
+        setCustomIMEAsDefault()
+        // 设置完毕后，再次检查是否设置成功
+        setupCustomIME()
+    } else {
+        // 输入法应用下载地址
+        val imeUrl = getIMEUrl()
+        // 如果未安装，则下载输入法并安装
+        APIService.downloadAsync(
+            imeUrl,
+            Environment.getExternalStorageDirectory().path,
+            callback = object :
+                StringCallback {
+                override fun onResponse(string: String) {
+                    // 下载成功，开始安装
+                    silentInstallApk(File(string)) { success, message ->
+                        val doubleCheckDelay: Long = if (success) {
+                            5 * 1000
+                        } else {
+                            30 * 1000
+                        }
+
+                        Syslog.logI("install apk: $success, message: $message", category = SYSLOG_CATEGORY_IME)
+
+                        // 无论安装成功与否，都尝试重新配置输入法，以将其设置为默认输入法
+                        Handler().postDelayed({
+                            setupCustomIME()
+                        }, doubleCheckDelay)
+
+                        // 安装完成后删除下载的 APK 文件
+                        File(string).delete()
+                    }
+                }
+
+                override fun onFailure(request: Request, e: IOException) {
+                    Syslog.logI("download ime from $imeUrl failure: ${e.message}", category = SYSLOG_CATEGORY_IME)
+                    // 下载失败，延迟 60s，尝试重新配置输入法
+                    Handler().postDelayed({
+                        setupCustomIME()
+                    }, 60 * 1000)
+                }
+            })
+    }
+}
 
 /**
  * 是否支持自定义输入法
