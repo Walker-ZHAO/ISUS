@@ -285,6 +285,17 @@ fun Context.isCustomIMAsDefault(): Boolean {
 }
 
 /**
+ * 将自定义输入法设为系统默认输入法
+ * 该方法需要系统签名权限
+ */
+fun Context.setCustomIMAsDefault() {
+    // 启用输入法
+    enableInputMethod(CUSTOM_IM_ID)
+    // 设置默认输入法
+    setDefaultInputMethod(CUSTOM_IM_ID)
+}
+
+/**
  * 自定义输入法 ID
  */
 private const val CUSTOM_IM_ID = "org.fcitx.fcitx5.android/.input.FcitxInputMethodService"
@@ -304,5 +315,74 @@ private fun getSystemProperty(propName: String): String {
     } catch (e: IOException) {
         e.printStackTrace()
         ""
+    }
+}
+
+/**
+ * 检查输入法是否已启用
+ */
+private fun Context.isInputMethodEnabled(imeId: String): Boolean {
+    val enabledInputMethods = Settings.Secure.getString(
+        contentResolver,
+        Settings.Secure.ENABLED_INPUT_METHODS
+    ) ?: ""
+
+    return enabledInputMethods.split(":").contains(imeId)
+}
+
+
+/**
+ * 启用指定输入法
+ * 该方法需要系统签名权限
+ * @param imeId 输入法的ID
+ */
+private fun Context.enableInputMethod(imeId: String) {
+    try {
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        val imeList = imm.inputMethodList
+        for (ime in imeList) {
+            if (ime.id == imeId) {
+                if (!isInputMethodEnabled(imeId)) {
+                    // 启用输入法
+                    val enabledInputMethods = Settings.Secure.getString(
+                        contentResolver,
+                        Settings.Secure.ENABLED_INPUT_METHODS
+                    ) ?: ""
+                    val newList = if (enabledInputMethods.isEmpty()) {
+                        imeId
+                    } else {
+                        "$enabledInputMethods:$imeId"
+                    }
+                    Settings.Secure.putString(
+                        contentResolver,
+                        Settings.Secure.ENABLED_INPUT_METHODS,
+                        newList
+                    )
+                }
+                break
+            }
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+}
+
+/**
+ * 设置默认输入法
+ * 该方法需要系统签名权限
+ * @param imeId 输入法的ID（格式：包名/服务类名）
+ * @return 是否设置成功
+ */
+private fun Context.setDefaultInputMethod(imeId: String): Boolean {
+    return try {
+        Settings.Secure.putString(
+            contentResolver,
+            Settings.Secure.DEFAULT_INPUT_METHOD,
+            imeId
+        )
+        true
+    } catch (e: Exception) {
+        e.printStackTrace()
+        false
     }
 }
