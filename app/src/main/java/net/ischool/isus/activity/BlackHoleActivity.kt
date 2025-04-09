@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit
  * Email: zhaocework@gmail.com
  * Date: 2025/1/6
  */
-class BlackHoleActivity: AppCompatActivity() {
+class BlackHoleActivity: ISUSActivity() {
 
     private lateinit var binding: ActivityBlackHoleBinding
 

@@ -13,10 +13,6 @@ import android.util.Base64
 import android.util.Log
 import android.view.Gravity
 import com.google.gson.Gson
-import com.jakewharton.rxbinding4.view.clicks
-import com.trello.rxlifecycle4.android.ActivityEvent
-import com.trello.rxlifecycle4.components.support.RxAppCompatActivity
-import com.trello.rxlifecycle4.kotlin.bindUntilEvent
 import com.walker.anke.foundation.md5
 import com.walker.anke.framework.*
 import com.walker.anke.gson.fromJson
@@ -40,7 +36,6 @@ import java.io.File
 import java.io.IOException
 import java.lang.Exception
 import java.nio.charset.Charset
-import java.util.concurrent.TimeUnit
 
 /**
  * 初始化界面
@@ -49,7 +44,7 @@ import java.util.concurrent.TimeUnit
  * Email: zhaocework@gmail.com
  * Date: 2017/10/12
  */
-class InitActivity : RxAppCompatActivity() {
+class InitActivity : ISUSActivity() {
 
     companion object {
         private const val SAFETY_APP = "net.zxedu.safetycampus"
@@ -67,18 +62,11 @@ class InitActivity : RxAppCompatActivity() {
         binding.toolBar.setTitle(R.string.device_init_title)
         setSupportActionBar(binding.toolBar)
 
-        binding.okBtn.clicks()
-            .debounce(1, TimeUnit.SECONDS)
-            .bindUntilEvent(this, ActivityEvent.DESTROY)
-            .subscribe { init() }
-
-        binding.scanBtn.clicks()
-            .debounce(1, TimeUnit.SECONDS)
-            .bindUntilEvent(this, ActivityEvent.DESTROY)
-            .subscribe {
-                val intent = Intent(this, ScanActivity::class.java)
-                startActivityForResult(intent, SCAN_REQUEST_CODE)
-            }
+        binding.okBtn.setOnClickListener { init() }
+        binding.scanBtn.setOnClickListener {
+            val intent = Intent(this, ScanActivity::class.java)
+            startActivityForResult(intent, SCAN_REQUEST_CODE)
+        }
 
         if (applicationContext.packageName == SAFETY_APP) {
             binding.safetyLogo.visiable()

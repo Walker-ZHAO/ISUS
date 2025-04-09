@@ -30,7 +30,7 @@ import kotlin.math.min
  * Email: zhaocework@gmail.com
  * Date: 2023/3/27
  */
-class ScanActivity: AppCompatActivity() {
+class ScanActivity: ISUSActivity() {
 
     companion object {
         private const val RATIO_4_3_VALUE = 4.0 / 3.0

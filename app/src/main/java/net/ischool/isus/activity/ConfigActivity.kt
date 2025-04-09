@@ -41,7 +41,7 @@ import kotlin.time.Duration.Companion.minutes
  * Email: zhaocework@gmail.com
  * Date: 2017/9/21
  */
-class ConfigActivity : AppCompatActivity() {
+class ConfigActivity : ISUSActivity() {
 
     private lateinit var binding: ActivityConfigBinding
 

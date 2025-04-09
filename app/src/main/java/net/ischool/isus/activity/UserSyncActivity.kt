@@ -24,7 +24,7 @@ import net.ischool.isus.service.RabbitMQService
  * Email: zhaocework@gmail.com
  * Date: 2019-06-05
  */
-class UserSyncActivity : AppCompatActivity() {
+class UserSyncActivity : ISUSActivity() {
 
     private lateinit var binding: ActivityUserSyncBinding
 
