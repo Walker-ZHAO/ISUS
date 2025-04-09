@@ -6,6 +6,7 @@ import com.hikvision.dmb.display.InfoDisplayApi
 import com.hikvision.dmb.system.InfoSystemApi
 import com.hikvision.dmb.util.InfoUtilApi
 import com.orhanobut.logger.Logger
+import net.ischool.isus.ISUSApp
 import net.ischool.isus.SYSLOG_CATEGORY_RABBITMQ
 import net.ischool.isus.log.Syslog
 import net.ischool.isus.network.APIService
@@ -69,6 +70,7 @@ class CommandProcessorHik(context: Context): CommandProcessorCommon(context) {
      * 命令方式进入指定页面
      */
     override fun launchPage(component: String?, remoteUUID: String) {
+        ISUSApp.ignoreBackgroundCheck()
         val result = CommandResult(ICommand.COMMAND_LAUNCH_PAGE)
         if (component == null) {
             result.fail("Component is invalid")

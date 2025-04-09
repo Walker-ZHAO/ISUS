@@ -13,6 +13,7 @@ import com.walker.anke.framework.alarmManager
 import com.walker.anke.framework.reboot
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
+import net.ischool.isus.ISUSApp
 import net.ischool.isus.QueryType
 import net.ischool.isus.RESULT_OK
 import net.ischool.isus.SYSLOG_CATEGORY_RABBITMQ
@@ -164,6 +165,7 @@ open class CommandProcessorCommon constructor(protected val context: Context) : 
      * 进入系统设置页
      */
     override fun setting(remoteUUID: String) {
+        ISUSApp.ignoreBackgroundCheck()
         val intent = Intent(Settings.ACTION_SETTINGS).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
         context.startActivity(intent)
         finish(CommandResult(ICommand.COMMAND_SETTING), remoteUUID)
@@ -175,6 +177,7 @@ open class CommandProcessorCommon constructor(protected val context: Context) : 
      * Note：需要系统签名
      */
     override fun launchPage(component: String?, remoteUUID: String) {
+        ISUSApp.ignoreBackgroundCheck()
         val result = CommandResult(ICommand.COMMAND_LAUNCH_PAGE)
         if (component == null) {
             result.fail("Component is invalid")

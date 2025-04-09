@@ -24,6 +24,13 @@ open class ISUSApp: Application() {
 
     companion object {
         var lastTaskId: Int = -1
+
+        /**
+         * 忽略后台检测
+         */
+        fun ignoreBackgroundCheck() {
+            lastTaskId = -1
+        }
     }
 
     override fun onCreate() {
