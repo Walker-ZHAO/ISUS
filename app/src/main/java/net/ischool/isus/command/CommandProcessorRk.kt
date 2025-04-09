@@ -36,13 +36,7 @@ open class CommandProcessorRk(context: Context): CommandProcessorCommon(context)
      */
     override fun update(url: String?, remoteUUID: String) {
         val model = MyManager.getInstance(context).androidModle
-        // 触沃老版本设备，不支持 SDK 静默安装，使用通用方法安装升级
-        if (!(model.contains("rk3568") || isDh32Device())) {
-            super.update(url, remoteUUID)
-            return
-        }
 
-        // rk3568_r 与 大华32寸设备，使用 SDK 方式升级
         val result = CommandResult(ICommand.COMMAND_UPDATE)
         if (url == null) {
             result.fail("Update url is invalid")
@@ -58,11 +52,19 @@ open class CommandProcessorRk(context: Context): CommandProcessorCommon(context)
                 StringCallback {
                 override fun onResponse(string: String) {
                     Syslog.logI("Update download success, start install")
-                    if (!MyManager.getInstance(context).silentInstallApk(string, true)) {
+
+                    val success: Boolean = if (!(model.contains("rk3568") || isDh32Device())) {
+                        // 触沃老版本设备，不支持 SDK 静默安装，使用root命令行方式安装升级
+                        MyManager.getInstance(context).execSuCmd("pm install -r $string")
+                    } else {
+                        // rk3568_r 与 大华32寸设备，使用 SDK 方式升级
+                        MyManager.getInstance(context).silentInstallApk(string, true)
+                    }
+
+                    if (!success) {
                         result.fail("install failed")
                     }
                     finish(result, remoteUUID)
-
                 }
 
                 override fun onFailure(request: Request, e: IOException) {
