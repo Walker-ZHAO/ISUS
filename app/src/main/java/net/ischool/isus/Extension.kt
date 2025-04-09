@@ -45,7 +45,7 @@ fun Context.startZXBS() {
         val EXTRA_VERSION_INFO = "version_info"
         val info = packageManager.getPackageInfo(packageName, 0)
         val label =
-            if (info.applicationInfo.labelRes != 0) getString(info.applicationInfo.labelRes) else packageName
+            if (info.applicationInfo!!.labelRes != 0) getString(info.applicationInfo!!.labelRes) else packageName
         val version = "${label}:v${info.versionName}"
         val intent = Intent().apply {
             component = ComponentName(PACKAGE_NAME, SERVICE_NAME)

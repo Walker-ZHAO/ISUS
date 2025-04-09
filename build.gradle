@@ -7,7 +7,7 @@ buildscript {
     ext.ISUS_VERSION = '0.9.5'
     ext.ISUS_VERSION_CODE = 265
 
-    ext.COMPILE_SDK_VERSION = 33
+    ext.COMPILE_SDK_VERSION = 35
     ext.MIN_SDK_VERSION = 21
 
     repositories {

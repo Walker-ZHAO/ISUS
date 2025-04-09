@@ -96,3 +96,5 @@ internal const val SYSLOG_CATEGORY_SSE = "SSE"
 internal const val SYSLOG_CATEGORY_BLE = "BLE"
 // 输入法
 internal const val SYSLOG_CATEGORY_IME = "IME"
+// 应用相关
+internal const val SYSLOG_CATEGORY_APP = "APP"
