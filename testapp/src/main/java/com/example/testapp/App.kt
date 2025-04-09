@@ -1,6 +1,6 @@
 package com.example.testapp
 
-import androidx.multidex.MultiDexApplication
+import net.ischool.isus.ISUSApp
 
 /**
  * Description
@@ -9,6 +9,6 @@ import androidx.multidex.MultiDexApplication
  * Email: zhaocework@gmail.com
  * Date: 2023/6/12
  */
-class App : MultiDexApplication() {
+class App : ISUSApp() {
 
 }

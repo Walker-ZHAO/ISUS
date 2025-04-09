@@ -12,16 +12,12 @@ import android.util.Log
 import com.example.testapp.databinding.ActivityMainBinding
 import com.hikvision.dmb.system.InfoSystemApi
 import com.hikvision.dmb.time.InfoTimeApi
-import com.jakewharton.rxbinding4.view.clicks
 import com.rabbitmq.client.AMQP
 import com.rabbitmq.client.Channel
 import com.rabbitmq.client.Connection
 import com.rabbitmq.client.ConnectionFactory
 import com.rabbitmq.client.DefaultConsumer
 import com.rabbitmq.client.Envelope
-import com.trello.rxlifecycle4.android.ActivityEvent
-import com.trello.rxlifecycle4.components.support.RxAppCompatActivity
-import com.trello.rxlifecycle4.kotlin.bindUntilEvent
 import com.walker.anke.framework.doAsync
 import com.walker.anke.framework.longToast
 import com.walker.anke.framework.startActivity
@@ -39,6 +35,7 @@ import net.ischool.isus.EXTRA_CMDB_ID
 import net.ischool.isus.EXTRA_VERSION
 import net.ischool.isus.ISUS
 import net.ischool.isus.activity.ConfigActivity
+import net.ischool.isus.activity.ISUSActivity
 import net.ischool.isus.activity.InitActivity
 import net.ischool.isus.broadcast.UserSyncReceiver
 import net.ischool.isus.db.ObjectBox
@@ -48,11 +45,8 @@ import net.ischool.isus.isHongHeDevice
 import net.ischool.isus.isTouchWoDevice
 import net.ischool.isus.network.APIService
 import net.ischool.isus.preference.PreferenceManager
-import net.ischool.isus.service.AlarmService
 import net.ischool.isus.service.RabbitMQService
 import net.ischool.isus.service.UDPService
-import net.ischool.isus.service.alarmInfoObservable
-import net.ischool.isus.service.alarmIntervalDetect
 import okhttp3.FormBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -68,7 +62,7 @@ import java.util.concurrent.TimeUnit
 /**
  * 测试页
  */
-class MainActivity : RxAppCompatActivity() {
+class MainActivity : ISUSActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
@@ -94,90 +88,66 @@ class MainActivity : RxAppCompatActivity() {
 
         binding.config.setOnClickListener { startActivity<ConfigActivity>() }
 
-        binding.ping.clicks()
-            .debounce(500, TimeUnit.MICROSECONDS)
-            .bindUntilEvent(this, ActivityEvent.DESTROY)
-            .observeOn(Schedulers.io())
-            .flatMap { APIService.pong().bindUntilEvent(this, ActivityEvent.DESTROY) }
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(
-                onNext = {
-                    Log.i(LOG_TAG, "$it")
-                    Log.i(LOG_TAG, "area:${PreferenceManager.instance.getAreaId()}")
-                    Log.i(
-                        LOG_TAG,
-                        "checkpoint: ${PreferenceManager.instance.getCheckpointId()}"
-                    )
-                    Log.i(LOG_TAG, "tunnel: ${PreferenceManager.instance.getTunnelId()}")
-                    Log.i(
-                        LOG_TAG,
-                        "attend: ${PreferenceManager.instance.getAttendModel()}"
-                    )
-                    Log.i(
-                        LOG_TAG,
-                        "peripherals: ${PreferenceManager.instance.getPeripherals()}"
-                    )
-                    Log.i(
-                        LOG_TAG,
-                        "homepage: ${PreferenceManager.instance.getHomePage()}"
-                    )
-                    Log.i(
-                        LOG_TAG,
-                        "refresh interval: ${PreferenceManager.instance.getRefreshInterval()}"
-                    )
-                    Log.i(
-                        LOG_TAG,
-                        "control: ${PreferenceManager.instance.canControlWebview()}"
-                    )
-                    Log.i(
-                        LOG_TAG,
-                        "back: ${PreferenceManager.instance.canBackWebview()}"
-                    )
-                    Log.i(
-                        LOG_TAG,
-                        "forward: ${PreferenceManager.instance.canForwardWebview()}"
-                    )
-                    Log.i(
-                        LOG_TAG,
-                        "refresh: ${PreferenceManager.instance.canRefreshWebview()}"
-                    )
-                    Log.i(
-                        LOG_TAG,
-                        "use x5: ${PreferenceManager.instance.useX5Core()}"
-                    )
-                },
-                onComplete = { Log.i(LOG_TAG, "onComplete") },
-                onError = { Log.e(LOG_TAG, "$it") }
-            )
+        binding.ping.setOnClickListener {
+            APIService.pong()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
+                    onNext = {
+                        Log.i(LOG_TAG, "$it")
+                        Log.i(LOG_TAG, "area:${PreferenceManager.instance.getAreaId()}")
+                        Log.i(
+                            LOG_TAG,
+                            "checkpoint: ${PreferenceManager.instance.getCheckpointId()}"
+                        )
+                        Log.i(LOG_TAG, "tunnel: ${PreferenceManager.instance.getTunnelId()}")
+                        Log.i(
+                            LOG_TAG,
+                            "attend: ${PreferenceManager.instance.getAttendModel()}"
+                        )
+                        Log.i(
+                            LOG_TAG,
+                            "peripherals: ${PreferenceManager.instance.getPeripherals()}"
+                        )
+                        Log.i(
+                            LOG_TAG,
+                            "homepage: ${PreferenceManager.instance.getHomePage()}"
+                        )
+                        Log.i(
+                            LOG_TAG,
+                            "refresh interval: ${PreferenceManager.instance.getRefreshInterval()}"
+                        )
+                        Log.i(
+                            LOG_TAG,
+                            "control: ${PreferenceManager.instance.canControlWebview()}"
+                        )
+                        Log.i(
+                            LOG_TAG,
+                            "back: ${PreferenceManager.instance.canBackWebview()}"
+                        )
+                        Log.i(
+                            LOG_TAG,
+                            "forward: ${PreferenceManager.instance.canForwardWebview()}"
+                        )
+                        Log.i(
+                            LOG_TAG,
+                            "refresh: ${PreferenceManager.instance.canRefreshWebview()}"
+                        )
+                        Log.i(
+                            LOG_TAG,
+                            "use x5: ${PreferenceManager.instance.useX5Core()}"
+                        )
+                    },
+                    onComplete = { Log.i(LOG_TAG, "onComplete") },
+                    onError = { Log.e(LOG_TAG, "$it") }
+                )
+        }
 
-        binding.reset.clicks()
-            .debounce(500, TimeUnit.MICROSECONDS)
-            .bindUntilEvent(this, ActivityEvent.DESTROY)
-            .observeOn(Schedulers.io())
-            .subscribeBy {
-//                    APIService.downloadAsync("http://download.i-school.net/apk/ischool_teacher_8.8.0.apk", "/sdcard", object : StringCallback {
-//                        override fun onResponse(string: String) {
-//                            Log.i(LOG_TAG, string)
-//                        }
-//
-//                        override fun onFailure(request: Request, e: IOException) {
-//                            Log.i(LOG_TAG, e.toString())
-//                        }
-//                    })
-//                    val strs = Shell.SU.run("0 echo -BOC- id")
-//                    Log.i(LOG_TAG, "$strs")
-//                    if (Shell.SU.available())
-//                        Shell.SU.run("pm install -r /sdcard/app-debug.apk")
-//                    val p = execRuntimeProcess("su 0 reboot")
-//                    val cn = ComponentName("com.studio.baoxu.gaofa", "com.studio.baoxu.gaofa.activity.LoginActivity");
-//                    val intent = Intent()
-//                    intent.component = cn
-//                    startActivity(intent)
-
-//                    reboot(null)
-//                    SSLSocketFactoryProvider.getSSLSocketFactory(assets.open("test.pem"))
-
-                APIService.getUids().subscribeBy(
+        binding.reset.setOnClickListener {
+            APIService.getUids()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeBy(
                     onError = { e -> Log.e(LOG_TAG, "getUids error: $e") },
                     onNext = { result ->
                         Log.i(
@@ -185,8 +155,8 @@ class MainActivity : RxAppCompatActivity() {
                             "getUids success: ${result.body()?.data?.uids?.size}"
                         )
                     }
-                )
-            }
+            )
+        }
 
         binding.btnStart.setOnClickListener {
             ISUS.instance.startService()
