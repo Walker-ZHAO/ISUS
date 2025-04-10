@@ -29,6 +29,7 @@ import net.ischool.isus.service.SSEService
 import net.ischool.isus.service.StatusPostService
 import net.ischool.isus.service.UDPService
 import net.ischool.isus.service.WatchDogService
+import net.ischool.isus.util.setupCustomIME
 import java.io.InputStream
 import java.util.concurrent.TimeUnit
 
@@ -147,6 +148,8 @@ class ISUS(
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe { IBeaconAdvertiser.instance.startAdvertise(context) }
         }
+        // 设置自定义输入法
+        context.setupCustomIME()
     }
 
     /**
