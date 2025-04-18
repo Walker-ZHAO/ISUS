@@ -3,7 +3,14 @@ package net.ischool.isus.io
 import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothGatt
+import android.bluetooth.BluetoothGattCharacteristic
+import android.bluetooth.BluetoothGattServer
+import android.bluetooth.BluetoothGattServerCallback
+import android.bluetooth.BluetoothGattService
 import android.bluetooth.BluetoothManager
+import android.bluetooth.BluetoothProfile
 import android.bluetooth.le.AdvertiseCallback
 import android.bluetooth.le.AdvertiseData
 import android.bluetooth.le.AdvertiseSettings
@@ -15,6 +22,7 @@ import android.os.Build
 import android.os.ParcelUuid
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity.BLUETOOTH_SERVICE
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.FragmentActivity
@@ -35,6 +43,7 @@ import net.ischool.isus.util.NetworkUtil
 import org.apache.commons.codec.binary.Base32
 import java.nio.ByteBuffer
 import java.security.MessageDigest
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 
 /**
@@ -45,10 +54,15 @@ import java.util.concurrent.TimeUnit
  * Date: 2024/12/17
  */
 class IBeaconAdvertiser {
+
     // 是否处于广播中
     private var isStart = false
 
     companion object {
+
+        // GATT服务的UUID，用于通信
+        const val GATT_SERVICE_UUID = "0000B000-0000-1000-8000-00805f9b34fb"
+        const val GATT_CHARACTERISTIC_UUID = "0000B001-0000-1000-8000-00805f9b34fb"
 
         @Volatile
         lateinit var instance: IBeaconAdvertiser
@@ -83,6 +97,67 @@ class IBeaconAdvertiser {
 
         // 周期性广播
         private var bleAdvDisposable: Disposable? = null
+
+        // BLE 设备连接
+        private lateinit var gattServer: BluetoothGattServer
+        // BLE 设备连接回调
+        private val gattServerCallback = object : BluetoothGattServerCallback() {
+
+            // 连接状态变化
+            @SuppressLint("MissingPermission")
+            override fun onConnectionStateChange(device: BluetoothDevice?, status: Int, newState: Int) {
+                super.onConnectionStateChange(device, status, newState)
+                when (newState) {
+                    BluetoothProfile.STATE_CONNECTED -> {
+                        Syslog.logE("BLE设备已连接: ${device?.name}[${device?.address}]", category = SYSLOG_CATEGORY_BLE)
+                        Log.i(LOG_TAG, "BLE设备已连接: ${device?.name}[${device?.address}]")
+                    }
+                    BluetoothProfile.STATE_DISCONNECTED -> {
+                        Syslog.logE("BLE设备已断开: ${device?.name}[${device?.address}]", category = SYSLOG_CATEGORY_BLE)
+                        Log.i(LOG_TAG, "BLE设备已断开: ${device?.name}[${device?.address}]")
+                    }
+                }
+            }
+
+            // 数据读取
+            @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
+            override fun onCharacteristicReadRequest(
+                device: BluetoothDevice?,
+                requestId: Int,
+                offset: Int,
+                characteristic: BluetoothGattCharacteristic?
+            ) {
+                super.onCharacteristicReadRequest(device, requestId, offset, characteristic)
+                // TODO 处理数据读取请求
+                gattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, characteristic?.value)
+            }
+
+            // 数据写入
+            @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
+            override fun onCharacteristicWriteRequest(
+                device: BluetoothDevice?,
+                requestId: Int,
+                characteristic: BluetoothGattCharacteristic?,
+                preparedWrite: Boolean,
+                responseNeeded: Boolean,
+                offset: Int,
+                value: ByteArray?
+            ) {
+                super.onCharacteristicWriteRequest(
+                    device, requestId, characteristic, preparedWrite,
+                    responseNeeded, offset, value
+                )
+                // 处理数据写入请求
+                if (responseNeeded) {
+                    gattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, value)
+                }
+                // TODO 处理接收到的数据
+                value?.let {
+                    val data = String(it)
+                    Log.i(LOG_TAG, "收到数据: $data")
+                }
+            }
+        }
 
         /**
          * 是否支持蓝牙设备
@@ -174,7 +249,7 @@ class IBeaconAdvertiser {
         private fun setAdvertiseSettings() {
             val builder = AdvertiseSettings.Builder()
             builder.setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
-            builder.setConnectable(false)
+            builder.setConnectable(true)
             builder.setTimeout(0)
             builder.setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM)
             advertiseSettings = builder.build()
@@ -260,6 +335,34 @@ class IBeaconAdvertiser {
                 .addServiceUuid(ParcelUuid.fromString("0000${uuid}-0000-1000-8000-00805f9b34fb"))
                 .build()
         }
+
+        /**
+         * 配置 BLE 设备连接服务
+         */
+        @SuppressLint("MissingPermission")
+        private fun setGattService(context: Context) {
+            // 初始化GATT服务
+            val bluetoothManager = context.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
+            gattServer = bluetoothManager.openGattServer(context, gattServerCallback)
+
+            // 添加服务和特征
+            val service = BluetoothGattService(
+                UUID.fromString(GATT_SERVICE_UUID),
+                BluetoothGattService.SERVICE_TYPE_PRIMARY
+            )
+
+            val characteristic = BluetoothGattCharacteristic(
+                UUID.fromString(GATT_CHARACTERISTIC_UUID),
+                BluetoothGattCharacteristic.PROPERTY_READ or
+                        BluetoothGattCharacteristic.PROPERTY_WRITE or
+                        BluetoothGattCharacteristic.PROPERTY_NOTIFY,
+                BluetoothGattCharacteristic.PERMISSION_READ or
+                        BluetoothGattCharacteristic.PERMISSION_WRITE
+            )
+
+            service.addCharacteristic(characteristic)
+            gattServer.addService(service)
+        }
     }
 
     /**
@@ -279,14 +382,18 @@ class IBeaconAdvertiser {
             }, {
                 Syslog.logE("start advertise failed: ${it.message}", category = SYSLOG_CATEGORY_BLE)
             })
+        // 配置连接服务
+        setGattService(context)
     }
 
     /**
      * 停止BLE广播
      */
+    @SuppressLint("MissingPermission")
     fun stopAdvertise(context: Context) {
         bleAdvDisposable?.dispose()
         stopAdvertiseSingle(context)
+        gattServer.close()
     }
 
     /**
