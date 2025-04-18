@@ -32,6 +32,7 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.disposables.Disposable
 import net.ischool.isus.LOG_TAG
 import net.ischool.isus.SYSLOG_CATEGORY_BLE
+import net.ischool.isus.command.CommandParser
 import net.ischool.isus.isSeeWoDevice
 import net.ischool.isus.log.Syslog
 import net.ischool.isus.model.ALARM_TYPE_DISCONNECT
@@ -128,7 +129,7 @@ class IBeaconAdvertiser {
                 characteristic: BluetoothGattCharacteristic?
             ) {
                 super.onCharacteristicReadRequest(device, requestId, offset, characteristic)
-                // TODO 处理数据读取请求
+                // 处理数据读取请求
                 gattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, characteristic?.value)
             }
 
@@ -151,10 +152,18 @@ class IBeaconAdvertiser {
                 if (responseNeeded) {
                     gattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, value)
                 }
-                // TODO 处理接收到的数据
+                // 处理接收到的数据
                 value?.let {
-                    val data = String(it)
-                    Log.i(LOG_TAG, "收到数据: $data")
+                    try {
+                        val cmd = String(it).trim().lowercase()
+                        Log.i(LOG_TAG, "收到BLE命令: $cmd")
+                        Syslog.logI("收到BLE命令: $cmd", category = SYSLOG_CATEGORY_BLE)
+                        val command = CommandParser.instance.genCommand(cmd, null)
+                        CommandParser.instance.processCommand(command)
+                    } catch (e: Exception) {
+                        Log.e(LOG_TAG, "处理BLE命令失败: ${e.message}")
+                        Syslog.logE("处理BLE命令失败: ${e.message}", category = SYSLOG_CATEGORY_BLE)
+                    }
                 }
             }
         }
