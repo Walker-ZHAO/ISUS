@@ -95,7 +95,11 @@ fun Context.sleep() {
         }
 
         isTouchWoDevice() || isDh32Device() -> {
+            // 关闭屏幕背光
             MyManager.getInstance(this).turnOffBackLight()
+            // 兼容 3368 设备的背光关闭
+            MyManager.getInstance(this).execSuCmd("echo 0 > /sys/devices/fb.11/graphics/fb0/pwr_bl")
+
             // 使CPU进入节能模式
             MyManager.getInstance(this)
                 .execSuCmd("echo powersave > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor")
@@ -159,7 +163,10 @@ fun Context.inSleep(): Boolean {
         }
 
         isTouchWoDevice() || isDh32Device() -> {
-            !MyManager.getInstance(this).isBacklightOn
+            // 兼容 3368 设备
+            execRuntimeProcess("cat /sys/devices/fb.11/graphics/fb0/pwr_bl").contains(
+                "0"
+            ) || !MyManager.getInstance(this).isBacklightOn
         }
 
         isDhDevice() -> {
