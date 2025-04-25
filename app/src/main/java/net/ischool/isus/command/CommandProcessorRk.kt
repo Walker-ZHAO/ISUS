@@ -86,4 +86,12 @@ open class CommandProcessorRk(context: Context): CommandProcessorCommon(context)
             setNetworkAdb(true)
         }
     }
+
+    /**
+     * 从当前页返回
+     */
+    override fun backPage(remoteUUID: String) {
+        MyManager.getInstance(context).execSuCmd("input keyevent BACK")
+        finish(CommandResult(ICommand.COMMAND_BACK), remoteUUID)
+    }
 }
