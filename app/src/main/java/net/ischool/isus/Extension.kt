@@ -1,6 +1,7 @@
 package net.ischool.isus
 
 import android.app.PendingIntent
+import android.app.smdt.SmdtManagerNew
 import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
@@ -94,6 +95,19 @@ fun Context.sleep() {
             }
         }
 
+        isSmtDevice() -> {
+            // TODO
+            // 关闭屏幕背光
+            SmdtManagerNew.getInstance(this).disp_setLcdBackLightEnable(0, false)
+            // 使CPU进入节能模式
+            execRuntimeProcess(
+                "echo powersave > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor",
+                needEvn = true
+            )
+            // 需要禁用触屏，否则触摸事件会下发至应用
+            execRuntimeProcess("su & rm -rf /dev/input/event2")
+        }
+
         isTouchWoDevice() || isDh32Device() -> {
             // 关闭屏幕背光
             MyManager.getInstance(this).turnOffBackLight()
@@ -162,6 +176,11 @@ fun Context.inSleep(): Boolean {
             )
         }
 
+        isSmtDevice() -> {
+            // 0代表背光关闭
+            SmdtManagerNew.getInstance(this).disp_getLcdBackLightEnable(0) == 0
+        }
+
         isTouchWoDevice() || isDh32Device() -> {
             // 兼容 3368 设备
             execRuntimeProcess("cat /sys/devices/fb.11/graphics/fb0/pwr_bl").contains(
@@ -197,6 +216,10 @@ fun Context.wakeup() {
     when {
         isHikDevice() -> {
             InfoSystemApi.reboot()
+        }
+
+        isSmtDevice() -> {
+            SmdtManagerNew.getInstance(this).sys_setReboot()
         }
 
         isTouchWoDevice() || isDh32Device() -> {

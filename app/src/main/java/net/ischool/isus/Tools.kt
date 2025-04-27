@@ -2,6 +2,7 @@ package net.ischool.isus
 
 import android.annotation.SuppressLint
 import android.app.smdt.SmdtManager
+import android.app.smdt.SmdtManagerNew
 import android.content.Intent
 import android.lamy.system.Magicbox
 import android.net.Uri
@@ -131,6 +132,17 @@ fun isDh32Device(): Boolean {
     return try {
         SmdtManager.create(ISUS.instance.context).smdtGetAPIVersion()
         true
+    } catch (e: Throwable) {
+        false
+    }
+}
+
+/**
+ * 是否是视美泰设备
+ */
+fun isSmtDevice(): Boolean {
+    return try {
+        !SmdtManagerNew.getInstance(ISUS.instance.context).info_getApiVersion().isNullOrEmpty()
     } catch (e: Throwable) {
         false
     }
