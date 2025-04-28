@@ -56,7 +56,7 @@ import java.util.concurrent.TimeUnit
  * Email: zhaocework@gmail.com
  * Date: 2024/12/17
  */
-class IBeaconAdvertiser {
+class IBeaconAdvertiser(private val context: Context) {
 
     // 是否处于广播中
     private var isStart = false
@@ -67,122 +67,13 @@ class IBeaconAdvertiser {
         const val GATT_SERVICE_UUID = "0000B000-0000-1000-8000-00805f9b34fb"
         const val GATT_CHARACTERISTIC_UUID = "0000B001-0000-1000-8000-00805f9b34fb"
 
-        // 上下文
-        private lateinit var context: Context
-
+        @SuppressLint("StaticFieldLeak")
         @Volatile
         lateinit var instance: IBeaconAdvertiser
             private set
 
         // 蓝牙适配器
         private var bleAdapter: BluetoothAdapter? = null
-
-        // BLE广播适配器
-        private var bleAdvertiser: BluetoothLeAdvertiser? = null
-
-        // BLE广播设置
-        private lateinit var advertiseSettings: AdvertiseSettings
-
-        // BLE广播数据
-        private lateinit var advertiseData: AdvertiseData
-
-        // BLE广播额外数据，用于发送设备名称
-        private lateinit var scanResponse: AdvertiseData
-
-        // BLE广播结果回调
-        private val advertiseCallback = object : AdvertiseCallback() {
-            override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) {
-                Log.d(LOG_TAG, "advertise success: $settingsInEffect")
-            }
-
-            override fun onStartFailure(errorCode: Int) {
-                Syslog.logE("advertise failed: $errorCode", category = SYSLOG_CATEGORY_BLE)
-                Log.e(LOG_TAG, "advertise failed: $errorCode")
-            }
-        }
-
-        // 周期性广播
-        private var bleAdvDisposable: Disposable? = null
-
-        // BLE 设备连接
-        private lateinit var gattServer: BluetoothGattServer
-        // BLE 设备连接回调
-        private val gattServerCallback = object : BluetoothGattServerCallback() {
-
-            // 连接状态变化
-            @SuppressLint("MissingPermission")
-            override fun onConnectionStateChange(device: BluetoothDevice?, status: Int, newState: Int) {
-                super.onConnectionStateChange(device, status, newState)
-                when (newState) {
-                    BluetoothProfile.STATE_CONNECTED -> {
-                        Syslog.logE("BLE设备已连接: ${device?.name}[${device?.address}]", category = SYSLOG_CATEGORY_BLE)
-                        Log.i(LOG_TAG, "BLE设备已连接: ${device?.name}[${device?.address}]")
-                    }
-                    BluetoothProfile.STATE_DISCONNECTED -> {
-                        Syslog.logE("BLE设备已断开: ${device?.name}[${device?.address}]", category = SYSLOG_CATEGORY_BLE)
-                        Log.i(LOG_TAG, "BLE设备已断开: ${device?.name}[${device?.address}]")
-                    }
-                }
-            }
-
-            // 数据读取
-            @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
-            override fun onCharacteristicReadRequest(
-                device: BluetoothDevice?,
-                requestId: Int,
-                offset: Int,
-                characteristic: BluetoothGattCharacteristic?
-            ) {
-                super.onCharacteristicReadRequest(device, requestId, offset, characteristic)
-
-                // 创建设备信息对象
-                val deviceInfo = createDeviceInfo(context)
-                // 将设备信息转换为JSON字符串
-                val jsonString = Gson().toJson(deviceInfo)
-                // 将JSON字符串转换为字节数组
-                val responseData = jsonString.toByteArray()
-
-                // 处理数据读取请求
-                gattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, responseData)
-
-                Log.d(LOG_TAG, "BLE设备读取数据: $jsonString, offset: $offset")
-                Syslog.logI("收到BLE命令: $jsonString", category = SYSLOG_CATEGORY_BLE)
-            }
-
-            // 数据写入
-            @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
-            override fun onCharacteristicWriteRequest(
-                device: BluetoothDevice?,
-                requestId: Int,
-                characteristic: BluetoothGattCharacteristic?,
-                preparedWrite: Boolean,
-                responseNeeded: Boolean,
-                offset: Int,
-                value: ByteArray?
-            ) {
-                super.onCharacteristicWriteRequest(
-                    device, requestId, characteristic, preparedWrite,
-                    responseNeeded, offset, value
-                )
-                // 处理数据写入请求
-                if (responseNeeded) {
-                    gattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, value)
-                }
-                // 处理接收到的数据
-                value?.let {
-                    try {
-                        val cmd = String(it).trim().lowercase()
-                        Log.i(LOG_TAG, "收到BLE命令: $cmd")
-                        Syslog.logI("收到BLE命令: $cmd", category = SYSLOG_CATEGORY_BLE)
-                        val command = CommandParser.instance.genCommand(cmd, null)
-                        CommandParser.instance.processCommand(command)
-                    } catch (e: Exception) {
-                        Log.e(LOG_TAG, "处理BLE命令失败: ${e.message}")
-                        Syslog.logE("处理BLE命令失败: ${e.message}", category = SYSLOG_CATEGORY_BLE)
-                    }
-                }
-            }
-        }
 
         /**
          * 是否支持蓝牙设备
@@ -194,8 +85,7 @@ class IBeaconAdvertiser {
         @Synchronized
         @JvmStatic
         fun init(context: Context) {
-            this.context = context
-            instance = IBeaconAdvertiser()
+            instance = IBeaconAdvertiser(context)
             bleAdapter = (context.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager).adapter
             if (!supportBle()) {
                 // 设备无蓝牙硬件，直接退出
@@ -205,7 +95,7 @@ class IBeaconAdvertiser {
             }
             // Android S 以上需要动态申请权限
             if (Build.VERSION.SDK_INT < 31) {
-                initBle(context)
+                instance.initBle()
             } else if (context is FragmentActivity) {
                 RxPermissions(context)
                     .request(
@@ -219,239 +109,346 @@ class IBeaconAdvertiser {
                                 category = SYSLOG_CATEGORY_BLE
                             )
                         } else {
-                            initBle(context)
+                            instance.initBle()
                         }
                     }
             }
         }
+    }
 
-        /**
-         * 初始化BLE广播相关数据
-         */
-        @SuppressLint("MissingPermission", "CheckResult")
-        private fun initBle(context: Context) {
-            // 开启蓝牙
-            bleAdapter?.let {
-                if (!it.isEnabled) {
-                    if (Build.VERSION.SDK_INT > 33) {
-                        context.startActivity(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
-                        Toast.makeText(context, "请开启蓝牙", Toast.LENGTH_LONG).show()
-                    } else {
-                        it.enable()
-                    }
-                    // 延迟等待设备开启蓝牙后再设置蓝牙相关配置
-                    Observable.timer(5, TimeUnit.SECONDS)
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe { setupBle(context) }
-                } else {
-                    setupBle(context)
+    // BLE广播适配器
+    private var bleAdvertiser: BluetoothLeAdvertiser? = null
+
+    // BLE广播设置
+    private lateinit var advertiseSettings: AdvertiseSettings
+
+    // BLE广播数据
+    private lateinit var advertiseData: AdvertiseData
+
+    // BLE广播额外数据，用于发送设备名称
+    private lateinit var scanResponse: AdvertiseData
+
+    // BLE广播结果回调
+    private val advertiseCallback = object : AdvertiseCallback() {
+        override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) {
+            Log.d(LOG_TAG, "advertise success: $settingsInEffect")
+        }
+
+        override fun onStartFailure(errorCode: Int) {
+            Syslog.logE("advertise failed: $errorCode", category = SYSLOG_CATEGORY_BLE)
+            Log.e(LOG_TAG, "advertise failed: $errorCode")
+        }
+    }
+
+    // 周期性广播
+    private var bleAdvDisposable: Disposable? = null
+
+    // BLE 设备连接
+    private lateinit var gattServer: BluetoothGattServer
+    // BLE 设备连接回调
+    private val gattServerCallback = object : BluetoothGattServerCallback() {
+
+        // 连接状态变化
+        @SuppressLint("MissingPermission")
+        override fun onConnectionStateChange(device: BluetoothDevice?, status: Int, newState: Int) {
+            super.onConnectionStateChange(device, status, newState)
+            when (newState) {
+                BluetoothProfile.STATE_CONNECTED -> {
+                    Syslog.logE("BLE设备已连接: ${device?.name}[${device?.address}]", category = SYSLOG_CATEGORY_BLE)
+                    Log.i(LOG_TAG, "BLE设备已连接: ${device?.name}[${device?.address}]")
+                }
+                BluetoothProfile.STATE_DISCONNECTED -> {
+                    Syslog.logE("BLE设备已断开: ${device?.name}[${device?.address}]", category = SYSLOG_CATEGORY_BLE)
+                    Log.i(LOG_TAG, "BLE设备已断开: ${device?.name}[${device?.address}]")
                 }
             }
         }
 
-        /**
-         * 设置BLE相关配置
-         */
-        private fun setupBle(context: Context) {
-            setAdapterName()
-            bleAdvertiser = bleAdapter?.bluetoothLeAdvertiser
-            setAdvertiseSettings()
-            setAdvertiseData(context)
-            setScanResponse()
+        // 数据读取
+        @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
+        override fun onCharacteristicReadRequest(
+            device: BluetoothDevice?,
+            requestId: Int,
+            offset: Int,
+            characteristic: BluetoothGattCharacteristic?
+        ) {
+            super.onCharacteristicReadRequest(device, requestId, offset, characteristic)
+
+            // 创建设备信息对象
+            val deviceInfo = createDeviceInfo()
+            // 将设备信息转换为JSON字符串
+            val jsonString = Gson().toJson(deviceInfo)
+            // 将JSON字符串转换为字节数组
+            val responseData = jsonString.toByteArray()
+
+            // 处理数据读取请求
+            gattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, responseData)
+
+            Log.d(LOG_TAG, "BLE设备读取数据: $jsonString, offset: $offset")
+            Syslog.logI("收到BLE命令: $jsonString", category = SYSLOG_CATEGORY_BLE)
         }
 
-        /**
-         * 设置蓝牙适配器名称
-         */
-        @SuppressLint("MissingPermission")
-        private fun setAdapterName() {
-            // 设置设备名称，iBeacon最多支持9个汉字字符
-            bleAdapter?.name = PreferenceManager.instance.getDeviceName().take(9)
-        }
-
-        /**
-         * BLE广播配置
-         */
-        private fun setAdvertiseSettings() {
-            val builder = AdvertiseSettings.Builder()
-            builder.setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
-            builder.setConnectable(true)
-            builder.setTimeout(0)
-            builder.setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM)
-            advertiseSettings = builder.build()
-        }
-
-        /**
-         * 设置BLE广播数据
-         */
-        private fun setAdvertiseData(context: Context) {
-            // UUID
-            val uuid = ByteBuffer.allocate(16)
-            // 1字节自诊断状态
-            var status = 0
-            if (AlarmService.alarmInfos.firstOrNull { it.type == ALARM_TYPE_DISCONNECT } != null) {
-                // 边缘云无法连通
-                status = 1
-            } else if (AlarmService.alarmInfos.firstOrNull { it.type == ALARM_TYPE_MQ || it.type == ALARM_TYPE_PLATFORM } != null) {
-                // 平台无法连通
-                status = 2
-            }
-            uuid.put(0, status.toByte())
-            // 4字节IPV4地址
-            val ipSegments = NetworkUtil.getIpAddress(context).split(".")
-            uuid.put(1, ipSegments[0].toUByte().toByte())
-            uuid.put(2, ipSegments[1].toUByte().toByte())
-            uuid.put(3, ipSegments[2].toUByte().toByte())
-            uuid.put(4, ipSegments[3].toUByte().toByte())
-            // 4字节CMDB ID
-            val cmdb = PreferenceManager.instance.getCMDB().toInt()
-            uuid.put(5, ((cmdb shr 24) and 0xff).toByte())
-            uuid.put(6, ((cmdb shr 16) and 0xff).toByte())
-            uuid.put(7, ((cmdb shr 8) and 0xff).toByte())
-            uuid.put(8, (cmdb and 0xff).toByte())
-            // 1字节休眠状态
-            uuid.put(9, if (context.inSleep()) 0x01 else 0x00)
-            // 6字节保留
-            for (i in 10..15) {
-                uuid.put(i, (0x00).toByte())
-            }
-
-            // 计算UUID校验值（SHA-256）
-            val totpSecret = Base32().decode(PreferenceManager.instance.totpKeyWithBase32())
-            val hmacBuffer = ByteBuffer.allocate(16 + totpSecret.size)
-            // UUID与TOTP拼接后进行SHA-256计算
-            hmacBuffer.put(uuid.array())
-            hmacBuffer.put(totpSecret)
-            // 计算校验值
-            val hmac = MessageDigest.getInstance("SHA-256").digest(hmacBuffer.array())
-            // UUID最后一位使用校验值的最后一位
-            uuid.put(15, hmac.last())
-
-            // 构建广播消息
-            val builder = AdvertiseData.Builder()
-            val manufactureData = ByteBuffer.allocate(24)
-            // iBeacon协议头
-            manufactureData.put(0, (0x02).toByte())
-            manufactureData.put(1, (0x15).toByte())
-            // UUID
-            for (i in 2..17) {
-                manufactureData.put(i, uuid.get(i - 2))
-            }
-            // Major：固定值zx
-            manufactureData.put(18, 'z'.code.toByte())
-            manufactureData.put(19, 'x'.code.toByte())
-            // Minor: 设备类型 - uuid版本号
-            manufactureData.put(20, PreferenceManager.instance.getDeviceType().toByte())
-            manufactureData.put(21, 1)
-            // txPower
-            manufactureData.put(22, (-75).toByte())
-            // Apple厂商ID
-            builder.addManufacturerData(0x4c, manufactureData.array())
-            // Google厂商ID
-            // builder.addManufacturerData(0xe0, manufactureData.array())
-            advertiseData = builder.build()
-        }
-
-        /**
-         * BLE广播增加设备名称
-         */
-        private fun setScanResponse() {
-            val uuid = "${'z'.code.toString(16)}${'x'.code.toString(16)}"
-            scanResponse = AdvertiseData.Builder()
-                .setIncludeDeviceName(true)
-                // 服务UUID，用于标识服务提供商，可用于扫描端过滤
-                .addServiceUuid(ParcelUuid.fromString("0000${uuid}-0000-1000-8000-00805f9b34fb"))
-                .build()
-        }
-
-        /**
-         * 配置 BLE 设备连接服务
-         */
-        @SuppressLint("MissingPermission")
-        private fun setGattService(context: Context) {
-            // 初始化GATT服务
-            val bluetoothManager = context.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
-            gattServer = bluetoothManager.openGattServer(context, gattServerCallback)
-
-            // 添加服务和特征
-            val service = BluetoothGattService(
-                UUID.fromString(GATT_SERVICE_UUID),
-                BluetoothGattService.SERVICE_TYPE_PRIMARY
+        // 数据写入
+        @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
+        override fun onCharacteristicWriteRequest(
+            device: BluetoothDevice?,
+            requestId: Int,
+            characteristic: BluetoothGattCharacteristic?,
+            preparedWrite: Boolean,
+            responseNeeded: Boolean,
+            offset: Int,
+            value: ByteArray?
+        ) {
+            super.onCharacteristicWriteRequest(
+                device, requestId, characteristic, preparedWrite,
+                responseNeeded, offset, value
             )
-
-            val characteristic = BluetoothGattCharacteristic(
-                UUID.fromString(GATT_CHARACTERISTIC_UUID),
-                BluetoothGattCharacteristic.PROPERTY_READ or
-                        BluetoothGattCharacteristic.PROPERTY_WRITE or
-                        BluetoothGattCharacteristic.PROPERTY_NOTIFY,
-                BluetoothGattCharacteristic.PERMISSION_READ or
-                        BluetoothGattCharacteristic.PERMISSION_WRITE
-            )
-
-            service.addCharacteristic(characteristic)
-            gattServer.addService(service)
-        }
-
-        /**
-         * 创建设备信息对象
-         */
-        private fun createDeviceInfo(context: Context): BLEDeviceInfo {
-            // 获取设备状态
-            var diagState = 0
-            if (AlarmService.alarmInfos.firstOrNull { it.type == ALARM_TYPE_DISCONNECT } != null) {
-                // 边缘云无法连通
-                diagState = 1
-            } else if (AlarmService.alarmInfos.firstOrNull { it.type == ALARM_TYPE_MQ || it.type == ALARM_TYPE_PLATFORM } != null) {
-                // 平台无法连通
-                diagState = 2
+            // 处理数据写入请求
+            if (responseNeeded) {
+                gattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, value)
             }
-
-            return BLEDeviceInfo(
-                name = PreferenceManager.instance.getDeviceName(),
-                schoolId = PreferenceManager.instance.getSchoolId(),
-                cmdbId = PreferenceManager.instance.getCMDB(),
-                ip = NetworkUtil.getIpAddress(context),
-                diagState = diagState,
-                isSleep = context.inSleep()
-            )
+            // 处理接收到的数据
+            value?.let {
+                try {
+                    val cmd = String(it).trim().lowercase()
+                    Log.i(LOG_TAG, "收到BLE命令: $cmd")
+                    Syslog.logI("收到BLE命令: $cmd", category = SYSLOG_CATEGORY_BLE)
+                    val command = CommandParser.instance.genCommand(cmd, null)
+                    CommandParser.instance.processCommand(command)
+                } catch (e: Exception) {
+                    Log.e(LOG_TAG, "处理BLE命令失败: ${e.message}")
+                    Syslog.logE("处理BLE命令失败: ${e.message}", category = SYSLOG_CATEGORY_BLE)
+                }
+            }
         }
+    }
+
+    /**
+     * 初始化BLE广播相关数据
+     */
+    @SuppressLint("MissingPermission", "CheckResult")
+    private fun initBle() {
+        // 开启蓝牙
+        bleAdapter?.let {
+            if (!it.isEnabled) {
+                if (Build.VERSION.SDK_INT > 33) {
+                    context.startActivity(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE))
+                    Toast.makeText(context, "请开启蓝牙", Toast.LENGTH_LONG).show()
+                } else {
+                    it.enable()
+                }
+                // 延迟等待设备开启蓝牙后再设置蓝牙相关配置
+                Observable.timer(5, TimeUnit.SECONDS)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe { setupBle() }
+            } else {
+                setupBle()
+            }
+        }
+    }
+
+    /**
+     * 设置BLE相关配置
+     */
+    private fun setupBle() {
+        setAdapterName()
+        bleAdvertiser = bleAdapter?.bluetoothLeAdvertiser
+        setAdvertiseSettings()
+        setAdvertiseData()
+        setScanResponse()
+    }
+
+    /**
+     * 设置蓝牙适配器名称
+     */
+    @SuppressLint("MissingPermission")
+    private fun setAdapterName() {
+        // 设置设备名称，iBeacon最多支持9个汉字字符
+        bleAdapter?.name = PreferenceManager.instance.getDeviceName().take(9)
+    }
+
+    /**
+     * BLE广播配置
+     */
+    private fun setAdvertiseSettings() {
+        val builder = AdvertiseSettings.Builder()
+        builder.setAdvertiseMode(AdvertiseSettings.ADVERTISE_MODE_LOW_LATENCY)
+        builder.setConnectable(true)
+        builder.setTimeout(0)
+        builder.setTxPowerLevel(AdvertiseSettings.ADVERTISE_TX_POWER_MEDIUM)
+        advertiseSettings = builder.build()
+    }
+
+    /**
+     * 设置BLE广播数据
+     */
+    private fun setAdvertiseData() {
+        // UUID
+        val uuid = ByteBuffer.allocate(16)
+        // 1字节自诊断状态
+        var status = 0
+        if (AlarmService.alarmInfos.firstOrNull { it.type == ALARM_TYPE_DISCONNECT } != null) {
+            // 边缘云无法连通
+            status = 1
+        } else if (AlarmService.alarmInfos.firstOrNull { it.type == ALARM_TYPE_MQ || it.type == ALARM_TYPE_PLATFORM } != null) {
+            // 平台无法连通
+            status = 2
+        }
+        uuid.put(0, status.toByte())
+        // 4字节IPV4地址
+        val ipSegments = NetworkUtil.getIpAddress(context).split(".")
+        uuid.put(1, ipSegments[0].toUByte().toByte())
+        uuid.put(2, ipSegments[1].toUByte().toByte())
+        uuid.put(3, ipSegments[2].toUByte().toByte())
+        uuid.put(4, ipSegments[3].toUByte().toByte())
+        // 4字节CMDB ID
+        val cmdb = PreferenceManager.instance.getCMDB().toInt()
+        uuid.put(5, ((cmdb shr 24) and 0xff).toByte())
+        uuid.put(6, ((cmdb shr 16) and 0xff).toByte())
+        uuid.put(7, ((cmdb shr 8) and 0xff).toByte())
+        uuid.put(8, (cmdb and 0xff).toByte())
+        // 1字节休眠状态
+        uuid.put(9, if (context.inSleep()) 0x01 else 0x00)
+        // 6字节保留
+        for (i in 10..15) {
+            uuid.put(i, (0x00).toByte())
+        }
+
+        // 计算UUID校验值（SHA-256）
+        val totpSecret = Base32().decode(PreferenceManager.instance.totpKeyWithBase32())
+        val hmacBuffer = ByteBuffer.allocate(16 + totpSecret.size)
+        // UUID与TOTP拼接后进行SHA-256计算
+        hmacBuffer.put(uuid.array())
+        hmacBuffer.put(totpSecret)
+        // 计算校验值
+        val hmac = MessageDigest.getInstance("SHA-256").digest(hmacBuffer.array())
+        // UUID最后一位使用校验值的最后一位
+        uuid.put(15, hmac.last())
+
+        // 构建广播消息
+        val builder = AdvertiseData.Builder()
+        val manufactureData = ByteBuffer.allocate(24)
+        // iBeacon协议头
+        manufactureData.put(0, (0x02).toByte())
+        manufactureData.put(1, (0x15).toByte())
+        // UUID
+        for (i in 2..17) {
+            manufactureData.put(i, uuid.get(i - 2))
+        }
+        // Major：固定值zx
+        manufactureData.put(18, 'z'.code.toByte())
+        manufactureData.put(19, 'x'.code.toByte())
+        // Minor: 设备类型 - uuid版本号
+        manufactureData.put(20, PreferenceManager.instance.getDeviceType().toByte())
+        manufactureData.put(21, 1)
+        // txPower
+        manufactureData.put(22, (-75).toByte())
+        // Apple厂商ID
+        builder.addManufacturerData(0x4c, manufactureData.array())
+        // Google厂商ID
+        // builder.addManufacturerData(0xe0, manufactureData.array())
+        advertiseData = builder.build()
+    }
+
+    /**
+     * BLE广播增加设备名称
+     */
+    private fun setScanResponse() {
+        val uuid = "${'z'.code.toString(16)}${'x'.code.toString(16)}"
+        scanResponse = AdvertiseData.Builder()
+            .setIncludeDeviceName(true)
+            // 服务UUID，用于标识服务提供商，可用于扫描端过滤
+            .addServiceUuid(ParcelUuid.fromString("0000${uuid}-0000-1000-8000-00805f9b34fb"))
+            .build()
+    }
+
+    /**
+     * 配置 BLE 设备连接服务
+     */
+    @SuppressLint("MissingPermission")
+    private fun setGattService() {
+        // 初始化GATT服务
+        val bluetoothManager = context.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager
+        gattServer = bluetoothManager.openGattServer(context, gattServerCallback)
+
+        // 添加服务和特征
+        val service = BluetoothGattService(
+            UUID.fromString(GATT_SERVICE_UUID),
+            BluetoothGattService.SERVICE_TYPE_PRIMARY
+        )
+
+        val characteristic = BluetoothGattCharacteristic(
+            UUID.fromString(GATT_CHARACTERISTIC_UUID),
+            BluetoothGattCharacteristic.PROPERTY_READ or
+                    BluetoothGattCharacteristic.PROPERTY_WRITE or
+                    BluetoothGattCharacteristic.PROPERTY_NOTIFY,
+            BluetoothGattCharacteristic.PERMISSION_READ or
+                    BluetoothGattCharacteristic.PERMISSION_WRITE
+        )
+
+        service.addCharacteristic(characteristic)
+        gattServer.addService(service)
+    }
+
+    /**
+     * 创建设备信息对象
+     */
+    private fun createDeviceInfo(): BLEDeviceInfo {
+        // 获取设备状态
+        var diagState = 0
+        if (AlarmService.alarmInfos.firstOrNull { it.type == ALARM_TYPE_DISCONNECT } != null) {
+            // 边缘云无法连通
+            diagState = 1
+        } else if (AlarmService.alarmInfos.firstOrNull { it.type == ALARM_TYPE_MQ || it.type == ALARM_TYPE_PLATFORM } != null) {
+            // 平台无法连通
+            diagState = 2
+        }
+
+        return BLEDeviceInfo(
+            name = PreferenceManager.instance.getDeviceName(),
+            schoolId = PreferenceManager.instance.getSchoolId(),
+            cmdbId = PreferenceManager.instance.getCMDB(),
+            ip = NetworkUtil.getIpAddress(context),
+            diagState = diagState,
+            isSleep = context.inSleep()
+        )
     }
 
     /**
      * 开启BLE广播
      */
-    fun startAdvertise(context: Context) {
+    fun startAdvertise() {
         bleAdvDisposable?.dispose()
         // 每60秒更新一次广播数据并重新广播
         bleAdvDisposable = Observable.interval(0, 60, TimeUnit.SECONDS)
             .subscribe({
                 // 停止广播
-                stopAdvertiseSingle(context)
+                stopAdvertiseSingle()
                 // 更新广播数据
-                setAdvertiseData(context)
+                setAdvertiseData()
                 // 重新广播
-                startAdvertiseSingle(context)
+                startAdvertiseSingle()
             }, {
                 Syslog.logE("start advertise failed: ${it.message}", category = SYSLOG_CATEGORY_BLE)
             })
         // 配置连接服务
-        setGattService(context)
+        setGattService()
     }
 
     /**
      * 停止BLE广播
      */
     @SuppressLint("MissingPermission")
-    fun stopAdvertise(context: Context) {
+    fun stopAdvertise() {
         bleAdvDisposable?.dispose()
-        stopAdvertiseSingle(context)
+        stopAdvertiseSingle()
         gattServer.close()
     }
 
     /**
      * 开始单次BLE广播
      */
-    private fun startAdvertiseSingle(context: Context) {
+    private fun startAdvertiseSingle() {
         if (Build.VERSION.SDK_INT >= 31 && ActivityCompat.checkSelfPermission(
                 context,
                 Manifest.permission.BLUETOOTH_ADVERTISE
@@ -475,7 +472,7 @@ class IBeaconAdvertiser {
     /**
      * 停止单次BLE广播
      */
-    private fun stopAdvertiseSingle(context: Context) {
+    private fun stopAdvertiseSingle() {
         if (Build.VERSION.SDK_INT >= 31 && ActivityCompat.checkSelfPermission(
                 context,
                 Manifest.permission.BLUETOOTH_ADVERTISE

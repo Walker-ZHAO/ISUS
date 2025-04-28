@@ -90,9 +90,9 @@ class ConfigActivity : ISUSActivity() {
         binding.ibeaconSwitch.setOnCheckedChangeListener { _, checked ->
             PreferenceManager.instance.setIBeacon(checked)
             if (checked) {
-                IBeaconAdvertiser.instance.startAdvertise(this)
+                IBeaconAdvertiser.instance.startAdvertise()
             } else {
-                IBeaconAdvertiser.instance.stopAdvertise(this)
+                IBeaconAdvertiser.instance.stopAdvertise()
             }
         }
 

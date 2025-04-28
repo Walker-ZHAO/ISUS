@@ -179,11 +179,11 @@ class MainActivity : ISUSActivity() {
         }
 
         binding.btnStartBle.setOnClickListener {
-            IBeaconAdvertiser.instance.startAdvertise(this)
+            IBeaconAdvertiser.instance.startAdvertise()
         }
 
         binding.btnStopBle.setOnClickListener {
-            IBeaconAdvertiser.instance.stopAdvertise(this)
+            IBeaconAdvertiser.instance.stopAdvertise()
         }
 
         binding.mqTest.setOnClickListener {

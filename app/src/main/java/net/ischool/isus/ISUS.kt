@@ -146,7 +146,7 @@ class ISUS(
             // 延迟广播
             Observable.timer(10, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe { IBeaconAdvertiser.instance.startAdvertise(context) }
+                .subscribe { IBeaconAdvertiser.instance.startAdvertise() }
         }
         // 设置自定义输入法
         context.setupCustomIME()
