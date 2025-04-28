@@ -26,6 +26,7 @@ import androidx.annotation.RequiresPermission
 import androidx.appcompat.app.AppCompatActivity.BLUETOOTH_SERVICE
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.FragmentActivity
+import com.google.gson.Gson
 import com.tbruyelle.rxpermissions3.RxPermissions
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Observable
@@ -33,6 +34,7 @@ import io.reactivex.rxjava3.disposables.Disposable
 import net.ischool.isus.LOG_TAG
 import net.ischool.isus.SYSLOG_CATEGORY_BLE
 import net.ischool.isus.command.CommandParser
+import net.ischool.isus.inSleep
 import net.ischool.isus.isSeeWoDevice
 import net.ischool.isus.log.Syslog
 import net.ischool.isus.model.ALARM_TYPE_DISCONNECT
@@ -64,6 +66,9 @@ class IBeaconAdvertiser {
         // GATT服务的UUID，用于通信
         const val GATT_SERVICE_UUID = "0000B000-0000-1000-8000-00805f9b34fb"
         const val GATT_CHARACTERISTIC_UUID = "0000B001-0000-1000-8000-00805f9b34fb"
+
+        // 上下文
+        private lateinit var context: Context
 
         @Volatile
         lateinit var instance: IBeaconAdvertiser
@@ -129,8 +134,19 @@ class IBeaconAdvertiser {
                 characteristic: BluetoothGattCharacteristic?
             ) {
                 super.onCharacteristicReadRequest(device, requestId, offset, characteristic)
+
+                // 创建设备信息对象
+                val deviceInfo = createDeviceInfo(context)
+                // 将设备信息转换为JSON字符串
+                val jsonString = Gson().toJson(deviceInfo)
+                // 将JSON字符串转换为字节数组
+                val responseData = jsonString.toByteArray()
+
                 // 处理数据读取请求
-                gattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, characteristic?.value)
+                gattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, responseData)
+
+                Log.d(LOG_TAG, "BLE设备读取数据: $jsonString, offset: $offset")
+                Syslog.logI("收到BLE命令: $jsonString", category = SYSLOG_CATEGORY_BLE)
             }
 
             // 数据写入
@@ -178,6 +194,7 @@ class IBeaconAdvertiser {
         @Synchronized
         @JvmStatic
         fun init(context: Context) {
+            this.context = context
             instance = IBeaconAdvertiser()
             bleAdapter = (context.getSystemService(BLUETOOTH_SERVICE) as BluetoothManager).adapter
             if (!supportBle()) {
@@ -373,6 +390,30 @@ class IBeaconAdvertiser {
 
             service.addCharacteristic(characteristic)
             gattServer.addService(service)
+        }
+
+        /**
+         * 创建设备信息对象
+         */
+        private fun createDeviceInfo(context: Context): BLEDeviceInfo {
+            // 获取设备状态
+            var diagState = 0
+            if (AlarmService.alarmInfos.firstOrNull { it.type == ALARM_TYPE_DISCONNECT } != null) {
+                // 边缘云无法连通
+                diagState = 1
+            } else if (AlarmService.alarmInfos.firstOrNull { it.type == ALARM_TYPE_MQ || it.type == ALARM_TYPE_PLATFORM } != null) {
+                // 平台无法连通
+                diagState = 2
+            }
+
+            return BLEDeviceInfo(
+                name = PreferenceManager.instance.getDeviceName(),
+                schoolId = PreferenceManager.instance.getSchoolId(),
+                cmdbId = PreferenceManager.instance.getCMDB(),
+                ip = NetworkUtil.getIpAddress(context),
+                diagState = diagState,
+                isSleep = context.inSleep()
+            )
         }
     }
 
