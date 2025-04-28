@@ -292,8 +292,10 @@ class IBeaconAdvertiser {
             uuid.put(6, ((cmdb shr 16) and 0xff).toByte())
             uuid.put(7, ((cmdb shr 8) and 0xff).toByte())
             uuid.put(8, (cmdb and 0xff).toByte())
-            // 7字节保留
-            for (i in 9..15) {
+            // 1字节休眠状态
+            uuid.put(9, if (context.inSleep()) 0x01 else 0x00)
+            // 6字节保留
+            for (i in 10..15) {
                 uuid.put(i, (0x00).toByte())
             }
 
