@@ -405,8 +405,11 @@ class IBeaconAdvertiser(private val context: Context) {
         }
 
         return BLEDeviceInfo(
-            name = PreferenceManager.instance.getDeviceName(),
+            deviceName = PreferenceManager.instance.getDeviceName(),
             schoolId = PreferenceManager.instance.getSchoolId(),
+            schoolName = PreferenceManager.instance.getSchoolName(),
+            classId = PreferenceManager.instance.getClassId(),
+            className = PreferenceManager.instance.getClassName(),
             cmdbId = PreferenceManager.instance.getCMDB(),
             ip = NetworkUtil.getIpAddress(context),
             diagState = diagState,

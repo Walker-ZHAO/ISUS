@@ -11,9 +11,15 @@ package net.ischool.isus.io
  */
 data class BLEDeviceInfo(
     // 设备名称
-    val name: String,
+    val deviceName: String,
     // 学校 ID
     val schoolId: String,
+    // 学校名称
+    val schoolName: String,
+    // 班级 ID
+    val classId: String,
+    // 班级名称
+    val className: String,
     // 设备 ID
     val cmdbId: String,
     // 设备 IP
