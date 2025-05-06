@@ -96,16 +96,15 @@ fun Context.sleep() {
         }
 
         isSmtDevice() -> {
-            // TODO
             // 关闭屏幕背光
             SmdtManagerNew.getInstance(this).disp_setLcdBackLightEnable(0, false)
             // 使CPU进入节能模式
             execRuntimeProcess(
-                "echo powersave > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor",
+                "su & echo powersave > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor",
                 needEvn = true
             )
             // 需要禁用触屏，否则触摸事件会下发至应用
-            execRuntimeProcess("su & rm -rf /dev/input/event2")
+            execRuntimeProcess("su & rm -rf /dev/input/event3")
         }
 
         isTouchWoDevice() || isDh32Device() -> {
