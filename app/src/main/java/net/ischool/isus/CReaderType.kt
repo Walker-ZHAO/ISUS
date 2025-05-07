@@ -24,6 +24,7 @@ class CReaderType {
         const val T_S6 = 12             /** 串口，纯IC，ttyS3，9600波特率，触沃（龙江路乐培定制），4字节长度，字节反转后为卡号 **/
         const val T_S7 = 13             /** 串口，纯IC，/dev/ttyS3 19200波特率，鸿合21.5，7字节长度:  0xAA 0x55 四字节卡号（字节反转后为卡号） 数据校验位（卡号异或和） **/
         const val T_S8 = 14             /** 串口，纯IC，/dev/ttyS3，9600波特率，4字节长度，字节反转后为卡号，大华32寸 **/
+        const val T_S9 = 15             /** 串口，纯IC，/dev/ttyS3，9600波特率，4字节长度，字节反转后为卡号，视美泰（成都元素科技） **/
         const val T_N1 = 10             /** NFC，M1卡，MifareClassic协议，希沃 **/
     }
 }
