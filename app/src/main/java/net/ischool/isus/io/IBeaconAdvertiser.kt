@@ -78,8 +78,9 @@ class IBeaconAdvertiser(private val context: Context) {
         /**
          * 是否支持蓝牙设备
          * 希沃设备不支持蓝牙，但可以获取蓝牙适配器，会导致系统蓝牙应用崩溃
+         * 3368芯片设备不支持蓝牙，但可以获取蓝牙适配器，会导致系统蓝牙应用崩溃
          */
-        fun supportBle(): Boolean = bleAdapter != null && !isSeeWoDevice()
+        fun supportBle(): Boolean = bleAdapter != null && !isSeeWoDevice() && !Build.PRODUCT.contains("3368")
 
         @SuppressLint("CheckResult")
         @Synchronized
@@ -144,7 +145,7 @@ class IBeaconAdvertiser(private val context: Context) {
     private var bleAdvDisposable: Disposable? = null
 
     // BLE 设备连接
-    private lateinit var gattServer: BluetoothGattServer
+    private var gattServer: BluetoothGattServer? = null
     // BLE 设备连接回调
     private val gattServerCallback = object : BluetoothGattServerCallback() {
 
@@ -182,7 +183,7 @@ class IBeaconAdvertiser(private val context: Context) {
             val responseData = jsonString.toByteArray()
 
             // 处理数据读取请求
-            gattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, responseData)
+            gattServer?.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, responseData)
 
             Log.d(LOG_TAG, "BLE设备读取数据: $jsonString, offset: $offset")
             Syslog.logI("收到BLE命令: $jsonString", category = SYSLOG_CATEGORY_BLE)
@@ -205,7 +206,7 @@ class IBeaconAdvertiser(private val context: Context) {
             )
             // 处理数据写入请求
             if (responseNeeded) {
-                gattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, value)
+                gattServer?.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, value)
             }
             // 处理接收到的数据
             value?.let {
@@ -387,7 +388,7 @@ class IBeaconAdvertiser(private val context: Context) {
         )
 
         service.addCharacteristic(characteristic)
-        gattServer.addService(service)
+        gattServer?.addService(service)
     }
 
     /**
@@ -445,7 +446,7 @@ class IBeaconAdvertiser(private val context: Context) {
     fun stopAdvertise() {
         bleAdvDisposable?.dispose()
         stopAdvertiseSingle()
-        gattServer.close()
+        gattServer?.close()
     }
 
     /**
