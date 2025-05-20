@@ -149,6 +149,11 @@ class IBeaconAdvertiser(private val context: Context) {
     // BLE 设备连接回调
     private val gattServerCallback = object : BluetoothGattServerCallback() {
 
+        // 默认MTU大小（ATT_MTU 23 - 3字节ATT头部）
+        private var currentMtu = 20
+        // 设备信息
+        private var deviceInfo: BLEDeviceInfo? = null
+
         // 连接状态变化
         @SuppressLint("MissingPermission")
         override fun onConnectionStateChange(device: BluetoothDevice?, status: Int, newState: Int) {
@@ -165,6 +170,16 @@ class IBeaconAdvertiser(private val context: Context) {
             }
         }
 
+        // MTU发生变化
+        @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
+        override fun onMtuChanged(device: BluetoothDevice?, mtu: Int) {
+            super.onMtuChanged(device, mtu)
+            // 更新当前MTU值（减去3字节ATT头部）
+            currentMtu = mtu - 3
+            Log.d(LOG_TAG, "BLE MTU已更改: $mtu, 有效负载大小: $currentMtu, 设备: ${device?.address}")
+            Syslog.logI("BLE MTU已更改: $mtu, 有效负载大小: $currentMtu, 设备: ${device?.address}", category = SYSLOG_CATEGORY_BLE)
+        }
+
         // 数据读取
         @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
         override fun onCharacteristicReadRequest(
@@ -176,17 +191,45 @@ class IBeaconAdvertiser(private val context: Context) {
             super.onCharacteristicReadRequest(device, requestId, offset, characteristic)
 
             // 创建设备信息对象
-            val deviceInfo = createDeviceInfo()
+            if (deviceInfo == null) {
+                deviceInfo = createDeviceInfo()
+            }
             // 将设备信息转换为JSON字符串
             val jsonString = Gson().toJson(deviceInfo)
             // 将JSON字符串转换为字节数组
             val responseData = jsonString.toByteArray()
 
-            // 处理数据读取请求
-            gattServer?.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, responseData)
+            // 处理分片读取
+            if (offset >= responseData.size) {
+                // 偏移量超出范围，返回空数组
+                gattServer?.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, ByteArray(0))
+                Log.d(LOG_TAG, "BLE设备读取数据完成: offset=$offset 超出数据范围")
+                // 数据读取完毕，将设备信息重置为空
+                deviceInfo = null
+            } else {
+                // 计算剩余数据长度
+                val remaining = responseData.size - offset
 
-            Log.d(LOG_TAG, "BLE设备读取数据: $jsonString, offset: $offset")
-            Syslog.logI("收到BLE命令: $jsonString", category = SYSLOG_CATEGORY_BLE)
+                // 计算本次应该发送的数据长度（不超过MTU）
+                val chunkSize = remaining.coerceAtMost(currentMtu)
+
+                // 创建分片数据
+                val chunk = responseData.copyOfRange(offset, offset + chunkSize)
+
+                // 发送分片数据
+                gattServer?.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, offset, chunk)
+
+                // 如果一次性读取完毕，将设备信息重置为空
+                if (chunk.size == responseData.size) {
+                    deviceInfo = null
+                }
+
+                Log.d(LOG_TAG, "BLE设备读取数据分片: offset=$offset, 分片大小=${chunk.size}, 总大小=${responseData.size}, MTU=$currentMtu")
+                if (offset == 0) {
+                    // 只在第一次读取时记录完整数据
+                    Syslog.logI("BLE设备读取数据: $jsonString", category = SYSLOG_CATEGORY_BLE)
+                }
+            }
         }
 
         // 数据写入
