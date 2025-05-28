@@ -100,9 +100,9 @@ class WatchDogService: Service() {
                     disposables.add(Observable.timer(1, TimeUnit.MINUTES).subscribe { updateNetwork() })
                 },
                 onError = {
-                    // 网络访问失败，不再重新尝试
                     it.printStackTrace()
                     Syslog.logE("Network status call error: ${it.message}", tag = SYSLOG_TAG)
+                    disposables.add(Observable.timer(1, TimeUnit.MINUTES).subscribe { updateNetwork() })
                 }
             )
         disposables.add(disposable)
