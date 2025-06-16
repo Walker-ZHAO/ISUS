@@ -125,6 +125,12 @@ fun Context.sleep() {
             }
 
             // 需要禁用触屏，否则触摸事件会导致背光重新开启
+            if (model.contains("rk3288") && Build.VERSION.INCREMENTAL.contains("2022")) {
+                // 触沃 2022 款 7.1 系统的 3288 设备，仅需要删除确定的触屏节点
+                // 删除多余节点，会导致电子班牌 APP 被 kill 后，无法再次自启动进而影响定时开关机功能
+                MyManager.getInstance(this).execSuCmd("rm -rf /dev/input/event4")
+                return
+            }
             MyManager.getInstance(this).execSuCmd("rm -rf /dev/input/event1")
             if (model.contains("rk3288") && Build.VERSION.INCREMENTAL.contains("2023")) {
                 // 触沃 2023 款 7.1 系统的 3288 设备，仅需要删除确定的触屏节点
